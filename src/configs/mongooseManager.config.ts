@@ -27,7 +27,9 @@ export class MongooseManager {
 
     try {
       this._logger.info('Connecting to MongoDB...');
-      this._mongooseInstance = await mongoose.connect(env.mongodb.URI);
+      const mongodbURL = `mongodb://${env.mongodb.USERNAME}:${env.mongodb.PASSWORD}@mongodb:${env.mongodb.PORT}/lapbee_ecommerce?authSource=admin`;
+      console.log(mongodbURL);
+      this._mongooseInstance = await mongoose.connect(mongodbURL);
       this._logger.info('MongoDB connected');
     } catch (error) {
       this._logger.error('Failed to connect to MongoDB: ', error);
