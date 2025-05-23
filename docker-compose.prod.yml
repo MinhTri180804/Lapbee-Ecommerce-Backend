@@ -45,9 +45,10 @@ services:
     image: nginx:alpine
     container_name: lapbee_nginx_prod
     volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - nginx/default.conf:/etc/nginx/conf.d/default.conf
       # For Let's Encrypt/Certbot setup, you'd uncomment these and potentially add certbot service
-      - ./ssl:/etc/nginx/certs
+      - .ssl/origin.pem:/etc/nginx/certs/origin.pem:ro
+      - .ssl/origin.key:/etc/nginx/certs/origin.key:ro
     ports:
       - "80:80"
       - "443:443"
