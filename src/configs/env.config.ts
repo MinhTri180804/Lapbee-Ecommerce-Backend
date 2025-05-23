@@ -3,7 +3,9 @@ export const env = {
     PORT: process.env.PORT || 8080
   },
   mongodb: {
-    URI: process.env.MONGODB_URI || 'mongodb://localhost:27017/lapbee_ecommerce'
+    PORT: process.env.MONGO_PROD_PORT || '27017',
+    USERNAME: process.env.MONGO_PROD_USERNAME,
+    PASSWORD: process.env.MONGO_PROD_PASSWORD
   },
   redis: {
     HOST: process.env.REDIS_HOST || '127.0.0.1',

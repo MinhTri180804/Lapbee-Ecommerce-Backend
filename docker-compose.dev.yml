@@ -1,0 +1,34 @@
+# docker-compose.dev.yml
+version: '3.8'
+
+services:
+  # --------------------
+  # MongoDB Database
+  # --------------------
+  mongodb:
+    image: mongo:6
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_PROD_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PROD_PASSWORD}
+    ports:
+      - '27017:${MONGODB_PORT}'
+    restart: unless-stopped
+
+  # --------------------
+  # Redis Cache/Queue
+  # --------------------
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    ports:
+      - '6379:6379'
+    restart: unless-stopped
+# --------------------
+# Volumes for data persistence
+# --------------------
+volumes:
+  mongodb_data:
+  redis_data:
