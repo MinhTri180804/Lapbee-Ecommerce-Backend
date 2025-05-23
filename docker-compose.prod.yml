@@ -5,9 +5,9 @@ services:
   # === Backend Service (Node.js) ===
   backend:
     image: nguyenminhtri1808t/lapbee_ecommerce_backend:latest
-    env_file: '.env.prod'
+    env_file: ".env.prod"
     ports:
-      - '8080:${PORT}'
+      - "8080:${PORT}"
     depends_on:
       - mongodb
       - redis
@@ -17,12 +17,12 @@ services:
   mongodb:
     image: mongo:6.0
     container_name: lapbee_mongodb_prod
-    env_file: '.env.prod'
+    env_file: ".env.prod"
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_PROD_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PROD_PASSWORD}
     ports:
-      - '27017:27017'
+      - "27017:27017"
     volumes:
       - .data/mongodb_data:/data/db
     restart: always
@@ -31,11 +31,11 @@ services:
   redis:
     image: redis:6-alpine
     container_name: lapbee_redis_prod
-    env_file: '.env.prod'
-    environment:
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    env_file: ".env.prod"
+    # environment:
+    #   REDIS_PASSWORD: ${REDIS_PASSWORD}
     ports:
-      - '6379:6379'
+      - "6379:6379"
     volumes:
       - .data/redis_data:/data
     restart: always
@@ -49,8 +49,8 @@ services:
       # For Let's Encrypt/Certbot setup, you'd uncomment these and potentially add certbot service
       - ./ssl:/etc/nginx/certs
     ports:
-      - '80:80'
-      - '443:443'
+      - "80:80"
+      - "443:443"
     depends_on:
       - backend
     restart: always
