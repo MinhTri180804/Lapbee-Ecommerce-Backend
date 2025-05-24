@@ -10,10 +10,10 @@ services:
     volumes:
       - mongodb_data:/data/db
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_PROD_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PROD_PASSWORD}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
     ports:
-      - '27017:${MONGODB_PORT}'
+      - '27017:27017'
     restart: unless-stopped
 
   # --------------------
