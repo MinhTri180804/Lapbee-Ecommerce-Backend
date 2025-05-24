@@ -9,7 +9,7 @@ app.use(morgan('dev'));
 
 // Initial routes
 app.use('/', (_, response) => {
-  response.status(200).json({ message: 'Welcome to server !' });
+  response.status(200).json({ message: 'Welcome to server 2 !' });
 });
 
 app.use((error: Error, request: Request, response: Response, next: NextFunction) => {
