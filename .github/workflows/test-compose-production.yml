@@ -7,12 +7,14 @@ on:
       - 'docker-compose.prod.yml'
       - 'Dockerfile'
       - 'nginx/**'
+      - 'test.txt'
   pull_request:
     branches: [test]
     paths:
       - 'docker-compose.prod.yml'
       - 'Dockerfile'
       - 'nginx/**'
+      - 'test.txt'
 
 jobs:
   test-docker-compose:
