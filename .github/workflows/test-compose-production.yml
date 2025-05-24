@@ -41,7 +41,7 @@ jobs:
       - name: Wait for services
         run: |
           sleep 10
-          docker compose -f docker-compose.prod.yml ps
+          docker compose -f docker-compose.prod.yml --env-file=.env.prod ps
 
       - name: Check containers health status
         run: |
