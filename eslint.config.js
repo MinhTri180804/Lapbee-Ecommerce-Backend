@@ -3,6 +3,7 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 import { defineConfig } from 'eslint/config';
 import eslintPluginPrettier from 'eslint-plugin-prettier';
+import eslintPluginJest from 'eslint-plugin-jest';
 
 export default defineConfig([
   {
@@ -17,7 +18,8 @@ export default defineConfig([
   tseslint.configs.recommended,
   {
     plugins: {
-      prettier: eslintPluginPrettier
+      prettier: eslintPluginPrettier,
+      jest: eslintPluginJest
     },
     rules: {
       '@typescript-eslint/no-explicit-any': 'warn',
