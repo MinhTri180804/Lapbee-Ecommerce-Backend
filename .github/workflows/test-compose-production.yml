@@ -45,11 +45,11 @@ jobs:
 
       - name: Check containers health status
         run: |
-          docker compose -f docker-compose.prod.yml ps --services --filter "status=running" > running.txt
+          docker compose -f docker-compose.prod.yml --env-file=.env.prod ps --services --filter "status=running" > running.txt
           TOTAL=$(wc -l < running.txt)
-          EXPECTED=$(docker compose -f docker-compose.prod.yml config --services | wc -l)
+          EXPECTED=$(docker compose -f docker-compose.prod.yml --env-file=.env.prod config --services | wc -l)
           echo "Expected services: $EXPECTED, Running: $TOTAL"
           test "$TOTAL" -eq "$EXPECTED"
 
       - name: Stop Docker Compose
-        run: docker compose -f docker-compose.prod.yml down
+        run: docker compose -f docker-compose.prod.yml --env-file=.env.prod down
