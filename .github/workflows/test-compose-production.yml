@@ -32,7 +32,7 @@ jobs:
 
       - name: Build docker file
         run: |
-          docker build -t nguyenminhtri1808t/lapbee_ecommerce_backend:latest
+          docker build -t nguyenminhtri1808t/lapbee_ecommerce_backend:latest .
 
       - name: Start Docker Compose
         run: |
