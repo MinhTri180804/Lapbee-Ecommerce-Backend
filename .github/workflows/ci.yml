@@ -44,8 +44,8 @@ jobs:
       - name: Run jest tests
         run: npm run test
 
-      - name: Run development
-        run: npm run dev
+      - name: Run test development environment
+        run: npm run dev:test
 
       - name: Shutdown services
         if: always()
