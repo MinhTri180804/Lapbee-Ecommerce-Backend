@@ -38,7 +38,7 @@ jobs:
 
   deploy-server:
     name: SSH Deploy to server
-    needs: call-test-compose
+    needs: [build-and-push-image, call-test-compose]
     runs-on: ubuntu-latest
 
     steps:
@@ -52,6 +52,5 @@ jobs:
           script: |
             cd app/Lapbee-Ecommerce-Backend
             docker compose -f docker-compose.prod.yml --env-file=.env.prod down
-            git pull
             docker pull nguyenminhtri1808t/lapbee_ecommerce_backend:latest
             docker compose -f docker-compose.prod.yml --env-file=.env.prod up -d
