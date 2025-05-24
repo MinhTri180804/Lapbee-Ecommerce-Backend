@@ -21,6 +21,9 @@ jobs:
         run: |
           echo "${{ secrets.ENV_DEV }}" > .env.dev
 
+      - name: Debug .env.dev
+        run: head -n 3 .env.dev
+
       - name: Run Docker Compose Development
         run: docker compose -f docker-compose.dev.yml --env-file=.env.dev up -d
 
