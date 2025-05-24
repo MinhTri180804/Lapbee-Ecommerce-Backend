@@ -7,7 +7,8 @@ export const env = {
     USERNAME: process.env.MONGO_USERNAME,
     PASSWORD: process.env.MONGO_PASSWORD,
     HOST: process.env.MONGO_HOST,
-    SOURCE_AUTH: process.env.MONGO_SOURCE_AUTH
+    SOURCE_AUTH: process.env.MONGO_SOURCE_AUTH,
+    DATABASE: process.env.MONGO_DATABASE
   },
   redis: {
     HOST: process.env.REDIS_HOST || '127.0.0.1',
