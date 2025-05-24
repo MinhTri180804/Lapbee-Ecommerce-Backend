@@ -8,6 +8,7 @@
   "main": "server.js",
   "scripts": {
     "dev": "node --env-file=.env.dev --import=tsx server.ts",
+    "dev:test": "node --env-file=.env.dev --import=tsx scripts/dev-test.ts",
     "build": "rimraf ./dist && tsc && tsc-alias",
     "start": "node  dist/server.js",
     "lint": "eslint .",
