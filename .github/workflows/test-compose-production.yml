@@ -1,13 +1,6 @@
 name: Test Docker Compose on Deploy Production
 
 on:
-  push:
-    branches: [test]
-    paths:
-      - 'docker-compose.prod.yml'
-      - 'Dockerfile'
-      - 'nginx/**'
-      - 'test.txt'
   pull_request:
     branches: [test]
     paths:
