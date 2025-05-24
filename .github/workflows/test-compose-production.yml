@@ -30,6 +30,10 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v3
 
+      - name: Build docker file
+        run: |
+          docker build -t nguyenminhtri1808t/lapbee_ecommerce_backend:latest
+
       - name: Start Docker Compose
         run: |
           docker compose -f docker-compose.prod.yml --env-file=.env.prod up -d
