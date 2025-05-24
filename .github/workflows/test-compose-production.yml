@@ -1,18 +1,13 @@
 name: Test Docker Compose on Deploy Production
 
 on:
-  push:
-    branches: [test]
-    paths:
-      - 'docker-compose.prod.yml'
-      - 'Dockerfile'
-      - 'nginx/**'
   pull_request:
-    branches: [test]
+    branches: [main, develop]
     paths:
       - 'docker-compose.prod.yml'
       - 'Dockerfile'
       - 'nginx/**'
+      - 'test.txt'
 
 jobs:
   test-docker-compose:
@@ -35,6 +30,10 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v3
 
+      - name: Build docker file
+        run: |
+          docker build -t nguyenminhtri1808t/lapbee_ecommerce_backend:latest .
+
       - name: Start Docker Compose
         run: |
           docker compose -f docker-compose.prod.yml --env-file=.env.prod up -d
@@ -42,15 +41,15 @@ jobs:
       - name: Wait for services
         run: |
           sleep 10
-          docker compose -f docker-compose.prod.yml ps
+          docker compose -f docker-compose.prod.yml --env-file=.env.prod ps
 
       - name: Check containers health status
         run: |
-          docker compose -f docker-compose.prod.yml ps --services --filter "status=running" > running.txt
+          docker compose -f docker-compose.prod.yml --env-file=.env.prod ps --services --filter "status=running" > running.txt
           TOTAL=$(wc -l < running.txt)
-          EXPECTED=$(docker compose -f docker-compose.prod.yml config --services | wc -l)
+          EXPECTED=$(docker compose -f docker-compose.prod.yml --env-file=.env.prod config --services | wc -l)
           echo "Expected services: $EXPECTED, Running: $TOTAL"
           test "$TOTAL" -eq "$EXPECTED"
 
       - name: Stop Docker Compose
-        run: docker compose -f docker-compose.prod.yml down
+        run: docker compose -f docker-compose.prod.yml --env-file=.env.prod down
