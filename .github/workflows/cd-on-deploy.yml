@@ -7,7 +7,7 @@ on:
 jobs:
   call-test-compose:
     name: Run test Docker Compose Production
-    uses: './test-compose-production.yml'
+    uses: './.github/workflows/test-compose-production.yml'
     secrets:
       ENV_PROD_MOCK: ${{ secrets.ENV_PROD_MOCK }}
       SERVER_SSL_KEY_MOCK: ${{ secrets.SERVER_SSL_KEY_MOCK }}

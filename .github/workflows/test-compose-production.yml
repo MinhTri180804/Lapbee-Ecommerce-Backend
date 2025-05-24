@@ -1,13 +1,14 @@
 name: Test Docker Compose on Deploy Production
 
 on:
-  pull_request:
-    branches: [main, develop]
-    paths:
-      - 'docker-compose.prod.yml'
-      - 'Dockerfile'
-      - 'nginx/**'
-      - 'test.txt'
+  workflow_call:
+    secrets:
+      ENV_PROD_MOCK:
+        required: true
+      SERVER_SSL_KEY_MOCK:
+        required: true
+      SERVER_SSL_PEM_MOCK:
+        required: true
 
 jobs:
   test-docker-compose:
