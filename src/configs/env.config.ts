@@ -5,7 +5,8 @@ export const env = {
   mongodb: {
     PORT: process.env.MONGO_PROD_PORT || '27017',
     USERNAME: process.env.MONGO_USERNAME,
-    PASSWORD: process.env.MONGO_PASSWORD
+    PASSWORD: process.env.MONGO_PASSWORD,
+    HOST: process.env.MONGO_HOST
   },
   redis: {
     HOST: process.env.REDIS_HOST || '127.0.0.1',

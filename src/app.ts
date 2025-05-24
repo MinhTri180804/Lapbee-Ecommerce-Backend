@@ -12,9 +12,6 @@ app.use('/', (_, response) => {
   response.status(200).json({ message: 'Welcome to server !' });
 });
 
-console.log(process.env.APP_PORT);
-console.log(process.env.A);
-
 app.use((error: Error, request: Request, response: Response, next: NextFunction) => {
   console.log(error);
   console.log(request);
