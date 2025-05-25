@@ -67,11 +67,25 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create filtered branch for PR
+        run: |
+          git checkout -b auto/pr-from-main-to-deploy
+          git fetch origin deploy
+          git reset --hard origin/deploy
+
+          # Checkout only the desired files from main
+          git checkout origin/main -- docker-compose.prod.yml .env.prod.example nginx/
+
+          git add docker-compose.prod.yml .env.prod.example nginx/ || true
+          git diff --cached --quiet || git commit -m "chore: sync prod config"
 
       - name: Create PR
         uses: peter-evans/create-pull-request@v6
