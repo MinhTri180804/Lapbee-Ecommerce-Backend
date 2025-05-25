@@ -76,14 +76,21 @@ jobs:
           fetch-depth: 0
           ref: main
 
-      - name: Create new branch for PR
+      - name: Create new branch from deploy
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b temp/pr-for-deploy
-          git reset --soft origin/deploy
-          git restore --staged .
-          git add docker-compose.prod.yml .env.prod.example nginx/ || true
+
+          # Fetch deploy branch explicitly
+          git fetch origin deploy:origin/deploy
+
+          # Create a branch from origin/deploy
+          git checkout -b temp/pr-for-deploy origin/deploy
+
+          # Cherry-pick or restore specific prod-related files from main
+          git checkout origin/main -- docker-compose.prod.yml .env.prod.example nginx/
+
+          git add docker-compose.prod.yml .env.prod.example nginx/
           git commit -m "chore: sync prod config"
 
       - name: Create PR
