@@ -27,8 +27,13 @@ export class MongooseManager {
 
     try {
       this._logger.info('Connecting to MongoDB...');
-      const mongodbURL = `mongodb://${env.mongodb.USERNAME}:${env.mongodb.PASSWORD}@mongodb:${env.mongodb.PORT}/lapbee_ecommerce?authSource=admin`;
-      console.log(mongodbURL);
+      const USERNAME = env.mongodb.USERNAME;
+      const PASSWORD = env.mongodb.PASSWORD;
+      const HOST = env.mongodb.HOST;
+      const PORT = env.mongodb.PORT;
+      const SOURCE_AUTH = env.mongodb.SOURCE_AUTH;
+      const DATABASE = env.mongodb.DATABASE;
+      const mongodbURL = `mongodb://${USERNAME}:${PASSWORD}@${HOST}:${PORT}/${DATABASE}?authSource=${SOURCE_AUTH}`;
       this._mongooseInstance = await mongoose.connect(mongodbURL);
       this._logger.info('MongoDB connected');
     } catch (error) {

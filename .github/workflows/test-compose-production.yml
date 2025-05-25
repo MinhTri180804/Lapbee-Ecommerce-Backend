@@ -1,0 +1,56 @@
+name: Test Docker Compose on Deploy Production
+
+on:
+  workflow_call:
+    secrets:
+      ENV_PROD_MOCK:
+        required: true
+      SERVER_SSL_KEY_MOCK:
+        required: true
+      SERVER_SSL_PEM_MOCK:
+        required: true
+
+jobs:
+  test-docker-compose:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup mock folder ssl
+        run: |
+          mkdir -p .ssl
+          echo "${{ secrets.SERVER_SSL_KEY_MOCK }}" > .ssl/origin.key
+          echo "${{ secrets.SERVER_SSL_PEM_MOCK }}" > .ssl/origin.pem
+
+      - name: Setup env production mock file
+        run: |
+          echo "${{ secrets.ENV_PROD_MOCK }}" > .env.prod
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build docker file
+        run: |
+          docker build -t nguyenminhtri1808t/lapbee_ecommerce_backend:latest .
+
+      - name: Start Docker Compose
+        run: |
+          docker compose -f docker-compose.prod.yml --env-file=.env.prod up -d
+
+      - name: Wait for services
+        run: |
+          sleep 10
+          docker compose -f docker-compose.prod.yml --env-file=.env.prod ps
+
+      - name: Check containers health status
+        run: |
+          docker compose -f docker-compose.prod.yml --env-file=.env.prod ps --services --filter "status=running" > running.txt
+          TOTAL=$(wc -l < running.txt)
+          EXPECTED=$(docker compose -f docker-compose.prod.yml --env-file=.env.prod config --services | wc -l)
+          echo "Expected services: $EXPECTED, Running: $TOTAL"
+          test "$TOTAL" -eq "$EXPECTED"
+
+      - name: Stop Docker Compose
+        run: docker compose -f docker-compose.prod.yml --env-file=.env.prod down
