@@ -50,15 +50,13 @@ jobs:
       - name: Get changed files
         id: filter
         run: |
+          git fetch origin main
           git fetch origin deploy
-          CHANGED=$(git diff --name-only origin/deploy...HEAD)
-          echo "$CHANGED"
-
-          if echo "$CHANGED" | grep -qE '^nginx/|^docker-compose\.prod\.yml$'; then
-            echo "skip_deploy=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "skip_deploy=false" >> "$GITHUB_OUTPUT"
-          fi
+          CHANGED_FILES=$(git diff --name-only origin/deploy..origin/main)
+          echo "$CHANGED_FILES"
+          echo "$CHANGED_FILES" | grep -qE '^(nginx/|docker-compose\.prod\.yml|\.env\.prod\.example)$' \
+            && echo "changed=true" >> $GITHUB_OUTPUT \
+            || echo "changed=false" >> $GITHUB_OUTPUT
 
   create-pr-to-deploy:
     name: Create PR to deploy branch
