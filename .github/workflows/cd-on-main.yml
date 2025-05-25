@@ -82,7 +82,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
           # Fetch deploy branch explicitly
-          git fetch origin deploy:origin/deploy
+          git fetch origin deploy
 
           # Create a branch from origin/deploy
           git checkout -b temp/pr-for-deploy origin/deploy
