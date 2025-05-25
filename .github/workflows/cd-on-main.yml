@@ -77,9 +77,9 @@ jobs:
 
       - name: Create filtered branch for PR
         run: |
-          git checkout -b auto/pr-from-main-to-deploy
+          git checkout -b temp/pr-for-deploy
           git fetch origin deploy
-          git reset --hard origin/deploy
+          git reset --hard deploy
 
           # Checkout only the desired files from main
           git checkout origin/main -- docker-compose.prod.yml .env.prod.example nginx/
