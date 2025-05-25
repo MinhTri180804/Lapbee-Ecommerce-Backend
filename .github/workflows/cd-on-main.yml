@@ -41,6 +41,7 @@ jobs:
 
   check-prod-files-changed:
     name: Check if prod files changed
+    needs: build-and-push-image
     runs-on: ubuntu-latest
     outputs:
       changed: ${{ steps.filter.outputs.changed }}
@@ -96,6 +97,7 @@ jobs:
           git add docker-compose.prod.yml .env.prod.example nginx/
           git commit -m "chore: sync prod config"
           git push origin temp/pr-for-deploy
+
       - name: Create PR
         uses: peter-evans/create-pull-request@v6
         with:
