@@ -41,7 +41,7 @@ jobs:
     needs: [call-test-compose, build-and-push-image]
     runs-on: ubuntu-latest
     outputs:
-      skip_deploy: ${{ steps.filter.outputs.skip_deploy }}
+      changed: ${{ steps.filter.outputs.changed }}
 
     steps:
       - name: Checkout code
@@ -61,7 +61,7 @@ jobs:
   create-pr-to-deploy:
     name: Create PR to deploy branch
     needs: check-prod-files-changed
-    if: needs.check-prod-files-changed.outputs.skip_deploy == 'true'
+    if: needs.check-prod-files-changed.outputs.changed == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -86,7 +86,7 @@ jobs:
   deploy-server:
     name: SSH Deploy to server
     needs: check-prod-files-changed
-    if: needs.check-prod-files-changed.outputs.skip_deploy == 'false'
+    if: needs.check-prod-files-changed.outputs.changed == 'false'
     runs-on: ubuntu-latest
 
     steps:
