@@ -92,7 +92,7 @@ jobs:
 
           git add docker-compose.prod.yml .env.prod.example nginx/
           git commit -m "chore: sync prod config"
-
+          git push origin temp/pr-for-deploy
       - name: Create PR
         uses: peter-evans/create-pull-request@v6
         with:
