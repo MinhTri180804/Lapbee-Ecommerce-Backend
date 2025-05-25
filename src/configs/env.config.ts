@@ -12,7 +12,7 @@ export const env = {
   },
   redis: {
     HOST: process.env.REDIS_HOST || '127.0.0.1',
-    PORT: process.env.REDIS_PORT || '6379'
+    PORT: process.env.REDIS_PORT || 6379
   },
   mailtrap: {
     HOST: process.env.MAILTRAP_HOST,

@@ -1,6 +1,7 @@
 import winston from 'winston';
 import { MongooseManager } from './src/configs/mongooseManager.config.js';
 import { GracefulShutdownManager } from './src/utils/gracefulShutdownManager.util.js';
+import { IoredisManager } from './src/configs/ioredisManager.config.js';
 import app from './src/app.js';
 import { env } from './src/configs/env.config.js';
 
@@ -24,6 +25,10 @@ const startApplication = async () => {
     const mongooseManager = MongooseManager.getInstance(logger);
     await mongooseManager.connect();
 
+    // Connecting Redis with ioredis
+    const ioredisManager = IoredisManager.createInstance(logger);
+    await ioredisManager.connectRedisClient();
+
     // Start HTTP Server
     const server = app.listen(PORT, (error) => {
       if (error) throw error;
@@ -31,7 +36,10 @@ const startApplication = async () => {
       logger.info(`Server running on port: ${PORT}`);
     });
 
-    new GracefulShutdownManager({ httpServer: server, mongooseConnection: mongooseManager.getConnection() }, logger);
+    new GracefulShutdownManager(
+      { httpServer: server, mongooseConnection: mongooseManager.getConnection(), ioredisManager: ioredisManager },
+      logger
+    );
   } catch (error) {
     logger.error('Failed to start application...');
     logger.error(`Error failed start application: `, error);
