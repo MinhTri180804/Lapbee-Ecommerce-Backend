@@ -17,7 +17,7 @@ export const env = {
   mailtrap: {
     HOST: process.env.MAILTRAP_HOST,
     PORT: process.env.MAILTRAP_PORT,
-    USERNAME: process.env.MAITRAP_USERNAME,
+    USERNAME: process.env.MAILTRAP_USERNAME,
     PASSWORD: process.env.MAILTRAP_PASSWORD
   },
   jwt: {

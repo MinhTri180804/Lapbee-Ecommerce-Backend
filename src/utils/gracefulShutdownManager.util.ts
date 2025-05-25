@@ -1,18 +1,22 @@
 import { Server } from 'http';
 import mongoose from 'mongoose';
-import { IoredisManager } from 'src/configs/ioredisManager.config.js';
+import { IoredisManager } from 'src/configs/IoredisManager.config.js';
+import { NodemailerManager } from 'src/configs/NodemailerManager.config.js';
 import winston from 'winston';
 
 interface ShutdownOptions {
   httpServer?: Server;
   mongooseConnection?: typeof mongoose.connection;
   ioredisManager?: IoredisManager;
+  nodemailerManager?: NodemailerManager;
 }
 
 export class GracefulShutdownManager {
   private readonly httpServer: ShutdownOptions['httpServer'];
   private readonly mongooseConnection: ShutdownOptions['mongooseConnection'];
   private readonly ioredisManager: ShutdownOptions['ioredisManager'];
+  private readonly nodemailerManager: ShutdownOptions['nodemailerManager'];
+  //TODO: Change _ for logger because this is private
   private readonly logger: winston.Logger;
   private readonly SHUTDOWN_TIMEOUT_SECOND: number = 10000;
 
@@ -21,6 +25,7 @@ export class GracefulShutdownManager {
     this.mongooseConnection = options.mongooseConnection;
     this.logger = logger;
     this.ioredisManager = options.ioredisManager;
+    this.nodemailerManager = options.nodemailerManager;
 
     this.registerProcessHandlers();
   }
@@ -55,11 +60,26 @@ export class GracefulShutdownManager {
 
   // Private method close redisClient connection
   private _closeRedisClientConnection(): void {
-    const redisClient = this.ioredisManager.getRedisClient();
-    if (redisClient && redisClient.status === 'ready') {
-      this.logger.info('Closing Redis connection...');
-      this.ioredisManager.disconnectRedisClient();
-      this.logger.info('Closed Redis success.');
+    if (this.ioredisManager) {
+      const redisClient = this.ioredisManager.getRedisClient();
+      if (redisClient && redisClient.status === 'ready') {
+        this.logger.info('Closing Redis connection...');
+        this.ioredisManager.disconnectRedisClient();
+        this.logger.info('Closed Redis success.');
+      }
+    }
+  }
+
+  // Private method close transporter send email in nodemailer connection
+  private _closeTransporterNodemailerConnection(): void {
+    if (this.nodemailerManager) {
+      const instanceTransporter = this.nodemailerManager.getInstanceTransporter();
+      const isTransporterReady = this.nodemailerManager.isTransporterReady();
+      if (instanceTransporter && isTransporterReady) {
+        this.logger.info('Closing transporter send email');
+        this.nodemailerManager.disconnectTransporter();
+        this.logger.info('Closed transporter send email success.');
+      }
     }
   }
 
@@ -76,6 +96,7 @@ export class GracefulShutdownManager {
       await this._closeHttpServer();
       await this._closeMongooseConnection();
       this._closeRedisClientConnection();
+      this._closeTransporterNodemailerConnection();
       // Add stop more services here...
 
       this.logger.info('All services shut down gracefully. Exiting process.');

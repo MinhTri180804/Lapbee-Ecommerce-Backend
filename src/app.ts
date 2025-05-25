@@ -1,6 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express';
 import morgan from 'morgan';
-import { IoredisManager } from './configs/ioredisManager.config.js';
+import { IoredisManager } from './configs/IoredisManager.config.js';
 
 const app = express();
 

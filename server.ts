@@ -1,7 +1,8 @@
 import winston from 'winston';
-import { MongooseManager } from './src/configs/mongooseManager.config.js';
+import { MongooseManager } from './src/configs/MongooseManager.config.js';
 import { GracefulShutdownManager } from './src/utils/gracefulShutdownManager.util.js';
-import { IoredisManager } from './src/configs/ioredisManager.config.js';
+import { IoredisManager } from './src/configs/IoredisManager.config.js';
+import { NodemailerManager } from './src/configs/NodemailerManager.config.js';
 import app from './src/app.js';
 import { env } from './src/configs/env.config.js';
 
@@ -29,6 +30,11 @@ const startApplication = async () => {
     const ioredisManager = IoredisManager.createInstance(logger);
     await ioredisManager.connectRedisClient();
 
+    // Connecting Transporter send email with Nodemailer
+    const nodemailerManager = NodemailerManager.createInstance(logger);
+    nodemailerManager.createTransporter();
+    await nodemailerManager.verifyTransporter();
+
     // Start HTTP Server
     const server = app.listen(PORT, (error) => {
       if (error) throw error;
@@ -37,7 +43,12 @@ const startApplication = async () => {
     });
 
     new GracefulShutdownManager(
-      { httpServer: server, mongooseConnection: mongooseManager.getConnection(), ioredisManager: ioredisManager },
+      {
+        httpServer: server,
+        mongooseConnection: mongooseManager.getConnection(),
+        ioredisManager: ioredisManager,
+        nodemailerManager: nodemailerManager
+      },
       logger
     );
   } catch (error) {
