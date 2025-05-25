@@ -29,6 +29,6 @@ jobs:
           script: |
             cd app/Lapbee-Ecommerce-Backend
             docker compose -f docker-compose.prod.yml --env-file=.env.prod down
-            git pull
+            git pull orgin deploy
             docker pull nguyenminhtri1808t/lapbee_ecommerce_backend:latest
             docker compose -f docker-compose.prod.yml --env-file=.env.prod up -d

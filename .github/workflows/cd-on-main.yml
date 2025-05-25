@@ -36,6 +36,55 @@ jobs:
         run: |
           docker push nguyenminhtri1808t/lapbee_ecommerce_backend:latest
 
+  check-prod-files-changed:
+    name: Check if prod files changed
+    needs: [call-test-compose, build-and-push-image]
+    runs-on: ubuntu-latest
+    outputs:
+      skip_deploy: ${{ steps.filter.outputs.skip_deploy }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get changed files
+        id: filter
+        run: |
+          git fetch origin deploy
+          CHANGED=$(git diff --name-only origin/deploy...HEAD)
+          echo "$CHANGED"
+
+          if echo "$CHANGED" | grep -qE '^nginx/|^docker-compose\.prod\.yml$'; then
+            echo "skip_deploy=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip_deploy=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  create-pr-to-deploy:
+    name: Create PR to deploy branch
+    needs: check-prod-files-changed
+    if: needs.check-prod-files-changed.outputs.skip_deploy == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          base: deploy
+          branch: auto/pr-from-main-to-deploy
+          title: 'Auto PR: Sync prod config from main'
+          body: 'This PR was created automatically due to changes in nginx or docker-compose.prod.yml'
+          commit-message: 'chore: sync prod config'
+          delete-branch: true
+
   deploy-server:
     name: SSH Deploy to server
     needs: [build-and-push-image, call-test-compose]
