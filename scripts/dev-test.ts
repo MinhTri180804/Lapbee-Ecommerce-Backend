@@ -1,9 +1,9 @@
 import winston from 'winston';
 import { env } from '../src/configs/env.config.js';
-import { MongooseManager } from '../src/configs/mongooseManager.config.js';
+import { MongooseManager } from '../src/configs/mongooseManager.config';
 import app from '../src/app.js';
-import { IoredisManager } from '../src/configs/IoredisManager.config.js';
-import { NodemailerManager } from '../src/configs/NodemailerManager.config.js';
+import { IoredisManager } from '../src/configs/IoredisManager.config';
+import { NodemailerManager } from '../src/configs/NodemailerManager.config';
 
 const PORT = env.app.PORT;
 
