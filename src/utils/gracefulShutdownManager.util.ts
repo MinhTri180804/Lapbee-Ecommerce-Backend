@@ -1,15 +1,18 @@
 import { Server } from 'http';
 import mongoose from 'mongoose';
+import { IoredisManager } from 'src/configs/ioredisManager.config.js';
 import winston from 'winston';
 
 interface ShutdownOptions {
   httpServer?: Server;
   mongooseConnection?: typeof mongoose.connection;
+  ioredisManager?: IoredisManager;
 }
 
 export class GracefulShutdownManager {
   private readonly httpServer: ShutdownOptions['httpServer'];
   private readonly mongooseConnection: ShutdownOptions['mongooseConnection'];
+  private readonly ioredisManager: ShutdownOptions['ioredisManager'];
   private readonly logger: winston.Logger;
   private readonly SHUTDOWN_TIMEOUT_SECOND: number = 10000;
 
@@ -17,6 +20,7 @@ export class GracefulShutdownManager {
     this.httpServer = options.httpServer;
     this.mongooseConnection = options.mongooseConnection;
     this.logger = logger;
+    this.ioredisManager = options.ioredisManager;
 
     this.registerProcessHandlers();
   }
@@ -49,6 +53,16 @@ export class GracefulShutdownManager {
     }
   }
 
+  // Private method close redisClient connection
+  private _closeRedisClientConnection(): void {
+    const redisClient = this.ioredisManager.getRedisClient();
+    if (redisClient && redisClient.status === 'ready') {
+      this.logger.info('Closing Redis connection...');
+      this.ioredisManager.disconnectRedisClient();
+      this.logger.info('Closed Redis success.');
+    }
+  }
+
   // --- PUBLIC METHOD to initiate shutdown ---
 
   public async initiateShutdown(): Promise<void> {
@@ -61,6 +75,7 @@ export class GracefulShutdownManager {
     try {
       await this._closeHttpServer();
       await this._closeMongooseConnection();
+      this._closeRedisClientConnection();
       // Add stop more services here...
 
       this.logger.info('All services shut down gracefully. Exiting process.');
