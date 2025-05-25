@@ -38,25 +38,30 @@ jobs:
 
   check-prod-files-changed:
     name: Check if prod files changed
-    needs: [call-test-compose, build-and-push-image]
     runs-on: ubuntu-latest
     outputs:
       changed: ${{ steps.filter.outputs.changed }}
-
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Get changed files
+      - name: Fetch full history
+        run: git fetch origin
+
+      - name: Check changed prod files
         id: filter
         run: |
-          git fetch origin main
-          git fetch origin deploy
           CHANGED_FILES=$(git diff --name-only origin/deploy..origin/main)
+          echo "Changed files:"
           echo "$CHANGED_FILES"
-          echo "$CHANGED_FILES" | grep -qE '^(nginx/|docker-compose\.prod\.yml|\.env\.prod\.example)$' \
-            && echo "changed=true" >> $GITHUB_OUTPUT \
-            || echo "changed=false" >> $GITHUB_OUTPUT
+
+          if echo "$CHANGED_FILES" | grep -qE '^(nginx/|docker-compose\.prod\.yml|\.env\.prod\.example)$'; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
 
   create-pr-to-deploy:
     name: Create PR to deploy branch
@@ -65,33 +70,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout main
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: main
 
-      - name: Setup Git
+      - name: Create new branch for PR
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Create filtered branch for PR
-        run: |
           git checkout -b temp/pr-for-deploy
-          git fetch origin deploy
-          git reset --hard deploy
-
-          # Checkout only the desired files from main
-          git checkout origin/main -- docker-compose.prod.yml .env.prod.example nginx/
-
+          git reset --soft origin/deploy
+          git restore --staged .
           git add docker-compose.prod.yml .env.prod.example nginx/ || true
-          git diff --cached --quiet || git commit -m "chore: sync prod config"
+          git commit -m "chore: sync prod config"
 
       - name: Create PR
         uses: peter-evans/create-pull-request@v6
         with:
           base: deploy
-          branch: auto/pr-from-main-to-deploy
+          branch: temp/pr-for-deploy
           title: 'Auto PR: Sync prod config from main'
           body: 'This PR was created automatically due to changes in nginx or docker-compose.prod.yml'
           commit-message: 'chore: sync prod config'
