@@ -19,15 +19,15 @@ const startApplication = async () => {
     const mongooseManager = MongooseManager.getInstance(logger);
     await mongooseManager.connect();
 
-    // Connecting Redis with ioredis
-    const ioredisManager = IoredisManager.createInstance(logger);
-    await ioredisManager.connectRedisClient();
-
-    // Connecting Transporter send email with Nodemailer
-    const nodemailerManager = NodemailerManager.createInstance(logger);
-    nodemailerManager.createTransporter();
-    await nodemailerManager.verifyTransporter();
-
+    // // Connecting Redis with ioredis
+    // const ioredisManager = IoredisManager.createInstance(logger);
+    // await ioredisManager.connectRedisClient();
+    //
+    // // Connecting Transporter send email with Nodemailer
+    // const nodemailerManager = NodemailerManager.createInstance(logger);
+    // nodemailerManager.createTransporter();
+    // await nodemailerManager.verifyTransporter();
+    //
     // Start HTTP Server
     app.listen(PORT, (error) => {
       if (error) throw error;
