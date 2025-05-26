@@ -1,9 +1,9 @@
 import winston from 'winston';
 import { env } from '../src/configs/env.config.js';
-import { MongooseManager } from '../src/configs/mongooseManager.config.js';
+import { MongooseManager } from '../src/configs/mongooseManager.config';
 import app from '../src/app.js';
-import { IoredisManager } from '../src/configs/IoredisManager.config.js';
-import { NodemailerManager } from '../src/configs/NodemailerManager.config.js';
+import { IoredisManager } from '../src/configs/IoredisManager.config';
+import { NodemailerManager } from '../src/configs/NodemailerManager.config';
 
 const PORT = env.app.PORT;
 
@@ -19,15 +19,15 @@ const startApplication = async () => {
     const mongooseManager = MongooseManager.getInstance(logger);
     await mongooseManager.connect();
 
-    // Connecting Redis with ioredis
-    const ioredisManager = IoredisManager.createInstance(logger);
-    await ioredisManager.connectRedisClient();
-
-    // Connecting Transporter send email with Nodemailer
-    const nodemailerManager = NodemailerManager.createInstance(logger);
-    nodemailerManager.createTransporter();
-    await nodemailerManager.verifyTransporter();
-
+    // // Connecting Redis with ioredis
+    // const ioredisManager = IoredisManager.createInstance(logger);
+    // await ioredisManager.connectRedisClient();
+    //
+    // // Connecting Transporter send email with Nodemailer
+    // const nodemailerManager = NodemailerManager.createInstance(logger);
+    // nodemailerManager.createTransporter();
+    // await nodemailerManager.verifyTransporter();
+    //
     // Start HTTP Server
     app.listen(PORT, (error) => {
       if (error) throw error;
