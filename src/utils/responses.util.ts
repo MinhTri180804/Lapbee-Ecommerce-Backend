@@ -1,9 +1,14 @@
 import { Response } from 'express';
 import { SuccessResponseType } from '../types/responses.type.js';
+import { StatusCodes } from 'http-status-codes';
 
 type SendSuccessResponseParams<T, U> = {
   response: Response<SuccessResponseType<T, U>>;
   content: SuccessResponseType<T, U>;
+};
+
+type SendSuccessNoContentResponseParams = {
+  response: Response;
 };
 
 export const sendSuccessResponse = <T = null, U = null>(params: SendSuccessResponseParams<T, U>) => {
@@ -15,4 +20,9 @@ export const sendSuccessResponse = <T = null, U = null>(params: SendSuccessRespo
     data: content.data || null,
     metadata: content.metadata || null
   });
+};
+
+export const sendSuccessResponseNoContent = (params: SendSuccessNoContentResponseParams) => {
+  const { response } = params;
+  response.status(StatusCodes.NO_CONTENT);
 };
