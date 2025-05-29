@@ -1,5 +1,5 @@
 import { ErrorInstance } from '../constants/errorInstance.constant.js';
-import { ErrorCodes } from '../constants/errorCodes.constants.js';
+import { ErrorCodes } from '../constants/errorCodes.constant.js';
 
 export type SuccessResponseType<T = null, U = null> = {
   success?: true;
@@ -10,7 +10,7 @@ export type SuccessResponseType<T = null, U = null> = {
 };
 
 export type ErrorResponseType<T = null> = {
-  success?: boolean;
+  success?: false;
   statusCode: number;
   message: string;
   error: {
@@ -18,8 +18,8 @@ export type ErrorResponseType<T = null> = {
     message: string;
     name: string;
     details?: T[] | null;
-    instance: ErrorInstance;
     devInfo?: {
+      instance: ErrorInstance;
       stack: string;
       isOperational: boolean;
     };
