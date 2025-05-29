@@ -15,6 +15,11 @@ export const env = {
     HOST: process.env.REDIS_HOST || '127.0.0.1',
     PORT: process.env.REDIS_PORT || 6379
   },
+  expiredTime: {
+    minute: {
+      PIN_CODE_VERIFY_EMAIL_REGISTER: process.env.EXPIRED_TIME_MINUTE_PIN_CODE_VERIFY_EMAIL_REGISTER
+    }
+  },
   mailtrap: {
     HOST: process.env.MAILTRAP_HOST,
     PORT: process.env.MAILTRAP_PORT,
