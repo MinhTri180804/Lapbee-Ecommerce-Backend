@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for configs/env.config.ts</title>
+    <title>Code coverage report for services/Ioredis.service.ts</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../prettify.css" />
     <link rel="stylesheet" href="../base.css" />
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../index.html">All files</a> / <a href="index.html">configs</a> env.config.ts</h1>
+        <h1><a href="../index.html">All files</a> / <a href="index.html">services</a> Ioredis.service.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>14/14</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>8/8</span>
-            </div>
-        
-            
-            <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
-                <span class="quiet">Functions</span>
                 <span class='fraction'>0/0</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>2/2</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>14/14</span>
             </div>
         
             
@@ -107,7 +107,9 @@
 <a name='L42'></a><a href='#L42'>42</a>
 <a name='L43'></a><a href='#L43'>43</a>
 <a name='L44'></a><a href='#L44'>44</a>
-<a name='L45'></a><a href='#L45'>45</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">3x</span>
+<a name='L45'></a><a href='#L45'>45</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -122,79 +124,77 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">export const env = {
-  app: {
-    PORT: process.env.PORT || 8080,
-    NODE_ENV: process.env.NODE_ENV
-  },
-  mongodb: {
-    PORT: process.env.MONGO_PROD_PORT || '27017',
-    USERNAME: process.env.MONGO_USERNAME,
-    PASSWORD: process.env.MONGO_PASSWORD,
-    HOST: process.env.MONGO_HOST,
-    SOURCE_AUTH: process.env.MONGO_SOURCE_AUTH,
-    DATABASE: process.env.MONGO_DATABASE
-  },
-  redis: {
-    HOST: process.env.REDIS_HOST || '127.0.0.1',
-    PORT: process.env.REDIS_PORT || 6379
-  },
-  expiredTime: {
-    minute: {
-      PIN_CODE_VERIFY_EMAIL_REGISTER: process.env.EXPIRED_TIME_MINUTE_PIN_CODE_VERIFY_EMAIL_REGISTER
-    }
-  },
-  mailtrap: {
-    HOST: process.env.MAILTRAP_HOST,
-    PORT: process.env.MAILTRAP_PORT,
-    USERNAME: process.env.MAILTRAP_USERNAME,
-    PASSWORD: process.env.MAILTRAP_PASSWORD
-  },
-  jwt: {
-    SECRET_KEY: {
-      ACCESS_TOKEN: process.env.JWT_SECRET_KEY_ACCESS_TOKEN,
-      REFRESH_TOKEN: process.env.JWT_SECRET_KEY_REFRESH_TOKEN,
-      UPDATE_PASSWORD: process.env.JWT_SECRET_KEY_UPDATE_PASSWORD,
-      RESET_PASSWORD: process.env.JWT_SECRET_KEY_RESET_PASSWORD,
-      FORGOT_PASSWORD: process.env.JWT_SECRET_KEY_FORGOT_PASSWORD
-    }
-  },
-  zalo: {
-    APP_ID: process.env.ZALO_APP_ID,
-    CODE_VERIFIER: process.env.ZALO_CODE_VERIFIER,
-    CODE_CHALLENGE: process.env.ZALO_CODE_CHALLENGE,
-    URL_CALLBACK: process.env.ZALO_URL_CALLBACK
-  }
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Redis } from 'ioredis';
+import { RedisKeyGenerator } from '../utils/RedisKeyGenerator.util.js';
+import { env } from '../configs/env.config.js';
+&nbsp;
+type SavePinCodeVerifyEmailParams = {
+  email: string;
+  pinCode: string;
 };
+&nbsp;
+type SavePinCodeVerifyEmailResponse = {
+  expiredTimeAtPinCode: number;
+};
+&nbsp;
+interface IIoredisService {
+  savePinCodeVerifyEmail: (params: SavePinCodeVerifyEmailParams) =&gt; Promise&lt;SavePinCodeVerifyEmailResponse&gt;;
+}
+&nbsp;
+export class IoredisService implements IIoredisService {
+  private _redisInstance: Redis;
+  private readonly _pinCodeVerifyEmailExpiresInMinute = Number(env.expiredTime.minute.PIN_CODE_VERIFY_EMAIL_REGISTER);
+  private readonly _pinCodeVerifyEmailExpiresInSecond = 60 * this._pinCodeVerifyEmailExpiresInMinute;
+&nbsp;
+  constructor(redis: Redis) {
+    this._redisInstance = redis;
+  }
+&nbsp;
+  public async savePinCodeVerifyEmail(params: SavePinCodeVerifyEmailParams): Promise&lt;SavePinCodeVerifyEmailResponse&gt; {
+    const { email, pinCode } = params;
+&nbsp;
+    // CurrentTime is Unix timestamp second
+    const currentTime = Math.floor(Date.now() / 1000);
+&nbsp;
+    // ExpiredTimeAtPinCode is unix timestamp second
+    const expiredTimeAtPinCode = currentTime + this._pinCodeVerifyEmailExpiresInSecond;
+&nbsp;
+    // ExpiredTimeAtRedisInSecond is unix timestamp second
+    const expiredTimeAtRedisInSecond = 60 * (this._pinCodeVerifyEmailExpiresInMinute + 15);
+&nbsp;
+    const key = RedisKeyGenerator.pinCodeVerifyEmail({ email });
+    const value = `${pinCode}-${expiredTimeAtPinCode}`;
+    await this._redisInstance.setex(key, expiredTimeAtRedisInSecond, value);
+    return { expiredTimeAtPinCode };
+  }
+}
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->

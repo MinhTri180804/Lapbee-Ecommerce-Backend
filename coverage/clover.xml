@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1748526907623" clover="3.2.0">
-  <project timestamp="1748526907623" name="All files">
-    <metrics statements="33" coveredstatements="33" conditionals="19" coveredconditionals="19" methods="6" coveredmethods="6" elements="58" coveredelements="58" complexity="0" loc="33" ncloc="33" packages="4" files="7" classes="7"/>
+<coverage generated="1748554586569" clover="3.2.0">
+  <project timestamp="1748554586569" name="All files">
+    <metrics statements="49" coveredstatements="49" conditionals="21" coveredconditionals="21" methods="9" coveredmethods="9" elements="79" coveredelements="79" complexity="0" loc="49" ncloc="49" packages="5" files="9" classes="9"/>
     <package name="configs">
       <metrics statements="1" coveredstatements="1" conditionals="8" coveredconditionals="8" methods="0" coveredmethods="0"/>
       <file name="env.config.ts" path="/Users/minhtri/Documents/WorkSpace/Lapbee/Backend/src/configs/env.config.ts">
@@ -10,7 +10,7 @@
       </file>
     </package>
     <package name="constants">
-      <metrics statements="8" coveredstatements="8" conditionals="4" coveredconditionals="4" methods="2" coveredmethods="2"/>
+      <metrics statements="10" coveredstatements="10" conditionals="6" coveredconditionals="6" methods="3" coveredmethods="3"/>
       <file name="errorCodes.constant.ts" path="/Users/minhtri/Documents/WorkSpace/Lapbee/Backend/src/constants/errorCodes.constant.ts">
         <metrics statements="2" coveredstatements="2" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
         <line num="1" count="1" type="cond" truecount="2" falsecount="0"/>
@@ -31,6 +31,11 @@
         <line num="1" count="1" type="stmt"/>
         <line num="7" count="1" type="stmt"/>
       </file>
+      <file name="redisKeys.constant.ts" path="/Users/minhtri/Documents/WorkSpace/Lapbee/Backend/src/constants/redisKeys.constant.ts">
+        <metrics statements="2" coveredstatements="2" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
+        <line num="1" count="1" type="cond" truecount="2" falsecount="0"/>
+        <line num="2" count="1" type="stmt"/>
+      </file>
     </package>
     <package name="errors">
       <metrics statements="10" coveredstatements="10" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
@@ -46,6 +51,26 @@
         <line num="14" count="1" type="stmt"/>
         <line num="16" count="1" type="stmt"/>
         <line num="18" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="services">
+      <metrics statements="14" coveredstatements="14" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2"/>
+      <file name="Ioredis.service.ts" path="/Users/minhtri/Documents/WorkSpace/Lapbee/Backend/src/services/Ioredis.service.ts">
+        <metrics statements="14" coveredstatements="14" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2"/>
+        <line num="2" count="2" type="stmt"/>
+        <line num="3" count="2" type="stmt"/>
+        <line num="18" count="2" type="stmt"/>
+        <line num="20" count="4" type="stmt"/>
+        <line num="21" count="4" type="stmt"/>
+        <line num="24" count="4" type="stmt"/>
+        <line num="28" count="3" type="stmt"/>
+        <line num="31" count="3" type="stmt"/>
+        <line num="34" count="3" type="stmt"/>
+        <line num="37" count="3" type="stmt"/>
+        <line num="39" count="3" type="stmt"/>
+        <line num="40" count="3" type="stmt"/>
+        <line num="41" count="3" type="stmt"/>
+        <line num="42" count="2" type="stmt"/>
       </file>
     </package>
     <package name="utils">
