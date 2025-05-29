@@ -1,3 +1,3 @@
 export enum ErrorInstance {
-  APP
+  APP = 'APP'
 }

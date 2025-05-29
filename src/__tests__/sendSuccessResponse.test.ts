@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
-import { sendSuccessResponse } from '../utils/responses.util';
-import { SuccessResponseType } from '../types/responses.type';
+import { sendSuccessResponse } from '../utils/responses.util.js';
+import { SuccessResponseType } from '../types/responses.type.js';
 
 describe('sendSuccessResponse util function', () => {
   let mockResponse: Partial<Response<SuccessResponseType<any, any>, Record<string, any>>>;
