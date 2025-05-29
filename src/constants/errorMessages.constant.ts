@@ -1,9 +1,9 @@
-import { ErrorCodes } from './errorCodes.contants';
+import { ErrorCodes } from './errorCodes.constant.js';
 
 type ErrorMessagesType = {
   [key in ErrorCodes]: string;
 };
 
-export const errorMessages: ErrorMessagesType = {
+export const ErrorMessages: ErrorMessagesType = {
   [ErrorCodes.USER_MOT_FOUND]: 'User not found'
 };
