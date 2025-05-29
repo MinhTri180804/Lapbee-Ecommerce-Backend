@@ -81,3 +81,5 @@ export class IoredisManager {
     return this._redisInstance;
   }
 }
+
+export const IoredisManagerInstance = IoredisManager.getInstance();
