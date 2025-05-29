@@ -1,6 +1,7 @@
 export const env = {
   app: {
-    PORT: process.env.PORT || 8080
+    PORT: process.env.PORT || 8080,
+    NODE_ENV: process.env.NODE_ENV
   },
   mongodb: {
     PORT: process.env.MONGO_PROD_PORT || '27017',
