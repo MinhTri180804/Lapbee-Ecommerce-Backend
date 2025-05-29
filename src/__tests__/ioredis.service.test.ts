@@ -39,8 +39,6 @@ describe('IoredisService', () => {
     jest.clearAllMocks();
     jest.resetModules();
 
-    const { RedisKeyGenerator: currentRedisKeyGenerator } = await import('../utils/RedisKeyGenerator.util.js');
-
     mockRedisInstance = {
       setex: jest.fn().mockResolvedValue('OK')
     } as unknown as jest.Mocked<Redis>;
