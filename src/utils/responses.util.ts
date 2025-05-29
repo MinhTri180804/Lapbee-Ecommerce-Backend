@@ -1,5 +1,6 @@
+import { env } from '../configs/env.config.js';
 import { Response } from 'express';
-import { SuccessResponseType } from '../types/responses.type.js';
+import { ErrorResponseType, SuccessResponseType } from '../types/responses.type.js';
 import { StatusCodes } from 'http-status-codes';
 
 type SendSuccessResponseParams<T, U> = {
@@ -9,6 +10,11 @@ type SendSuccessResponseParams<T, U> = {
 
 type SendSuccessNoContentResponseParams = {
   response: Response;
+};
+
+type SendErrorResponseParams<T> = {
+  response: Response<ErrorResponseType<T>>;
+  content: ErrorResponseType<T>;
 };
 
 export const sendSuccessResponse = <T = null, U = null>(params: SendSuccessResponseParams<T, U>) => {
@@ -25,4 +31,31 @@ export const sendSuccessResponse = <T = null, U = null>(params: SendSuccessRespo
 export const sendSuccessResponseNoContent = (params: SendSuccessNoContentResponseParams) => {
   const { response } = params;
   response.status(StatusCodes.NO_CONTENT);
+};
+
+export const sendErrorResponse = <T>(params: SendErrorResponseParams<T>) => {
+  const { content, response } = params;
+
+  const errorObjectResponse: ErrorResponseType<T> = {
+    success: false,
+    statusCode: content.statusCode,
+    message: content.message,
+    error: {
+      code: content.error.code,
+      message: content.error.message,
+      name: content.error.name,
+      details: content.error?.details || null,
+      devInfo: {
+        instance: content.error.devInfo!.instance,
+        stack: content.error.devInfo!.stack,
+        isOperational: content.error.devInfo!.isOperational
+      }
+    }
+  };
+
+  if (env.app.NODE_ENV !== 'dev') {
+    delete errorObjectResponse.error.devInfo;
+  }
+
+  response.status(content.statusCode).json(errorObjectResponse);
 };
