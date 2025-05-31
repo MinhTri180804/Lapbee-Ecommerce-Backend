@@ -3,7 +3,7 @@ import { ErrorMessage } from '../../constants/errorMessage.constant.js';
 import { UserAuthRoleEnum } from '../../enums/userAuthRole.enum.js';
 import { UserAuthProviderEnum } from '../../enums/userAuthProvider.enum.js';
 
-type UserAuthSchemaType = z.infer<typeof userAuthZodSchema>;
+export type UserAuthSchemaType = z.infer<typeof userAuthZodSchema>;
 type ValidationContext = z.RefinementCtx;
 type ProviderForValidation = UserAuthProviderEnum.LOCAL | UserAuthProviderEnum.ZALO;
 
