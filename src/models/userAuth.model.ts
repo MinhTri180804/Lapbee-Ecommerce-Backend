@@ -7,7 +7,7 @@ import { UserAuthSchemaType } from '../schema/zod/userAuth.schema.js';
 const DOCUMENT_NAME = 'users_auth';
 const COLLECTION_NAME = 'user_auth';
 
-interface IUserAuthDocument extends UserAuthSchemaType, Document {
+export interface IUserAuthDocument extends UserAuthSchemaType, Document {
   isSetPassword: boolean;
 }
 
