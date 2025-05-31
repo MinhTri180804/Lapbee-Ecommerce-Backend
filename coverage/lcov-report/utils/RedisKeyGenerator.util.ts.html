@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for errors/AppError.error.ts</title>
+    <title>Code coverage report for utils/RedisKeyGenerator.util.ts</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../prettify.css" />
     <link rel="stylesheet" href="../base.css" />
@@ -19,13 +19,13 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../index.html">All files</a> / <a href="index.html">errors</a> AppError.error.ts</h1>
+        <h1><a href="../index.html">All files</a> / <a href="index.html">utils</a> RedisKeyGenerator.util.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>10/10</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>10/10</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
@@ -83,44 +83,71 @@
 <a name='L18'></a><a href='#L18'>18</a>
 <a name='L19'></a><a href='#L19'>19</a>
 <a name='L20'></a><a href='#L20'>20</a>
-<a name='L21'></a><a href='#L21'>21</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { StatusCodes } from 'http-status-codes';
-import { ErrorInstance } from '../constants/errorInstance.constant.js';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { RedisKeys } from '../constants/redisKeys.constant.js';
 &nbsp;
-export class AppError extends Error {
-  readonly statusCode: StatusCodes;
-  readonly isOperational: boolean = true;
-  readonly errorInstance: ErrorInstance = ErrorInstance.APP;
+type PinCodeVerifyEmailParams = {
+  email: string;
+};
 &nbsp;
-  static readonly staticErrorInstance: ErrorInstance = ErrorInstance.APP;
-&nbsp;
-  constructor(statusCode: StatusCodes, message: string) {
-    super(message);
-    this.statusCode = statusCode;
-    this.name = 'AppError';
-&nbsp;
-    Object.setPrototypeOf(this, new.target.prototype);
-&nbsp;
-    Error.captureStackTrace(this, this.constructor);
+export class RedisKeyGenerator {
+  /**
+   * Generates a Redis key specifically for storing or retrieving PIN codes
+   * used in email verification.
+   *
+   * The generated key follows the format `RedisKeys.PIN_CODE_VERIFY_EMAIL:&lt;email_address&gt;`,
+   * ensuring a unique and easily identifiable key for each email.
+   *
+   * @param params - An object containing the necessary data to generate the key.
+   * @param params.email - The email address for which the Redis key is to be generated.
+   * @returns A string representing the unique Redis key for the given email's PIN code verification.
+   *
+   * @example
+   * ```typescript
+   * const key = RedisKeyGenerator.pinCodeVerifyEmail({ email: 'test@example.com' });
+   * // key will be "RedisKeys.PIN_CODE_VERIFY_EMAIL:test@example.com"
+   * ```
+   */
+  static pinCodeVerifyEmail(params: PinCodeVerifyEmailParams): string {
+    const { email } = params;
+    return `${RedisKeys.PIN_CODE_VERIFY_EMAIL}:${email}`;
   }
 }
 &nbsp;</pre></td></tr></table></pre>
