@@ -1,12 +1,17 @@
-import { model, Schema } from 'mongoose';
+import { model, Schema, Document } from 'mongoose';
 import bcrypt from 'bcrypt';
 import { UserAuthRoleEnum } from '../enums/userAuthRole.enum.js';
 import { UserAuthProviderEnum } from '../enums/userAuthProvider.enum.js';
+import { UserAuthSchemaType } from '../schema/zod/userAuth.schema.js';
 
 const DOCUMENT_NAME = 'users_auth';
 const COLLECTION_NAME = 'user_auth';
 
-const userAuth = new Schema(
+interface IUserAuthDocument extends UserAuthSchemaType, Document {
+  isSetPassword: boolean;
+}
+
+const userAuthSchema = new Schema<IUserAuthDocument>(
   {
     email: {
       type: String,
@@ -50,18 +55,26 @@ const userAuth = new Schema(
   }
 );
 
-userAuth.virtual('isSetPassword').get(function () {
-  if (this.provider == UserAuthProviderEnum.LOCAL || this.provider == UserAuthProviderEnum.BOTH) {
-    return this.password === null;
+userAuthSchema.virtual('isSetPassword').get(function () {
+  const condition =
+    (this.provider == UserAuthProviderEnum.LOCAL || this.provider == UserAuthProviderEnum.BOTH) &&
+    this.email &&
+    this.password;
+
+  if (condition) {
+    return !this.password;
   }
   return false;
 });
 
-userAuth.pre('save', async function (next) {
+userAuthSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
+  if (!this.password) return next();
+
   this.passwordConfirm = undefined;
-  this.password = await bcrypt.hash(this.password, 10);
+  const hashPassword = await bcrypt.hash(this.password, 10);
+  this.password = hashPassword;
   return next();
 });
 
-export const UserAuth = model(DOCUMENT_NAME, userAuth);
+export const UserAuth = model<IUserAuthDocument>(DOCUMENT_NAME, userAuthSchema);
