@@ -3,6 +3,11 @@ export const env = {
     PORT: process.env.PORT || 8080,
     NODE_ENV: process.env.NODE_ENV
   },
+  pinCode: {
+    verifyEmail: {
+      length: process.env.PIN_CODE_VERIFY_EMAIL_LENGTH
+    }
+  },
   mongodb: {
     PORT: process.env.MONGO_PROD_PORT || '27017',
     USERNAME: process.env.MONGO_USERNAME,
