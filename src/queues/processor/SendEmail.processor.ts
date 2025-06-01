@@ -1,5 +1,6 @@
 import { JobsSendEmailEnum } from '../../enums/jobs.enum.js';
 import { VerifyEmailJobType } from '../jobs/SendEmail.job.js';
+import { SendEmailService } from '../../services/SendEmail.service.js';
 
 type SendEmailVerifyParams = Pick<VerifyEmailJobType, 'data'>;
 type HandleParams = {
@@ -22,12 +23,9 @@ class _ProcessorSendEmail {
     return _ProcessorSendEmail.instance;
   }
 
-  private _sendEmailVerify({ data }: SendEmailVerifyParams): Promise<void> {
-    const { to, subject, otp } = data;
-    //TODO: Implement service send email verify
-    return new Promise((resolve) => {
-      resolve();
-    });
+  private async _sendEmailVerify({ data }: SendEmailVerifyParams): Promise<void> {
+    const sendEmailService = new SendEmailService();
+    await sendEmailService.verifyEmail({ data });
   }
 
   public handle({ name }: HandleParams) {
