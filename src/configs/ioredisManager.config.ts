@@ -30,7 +30,9 @@ export class IoredisManager {
 
     const PORT = Number(env.redis.PORT);
     const HOST = env.redis.HOST;
-    this._redisInstance = new Redis(PORT, HOST);
+    this._redisInstance = new Redis(PORT, HOST, {
+      maxRetriesPerRequest: null
+    });
 
     return await new Promise((resolve, reject) => {
       this._redisInstance!.on('connecting', () => {
@@ -81,5 +83,3 @@ export class IoredisManager {
     return this._redisInstance;
   }
 }
-
-export const IoredisManagerInstance = IoredisManager.getInstance();

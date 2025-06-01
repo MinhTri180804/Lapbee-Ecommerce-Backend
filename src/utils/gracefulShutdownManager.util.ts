@@ -2,6 +2,7 @@ import { Server } from 'http';
 import mongoose from 'mongoose';
 import { IoredisManager } from 'src/configs/IoredisManager.config.js';
 import { NodemailerManager } from 'src/configs/NodemailerManager.config.js';
+import { SendEmailWorker } from 'src/queues/workers/SendEmail.worker.js';
 import winston from 'winston';
 
 interface ShutdownOptions {
@@ -9,6 +10,7 @@ interface ShutdownOptions {
   mongooseConnection?: typeof mongoose.connection;
   ioredisManager?: IoredisManager;
   nodemailerManager?: NodemailerManager;
+  sendEmailWorker?: SendEmailWorker;
 }
 
 export class GracefulShutdownManager {
@@ -16,6 +18,7 @@ export class GracefulShutdownManager {
   private readonly mongooseConnection: ShutdownOptions['mongooseConnection'];
   private readonly ioredisManager: ShutdownOptions['ioredisManager'];
   private readonly nodemailerManager: ShutdownOptions['nodemailerManager'];
+  private readonly sendEmailWorker: ShutdownOptions['sendEmailWorker'];
   //TODO: Change _ for logger because this is private
   private readonly logger: winston.Logger;
   private readonly SHUTDOWN_TIMEOUT_SECOND: number = 10000;
@@ -26,6 +29,7 @@ export class GracefulShutdownManager {
     this.logger = logger;
     this.ioredisManager = options.ioredisManager;
     this.nodemailerManager = options.nodemailerManager;
+    this.sendEmailWorker = options.sendEmailWorker;
 
     this.registerProcessHandlers();
   }
@@ -83,6 +87,19 @@ export class GracefulShutdownManager {
     }
   }
 
+  // Private method close sendEmailWorker
+  private async _closeSendEmailWorker(): Promise<void> {
+    try {
+      if (this.sendEmailWorker) {
+        await this.sendEmailWorker.closeWorker();
+        this.logger.info('Closed sendEmailWorker success');
+      }
+    } catch (error) {
+      this.logger.error('Closed sendEmailWorker error', error);
+      throw new Error('Closed sendEmailWorker error: ');
+    }
+  }
+
   // --- PUBLIC METHOD to initiate shutdown ---
 
   public async initiateShutdown(): Promise<void> {
@@ -95,6 +112,7 @@ export class GracefulShutdownManager {
     try {
       await this._closeHttpServer();
       await this._closeMongooseConnection();
+      await this._closeSendEmailWorker();
       this._closeRedisClientConnection();
       this._closeTransporterNodemailerConnection();
       // Add stop more services here...
