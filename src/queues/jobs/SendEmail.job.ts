@@ -7,6 +7,7 @@ type CreateVerifyEmailParams = {
   to: string;
   subject: string;
   otp: string;
+  otpExpiredAt: number;
 };
 
 type CreateVerifyEmailReturns = {

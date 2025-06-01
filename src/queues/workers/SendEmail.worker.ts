@@ -23,9 +23,9 @@ export class SendEmailWorker {
   public workerConnect() {
     this._worker = new Worker(
       QueuesEnum.SEND_EMAIL,
-      (job: Job) => {
+      async (job: Job) => {
         const handle = ProcessorSendEmail.handle({ name: job.name as JobsSendEmailEnum });
-        return handle({ data: job.data });
+        return await handle({ data: job.data });
       },
       {
         connection: this._connection
