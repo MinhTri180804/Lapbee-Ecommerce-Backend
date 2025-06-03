@@ -90,5 +90,3 @@ export class NodemailerManager {
     }
   }
 }
-
-export const TransporterInstance = NodemailerManager.getInstance().getInstanceTransporter();
