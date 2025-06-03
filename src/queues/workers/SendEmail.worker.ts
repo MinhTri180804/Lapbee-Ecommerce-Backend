@@ -2,7 +2,7 @@ import { Job, Worker } from 'bullmq';
 import { QueuesEnum } from '../../enums/queues.enum.js';
 import { JobsSendEmailEnum } from '../../enums/jobs.enum.js';
 import { WorkerLogger } from '../../loggers/bullMQ.logger.js';
-import { IoredisManager } from '../../configs/IoredisManager.config.js';
+import { IoredisManager } from '../../configs/ioredisManager.config.js';
 import { ProcessorSendEmail } from '../processor/SendEmail.processor.js';
 import winston from 'winston';
 import { Redis } from 'ioredis';

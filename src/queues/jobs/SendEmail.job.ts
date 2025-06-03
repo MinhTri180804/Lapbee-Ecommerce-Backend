@@ -20,20 +20,20 @@ interface ISendEmailJobs {
   createVerifyEmail: (params: CreateVerifyEmailParams) => CreateVerifyEmailReturns;
 }
 
-class SendEmailJobs implements ISendEmailJobs {
-  static instance: SendEmailJobs;
+class _SendEmailJobs implements ISendEmailJobs {
+  static instance: _SendEmailJobs;
   private _logger: winston.Logger = JobLogger;
-  constructor() {}
+  private constructor() {}
 
   static getInstance() {
-    if (!SendEmailJobs.instance) {
-      SendEmailJobs.instance = new SendEmailJobs();
+    if (!_SendEmailJobs.instance) {
+      _SendEmailJobs.instance = new _SendEmailJobs();
     }
 
-    return SendEmailJobs.instance;
+    return _SendEmailJobs.instance;
   }
 
-  createVerifyEmail(data: CreateVerifyEmailParams) {
+  public createVerifyEmail(data: CreateVerifyEmailParams) {
     const jobOptions: JobsOptions = {
       attempts: 3,
       backoff: {
@@ -52,4 +52,4 @@ class SendEmailJobs implements ISendEmailJobs {
 
 export type VerifyEmailJobType = CreateVerifyEmailReturns;
 
-export const SendEmailJobsInstance = SendEmailJobs.instance;
+export const SendEmailJobs = _SendEmailJobs.getInstance();

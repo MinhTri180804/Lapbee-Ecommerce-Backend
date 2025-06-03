@@ -33,4 +33,4 @@ class _ProcessorSendEmail {
   }
 }
 
-export const ProcessorSendEmail = _ProcessorSendEmail.instance;
+export const ProcessorSendEmail = _ProcessorSendEmail.getInstance();
