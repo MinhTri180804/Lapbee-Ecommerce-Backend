@@ -1,3 +1,5 @@
 export enum ErrorInstance {
-  APP = 'APP'
+  APP = 'AppError',
+  EMAIL_EXIST = 'EmailExistError',
+  VALIDATION_REQUEST_BODY = 'ValidationRequestBodyError'
 }

@@ -1,7 +1,7 @@
-export const ErrorMessage = {
+export const ValidationMessages = {
   userAuth: {
     INVALID_EMAIL: 'Email invalid',
-    WEAK_PASSWORD: 'Password must include at last one lowwercase, uppercase, and number',
+    WEAK_PASSWORD: 'Password must include at last one lowercase, uppercase, and number',
     PASSWORD_MISMATCH: 'Password do not match',
     MIN_LENGTH_PASSWORD: 'Password must be length equal or greater than 8',
     MAX_LENGTH_PASSWORD: 'Password must be length equal or less than 16',
