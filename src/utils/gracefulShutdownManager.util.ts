@@ -1,6 +1,6 @@
 import { Server } from 'http';
 import mongoose from 'mongoose';
-import { IoredisManager } from 'src/configs/IoredisManager.config.js';
+import { IoredisManager } from 'src/configs/ioredisManager.config.js';
 import { NodemailerManager } from 'src/configs/NodemailerManager.config.js';
 import { SendEmailWorker } from 'src/queues/workers/SendEmail.worker.js';
 import winston from 'winston';

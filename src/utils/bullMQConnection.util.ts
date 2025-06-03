@@ -1,4 +1,4 @@
-import { IoredisManager } from '../configs/IoredisManager.config.js';
+import { IoredisManager } from '../configs/ioredisManager.config.js';
 
 export const bullMQConnection = () => {
   return IoredisManager.getInstance().getRedisClient();
