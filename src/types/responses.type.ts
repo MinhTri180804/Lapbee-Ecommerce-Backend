@@ -15,12 +15,11 @@ export type ErrorResponseType<T = null> = {
   message: string;
   error: {
     code: ErrorCodes;
-    message: string;
     name: string;
-    details?: T[] | null;
+    details?: T | null;
     devInfo?: {
       instance: ErrorInstance;
-      stack: string;
+      stack: string | undefined;
       isOperational: boolean;
     };
   };
