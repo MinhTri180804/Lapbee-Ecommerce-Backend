@@ -5,7 +5,8 @@ export const env = {
   },
   pinCode: {
     verifyEmail: {
-      length: process.env.PIN_CODE_VERIFY_EMAIL_LENGTH
+      length: process.env.PIN_CODE_VERIFY_EMAIL_LENGTH,
+      RESEND_AVAILABLE_MINUTE: process.env.PIN_CODE_VERIFY_EMAIL_RESEND_AVAILABLE_MINUTE || 1
     }
   },
   mongodb: {
