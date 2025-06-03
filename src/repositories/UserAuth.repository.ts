@@ -9,10 +9,8 @@ interface IUserAuthRepository {
 }
 
 export class UserAuthRepository implements IUserAuthRepository {
-  private userAuthModel: typeof UserAuth;
-  constructor(userAuthModel: typeof UserAuth) {
-    this.userAuthModel = userAuthModel;
-  }
+  private userAuthModel: typeof UserAuth = UserAuth;
+  constructor() {}
 
   public async findByEmail({ email }: FindByEmailParams) {
     return await this.userAuthModel.findOne({ email });
