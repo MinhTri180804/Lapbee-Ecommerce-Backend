@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ErrorMessage } from '../../constants/errorMessage.constant.js';
+import { ValidationMessages } from '../../constants/validationMessages.constant.js';
 import { UserAuthRoleEnum } from '../../enums/userAuthRole.enum.js';
 import { UserAuthProviderEnum } from '../../enums/userAuthProvider.enum.js';
 
@@ -21,7 +21,7 @@ const {
   EMAIL_REQUIRED,
   INVALID_EMAIL,
   ZALO_ID_REQUIRED
-} = ErrorMessage.userAuth;
+} = ValidationMessages.userAuth;
 const REGEX_CHECK_PASSWORD = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
 
 const RoleSchema = z.nativeEnum(UserAuthRoleEnum);
@@ -95,7 +95,11 @@ export const userAuthZodSchema = z
     zaloId: z.string().optional()
   })
   .superRefine((data, ctx) => {
-    const validation = validationBasedProvider[data.provider];
-    if (!validation) throw new Error(`Provider ${data.provider} is not support !`);
-    validation(data, ctx);
+    if (data.provider !== UserAuthProviderEnum.BOTH) {
+      const validation = validationBasedProvider[data.provider];
+      validation(data, ctx);
+      return;
+    }
+
+    throw new Error(`Provider ${data.provider} is not support !`);
   });
