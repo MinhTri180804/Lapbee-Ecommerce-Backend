@@ -42,7 +42,6 @@ export const sendErrorResponse = <T>(params: SendErrorResponseParams<T>) => {
     message: content.message,
     error: {
       code: content.error.code,
-      message: content.error.message,
       name: content.error.name,
       details: content.error?.details || null,
       devInfo: {
@@ -53,7 +52,7 @@ export const sendErrorResponse = <T>(params: SendErrorResponseParams<T>) => {
     }
   };
 
-  if (env.app.NODE_ENV !== 'dev') {
+  if (env.app.NODE_ENV !== 'dev' || (env.app.NODE_ENV === 'dev' && content.error.devInfo?.isOperational)) {
     delete errorObjectResponse.error.devInfo;
   }
 
