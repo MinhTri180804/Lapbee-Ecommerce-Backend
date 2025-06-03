@@ -59,6 +59,7 @@ userAuthSchema.virtual('isSetPassword').get(function () {
   const condition =
     (this.provider == UserAuthProviderEnum.LOCAL || this.provider == UserAuthProviderEnum.BOTH) &&
     this.email &&
+    this.isVerify &&
     this.password;
 
   if (condition) {
