@@ -1,4 +1,23 @@
 export const ValidationMessages = {
+  api: {
+    request: {
+      auth: {
+        local: {
+          register: {
+            EMAIL_REQUIRED: 'Email is required',
+            EMAIL_INVALID: 'Email invalid'
+          },
+          verifyEmailRegister: {
+            EMAIL_REQUIRED: 'Email is required',
+            EMAIL_INVALID: 'Email invalid',
+            OTP_REQUIRED: 'OTP Required',
+            OTP_MAX_LENGTH: 'Max length OTP is',
+            OTP_INVALID: 'OTP invalid'
+          }
+        }
+      }
+    }
+  },
   userAuth: {
     INVALID_EMAIL: 'Email invalid',
     WEAK_PASSWORD: 'Password must include at last one lowercase, uppercase, and number',

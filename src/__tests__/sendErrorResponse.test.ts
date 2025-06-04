@@ -161,7 +161,7 @@ describe('sendErrorResponse', () => {
           details: expect.objectContaining({
             _errors: [],
             email: {
-              _errors: [ValidationMessages.userAuth.EMAIL_REQUIRED]
+              _errors: [ValidationMessages.api.request.auth.local.register.EMAIL_REQUIRED]
             }
           })
         })
