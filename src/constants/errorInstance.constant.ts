@@ -1,3 +1,11 @@
-export enum ErrorInstance {
-  APP = 'APP'
-}
+export const ErrorInstance = {
+  EMAIL_EXIST: 'EMAIL_EXIST_ERROR',
+  VALIDATION_REQUEST_BODY: 'VALIDATION_REQUEST_BODY_ERROR',
+  VERIFICATION_PENDING_OTP_EXPIRED: 'VERIFICATION_PENDING_OTP_EXPIRED_ERROR',
+  EMAIL_ALREADY_PENDING_VERIFICATION: 'EMAIL_ALREADY_PENDING_VERIFICATION_ERROR',
+  VERIFIED_NO_PASSWORD: 'VERIFIED_NO_PASSWORD_ERROR',
+  UNKNOWN: 'UNKNOWN_ERROR'
+} as const;
+
+export type ErrorInstanceKeys = keyof typeof ErrorInstance;
+export type ErrorInstanceValues = (typeof ErrorInstance)[ErrorInstanceKeys];

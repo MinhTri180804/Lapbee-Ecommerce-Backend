@@ -3,6 +3,12 @@ export const env = {
     PORT: process.env.PORT || 8080,
     NODE_ENV: process.env.NODE_ENV
   },
+  pinCode: {
+    verifyEmail: {
+      length: process.env.PIN_CODE_VERIFY_EMAIL_LENGTH,
+      RESEND_AVAILABLE_MINUTE: process.env.PIN_CODE_VERIFY_EMAIL_RESEND_AVAILABLE_MINUTE || 1
+    }
+  },
   mongodb: {
     PORT: process.env.MONGO_PROD_PORT || '27017',
     USERNAME: process.env.MONGO_USERNAME,
@@ -14,6 +20,11 @@ export const env = {
   redis: {
     HOST: process.env.REDIS_HOST || '127.0.0.1',
     PORT: process.env.REDIS_PORT || 6379
+  },
+  expiredTime: {
+    minute: {
+      PIN_CODE_VERIFY_EMAIL_REGISTER: process.env.EXPIRED_TIME_MINUTE_PIN_CODE_VERIFY_EMAIL_REGISTER
+    }
   },
   mailtrap: {
     HOST: process.env.MAILTRAP_HOST,

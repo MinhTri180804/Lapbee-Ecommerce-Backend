@@ -1,8 +1,9 @@
 import winston from 'winston';
 import { MongooseManager } from './src/configs/MongooseManager.config.js';
 import { GracefulShutdownManager } from './src/utils/gracefulShutdownManager.util.js';
-import { IoredisManager } from './src/configs/IoredisManager.config.js';
+import { IoredisManager } from './src/configs/ioredisManager.config.js';
 import { NodemailerManager } from './src/configs/NodemailerManager.config.js';
+import { SendEmailWorker } from './src/queues/workers/SendEmail.worker.js';
 import app from './src/app.js';
 import { env } from './src/configs/env.config.js';
 
@@ -35,6 +36,10 @@ const startApplication = async () => {
     nodemailerManager.createTransporter();
     await nodemailerManager.verifyTransporter();
 
+    // Connecting sendEmailWorker with bullMQ
+    const sendEmailWorker = SendEmailWorker.getInstance();
+    sendEmailWorker.workerConnect();
+
     // Start HTTP Server
     const server = app.listen(PORT, (error) => {
       if (error) throw error;
@@ -47,7 +52,8 @@ const startApplication = async () => {
         httpServer: server,
         mongooseConnection: mongooseManager.getConnection(),
         ioredisManager: ioredisManager,
-        nodemailerManager: nodemailerManager
+        nodemailerManager: nodemailerManager,
+        sendEmailWorker: sendEmailWorker
       },
       logger
     );

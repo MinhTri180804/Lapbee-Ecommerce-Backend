@@ -64,7 +64,8 @@
     "qs": "^6.14.0",
     "slugify": "^1.6.6",
     "uuid": "^11.1.0",
-    "winston": "^3.17.0"
+    "winston": "^3.17.0",
+    "zod": "^3.25.42"
   },
   "config": {
     "commitizen": {

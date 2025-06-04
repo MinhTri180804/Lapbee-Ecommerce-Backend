@@ -2,6 +2,7 @@ import { env } from '../configs/env.config.js';
 import { Response } from 'express';
 import { ErrorResponseType, SuccessResponseType } from '../types/responses.type.js';
 import { StatusCodes } from 'http-status-codes';
+import { AppError } from 'src/errors/AppError.error.js';
 
 type SendSuccessResponseParams<T, U> = {
   response: Response<SuccessResponseType<T, U>>;
@@ -14,7 +15,7 @@ type SendSuccessNoContentResponseParams = {
 
 type SendErrorResponseParams<T> = {
   response: Response<ErrorResponseType<T>>;
-  content: ErrorResponseType<T>;
+  content: AppError<T>;
 };
 
 export const sendSuccessResponse = <T = null, U = null>(params: SendSuccessResponseParams<T, U>) => {
@@ -41,19 +42,18 @@ export const sendErrorResponse = <T>(params: SendErrorResponseParams<T>) => {
     statusCode: content.statusCode,
     message: content.message,
     error: {
-      code: content.error.code,
-      message: content.error.message,
-      name: content.error.name,
-      details: content.error?.details || null,
+      code: content.errorCode,
+      name: content.name,
+      details: content.details || null,
       devInfo: {
-        instance: content.error.devInfo!.instance,
-        stack: content.error.devInfo!.stack,
-        isOperational: content.error.devInfo!.isOperational
+        instance: content.errorInstance,
+        stack: content.stack,
+        isOperational: content.isOperational
       }
     }
   };
 
-  if (env.app.NODE_ENV !== 'dev') {
+  if (env.app.NODE_ENV !== 'dev' || (env.app.NODE_ENV === 'dev' && content.isOperational)) {
     delete errorObjectResponse.error.devInfo;
   }
 

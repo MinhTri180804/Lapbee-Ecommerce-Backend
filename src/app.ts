@@ -1,6 +1,7 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express from 'express';
 import morgan from 'morgan';
-import { IoredisManager } from './configs/IoredisManager.config.js';
+import { ErrorMiddlewareHandler } from './middleware/errorHandler.middleware.js';
+import { router as authRouter } from './routes/auth/index.route.js';
 
 const app = express();
 
@@ -9,18 +10,8 @@ app.use(express.json());
 app.use(morgan('dev'));
 
 // Initial routes
-app.use('/', (_, response) => {
-  response.status(200).json({ message: 'Welcome to server 2 !' });
-});
+app.use('/auth', authRouter);
 
-app.use((error: Error, request: Request, response: Response, next: NextFunction) => {
-  console.log(error);
-  console.log(request);
-  console.log(response);
-  console.log(next);
-  response.status(500).json({
-    message: 'Error something in server'
-  });
-});
+app.use(ErrorMiddlewareHandler.handler.bind(ErrorMiddlewareHandler));
 
 export default app;
