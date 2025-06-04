@@ -1,7 +1,7 @@
 import winston from 'winston';
 import { MongooseManager } from './src/configs/MongooseManager.config.js';
 import { GracefulShutdownManager } from './src/utils/gracefulShutdownManager.util.js';
-import { IoredisManager } from './src/configs/IoredisManager.config.js';
+import { IoredisManager } from './src/configs/ioredisManager.config.js';
 import { NodemailerManager } from './src/configs/NodemailerManager.config.js';
 import { SendEmailWorker } from './src/queues/workers/SendEmail.worker.js';
 import app from './src/app.js';
