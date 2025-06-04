@@ -1,11 +1,11 @@
 import { PinCode } from '../utils/pinCode/core/PinCode.js'; // Adjust path as per your project structure
-import { TypePinCodeEnum } from '../enums/typePinCode.enum.js'; // Adjust path
+import { TypePinCodeValue, TypePinCode } from '../constants/typePinCode.constant.js'; // Adjust path
 import { ModePinCodeEnum } from '../enums/modePinCode.enum.js'; // Adjust path
 
 // Concrete class implementation for testing the abstract PinCode class
 class TestablePinCode extends PinCode {
   constructor(
-    params: { length: number; type: TypePinCodeEnum; mode: ModePinCodeEnum },
+    params: { length: number; type: TypePinCodeValue; mode: ModePinCodeEnum },
     numericChars?: string,
     alphabeticChars?: string
   ) {
@@ -45,7 +45,7 @@ describe('PinCode', () => {
   // Default parameters for many tests
   const defaultParams = {
     length: 6,
-    type: TypePinCodeEnum.VERIFY_EMAIL,
+    type: TypePinCode.VERIFY_EMAIL,
     mode: ModePinCodeEnum.ONLY_NUMERIC
   };
 
@@ -112,7 +112,7 @@ describe('PinCode', () => {
   describe('_generateStrictlyCombinedPinCode (tested via exposed public method)', () => {
     const pinCodeInstance = new TestablePinCode({
       length: 6, // Min length for this type is 2
-      type: TypePinCodeEnum.VERIFY_EMAIL,
+      type: TypePinCode.VERIFY_EMAIL,
       mode: ModePinCodeEnum.COMBINE_ALPHANUMERIC
     });
 
@@ -274,7 +274,7 @@ describe('PinCode', () => {
 
     it('should call generateNumericPin for ONLY_NUMERIC mode', () => {
       const pinCodeInstance = new TestablePinCode({
-        type: TypePinCodeEnum.VERIFY_EMAIL,
+        type: TypePinCode.VERIFY_EMAIL,
         length,
         mode: ModePinCodeEnum.ONLY_NUMERIC
       });
@@ -285,7 +285,7 @@ describe('PinCode', () => {
 
     it('should call generateAlphabeticPin for ONLY_ALPHABETIC mode', () => {
       const pinCodeInstance = new TestablePinCode({
-        type: TypePinCodeEnum.VERIFY_EMAIL,
+        type: TypePinCode.VERIFY_EMAIL,
         length,
         mode: ModePinCodeEnum.ONLY_ALPHABETIC
       });
@@ -296,7 +296,7 @@ describe('PinCode', () => {
 
     it('should call generateAlphanumericPin for COMBINE_ALPHANUMERIC mode', () => {
       const pinCodeInstance = new TestablePinCode({
-        type: TypePinCodeEnum.VERIFY_EMAIL,
+        type: TypePinCode.VERIFY_EMAIL,
         length,
         mode: ModePinCodeEnum.COMBINE_ALPHANUMERIC
       });
@@ -340,7 +340,7 @@ describe('PinCode', () => {
       // Setup instance for COMBINE_ALPHANUMERIC mode for these tests
       pinCodeInstance = new TestablePinCode({
         length,
-        type: TypePinCodeEnum.VERIFY_EMAIL,
+        type: TypePinCode.VERIFY_EMAIL,
         mode: ModePinCodeEnum.COMBINE_ALPHANUMERIC
       });
       hashedPin = pinCodeInstance.hash(pin);
@@ -376,7 +376,7 @@ describe('PinCode', () => {
       const numericPin = '789012';
       const numericInstance = new TestablePinCode({
         length,
-        type: TypePinCodeEnum.VERIFY_EMAIL,
+        type: TypePinCode.VERIFY_EMAIL,
         mode: ModePinCodeEnum.ONLY_NUMERIC
       });
       const numericHash = numericInstance.hash(numericPin);
@@ -390,7 +390,7 @@ describe('PinCode', () => {
       const alphabeticPin = 'GhIjKl';
       const alphabeticInstance = new TestablePinCode({
         length,
-        type: TypePinCodeEnum.VERIFY_EMAIL,
+        type: TypePinCode.VERIFY_EMAIL,
         mode: ModePinCodeEnum.ONLY_ALPHABETIC
       });
       const alphabeticHash = alphabeticInstance.hash(alphabeticPin);
