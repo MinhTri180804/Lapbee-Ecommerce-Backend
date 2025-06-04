@@ -50,5 +50,10 @@ export const env = {
     CODE_VERIFIER: process.env.ZALO_CODE_VERIFIER,
     CODE_CHALLENGE: process.env.ZALO_CODE_CHALLENGE,
     URL_CALLBACK: process.env.ZALO_URL_CALLBACK
+  },
+  client: {
+    urlCallback: {
+      SET_PASSWORD: process.env.URL_CALLBACK_SET_PASSWORD
+    }
   }
 };

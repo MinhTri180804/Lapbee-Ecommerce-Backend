@@ -1,8 +1,9 @@
-import { JobsSendEmailValues } from '../../constants/jobs.constant.js';
+import { JobsSendEmail, JobsSendEmailValues } from '../../constants/jobs.constant.js';
 import { SendEmailService } from '../../services/SendEmail.service.js';
-import { VerifyEmailJobType } from '../jobs/SendEmail.job.js';
+import { VerificationEmailSuccessType, VerifyEmailJobType } from '../jobs/SendEmail.job.js';
 
 type SendEmailVerifyParams = Pick<VerifyEmailJobType, 'data'>;
+type SendEmailVerificationSuccessParams = Pick<VerificationEmailSuccessType, 'data'>;
 type HandleParams = {
   name: JobsSendEmailValues;
 };
@@ -15,7 +16,8 @@ type MappingProcessor = {
 class _ProcessorSendEmail {
   static instance: _ProcessorSendEmail;
   private _mappingProcessor: MappingProcessor = {
-    send_email_verify: this._sendEmailVerify
+    [JobsSendEmail['VERIFY_EMAIL']]: this._sendEmailVerify,
+    [JobsSendEmail.VERIFICATION_EMAIL_SUCCESS]: this._sendEmailVerificationSuccess
   };
 
   private constructor() {}
@@ -31,6 +33,11 @@ class _ProcessorSendEmail {
   private async _sendEmailVerify({ data }: SendEmailVerifyParams): Promise<void> {
     const sendEmailService = new SendEmailService();
     await sendEmailService.verifyEmail({ data });
+  }
+
+  private async _sendEmailVerificationSuccess({ data }: SendEmailVerificationSuccessParams): Promise<void> {
+    const sendEmailService = new SendEmailService();
+    await sendEmailService.verificationEmailSuccess({ data });
   }
 
   public handle({ name }: HandleParams) {

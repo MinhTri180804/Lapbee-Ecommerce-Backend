@@ -1,10 +1,12 @@
 import { env } from '../configs/env.config.js';
-import { VerifyEmailJobType } from '../queues/jobs/SendEmail.job.js';
+import { SubjectSendEmail } from '../constants/subjectSendEmail.constant.js';
+import { VerificationEmailSuccessType, VerifyEmailJobType } from '../queues/jobs/SendEmail.job.js';
 import { NodemailerManager } from '../configs/NodemailerManager.config.js';
 import { formatTime } from '../utils/formatTime.util.js';
 import { Transporter } from 'nodemailer';
 
 type VerifyEmailParams = Pick<VerifyEmailJobType, 'data'>;
+type VerificationEmailSuccessParams = Pick<VerificationEmailSuccessType, 'data'>;
 
 interface ISendEmailService {
   verifyEmail: (params: VerifyEmailParams) => Promise<void>;
@@ -33,6 +35,31 @@ export class SendEmailService implements ISendEmailService {
     } catch (error) {
       console.log('Send email verify error: ', error);
       throw new Error(`Send email verify error: ${(error as Error).message}`);
+    }
+  }
+
+  public async verificationEmailSuccess({ data }: VerificationEmailSuccessParams) {
+    try {
+      const { to, expiresAt, tokenSetPassword } = data;
+      const subject = SubjectSendEmail.VERIFICATION_EMAIL_SUCCESS;
+      const urlCallback = `${env.client.urlCallback.SET_PASSWORD}?token=${tokenSetPassword}`;
+      const timeExpiresFormat = formatTime({ second: expiresAt });
+      await this._transporter.sendMail({
+        from: 'lapbee@gmail.com',
+        to,
+        subject,
+        html: `<div>
+              <div><h4>Bạn đã xác thực email đăng kí tài khoản thành công</h4></div>
+              <h5>Dưới đây là đường dẫn đặt mật khẩu cho tài khoản phòng trường hợp bạn đã xác thực email nhưng chưa đặt mật khẩu cho tài khoản</h5>
+              <button>
+                <a href=${urlCallback}>Đặt mật khẩu cho tài khoản</a>
+              </button>
+              <div>Thời hạn sử dụng của đường dẫn đặt lại mật khẩu đến ${timeExpiresFormat}</div>
+            </div>`
+      });
+    } catch (error) {
+      console.log('Send email verification success error: ', error);
+      throw new Error(`Send email verification success error: ${(error as Error).message}`);
     }
   }
 }
