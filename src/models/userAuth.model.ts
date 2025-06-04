@@ -45,6 +45,10 @@ const userAuthSchema = new Schema<IUserAuthDocument>(
     zaloId: {
       type: String,
       default: null
+    },
+    jtiSetPassword: {
+      type: String,
+      default: null
     }
   },
   {
