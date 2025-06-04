@@ -31,7 +31,7 @@ class _JWTGenerator {
   }
 
   public isMatchWithTypeStringValue(value: string): boolean {
-    return /^(\d+|(\d+\s?(d|h|m|s)))$/i.test(value);
+    return /^\d+\s?(d|h|m|s)$/i.test(value);
   }
 }
 
