@@ -1,16 +1,22 @@
+import { StatusCodes } from 'http-status-codes';
 import { env } from '../configs/env.config.js';
-import { ErrorMessages } from '../constants/errorMessages.constant.js';
 import { ErrorCodes } from '../constants/errorCodes.constant.js';
-import { ErrorResponseType } from '../types/responses.type.js';
-import { sendErrorResponse } from '../utils/responses.util.js';
 import { ErrorInstance } from '../constants/errorInstance.constant.js';
-import { ErrorInstanceName } from '../constants/errorInstanceName.constant.js';
-import { StatusCodes, ReasonPhrases } from 'http-status-codes';
+import { ErrorMessages } from '../constants/errorMessages.constant.js';
+import { ValidationMessages } from '../constants/validationMessages.constant.js';
+import { EmailAlreadyPendingVerificationError } from '../errors/EmailAlreadyPendingVerification.error.js';
+import { EmailExistError } from '../errors/EmailExist.error.js';
+import { ValidateRequestBodyError } from '../errors/ValidateRequestBody.error.js';
+import { VerificationPendingOtpExpiredError } from '../errors/VerificationPendingOtpExpired.error.js';
+import { registerLocalRequestBodySchema } from '../schema/zod/api/requests/auth/local.schema.js';
+import { sendErrorResponse } from '../utils/responses.util.js';
+import { UnknownError } from '../errors/Unknown.error.js';
 
 const mockResponse = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const res: any = {};
-  res.status = jest.fn().mockReturnThis(); // Mock method status và cho phép chaining
-  res.json = jest.fn(); // Mock method json
+  res.status = jest.fn().mockReturnThis();
+  res.json = jest.fn();
   return res;
 };
 
@@ -22,130 +28,174 @@ describe('sendErrorResponse', () => {
     jest.clearAllMocks();
   });
 
-  it('should send a successful error response with devInfo in development environment', () => {
+  it('Send Error Response with EmailExistError', () => {
     Object.defineProperty(env.app, 'NODE_ENV', {
       writable: true,
       value: 'dev'
     });
 
-    const errorContent: ErrorResponseType<{ field: string; value: string }> = {
-      statusCode: StatusCodes.BAD_REQUEST,
-      message: ReasonPhrases.BAD_REQUEST,
-      error: {
-        code: ErrorCodes.USER_MOT_FOUND,
-        message: ErrorMessages[ErrorCodes.USER_MOT_FOUND],
-        name: ErrorInstanceName[ErrorInstance.APP],
-        details: [{ field: 'name', value: 'invalid' }],
-        devInfo: {
-          instance: ErrorInstance.APP,
-          stack: 'Error stack trace',
-          isOperational: true
-        }
-      }
-    };
+    const error = new EmailExistError({});
+    sendErrorResponse({ content: error, response: res });
 
-    sendErrorResponse({ content: errorContent, response: res });
-
-    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.status).toHaveBeenCalledWith(409);
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
         success: false,
-        statusCode: StatusCodes.BAD_REQUEST,
-        message: ReasonPhrases.BAD_REQUEST,
+        statusCode: StatusCodes.CONFLICT,
+        message: ErrorMessages.EMAIL_EXIST_ERROR,
         error: expect.objectContaining({
-          code: ErrorCodes.USER_MOT_FOUND,
-          message: ErrorMessages[ErrorCodes.USER_MOT_FOUND],
-          name: ErrorInstanceName[ErrorInstance.APP],
-          details: [{ field: 'name', value: 'invalid' }],
-          devInfo: {
-            instance: ErrorInstance.APP,
-            stack: 'Error stack trace',
-            isOperational: true
-          }
+          code: ErrorCodes.EMAIL_EXIST_ERROR,
+          name: ErrorInstance.EMAIL_EXIST,
+          details: expect.objectContaining({
+            field: 'email',
+            message: 'Email register exist'
+          })
         })
       })
     );
   });
 
-  it('should send a successful error response without devInfo in production environment', () => {
+  it('Send Error Response with VerificationPendingOtpExpired', () => {
     Object.defineProperty(env.app, 'NODE_ENV', {
       writable: true,
       value: 'prod'
     });
 
-    const errorContent: ErrorResponseType<{ field: string; value: string }> = {
-      statusCode: StatusCodes.BAD_REQUEST,
-      message: ReasonPhrases.BAD_REQUEST,
-      error: {
-        code: ErrorCodes.USER_MOT_FOUND,
-        message: ErrorMessages[ErrorCodes.USER_MOT_FOUND],
-        name: ErrorInstanceName[ErrorInstance.APP],
-        details: [{ field: 'name', value: 'invalid' }],
-        devInfo: {
-          instance: ErrorInstance.APP,
-          stack: 'Error stack trace',
-          isOperational: true
-        }
-      }
-    };
+    const expiredAt = 123;
+    const sentAt = 123;
+    const resendAvailable = true;
 
-    sendErrorResponse({ content: errorContent, response: res });
+    const error = new VerificationPendingOtpExpiredError({
+      errorDetails: {
+        expiredAt,
+        resendAvailable,
+        sentAt
+      }
+    });
+
+    sendErrorResponse({ content: error, response: res });
+
+    expect(res.status).toHaveBeenCalledWith(409);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        success: false,
+        statusCode: StatusCodes.CONFLICT,
+        message: ErrorMessages.VERIFICATION_PENDING_OTP_EXPIRED_ERROR,
+        error: expect.objectContaining({
+          code: ErrorCodes.VERIFICATION_PENDING_OTP_EXPIRED_ERROR,
+          name: ErrorInstance.VERIFICATION_PENDING_OTP_EXPIRED
+        })
+      })
+    );
+  });
+
+  it('Send Error Response with EmailAlreadyPendingVerification', () => {
+    Object.defineProperty(env.app, 'NODE_ENV', {
+      writable: true,
+      value: 'dev'
+    });
+
+    const resendAvailable = true;
+    const expiresAt = 123;
+    const sentAt = 123;
+    const remainingMs = 123;
+
+    const error = new EmailAlreadyPendingVerificationError({
+      errorDetails: {
+        resendAvailable,
+        expiresAt,
+        sentAt,
+        remainingMs
+      }
+    });
+
+    sendErrorResponse({ content: error, response: res });
+
+    expect(res.status).toHaveBeenCalledWith(409);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        success: false,
+        statusCode: StatusCodes.CONFLICT,
+        message: ErrorMessages.EMAIL_ALREADY_PENDING_VERIFICATION_ERROR,
+        error: expect.objectContaining({
+          code: ErrorCodes.EMAIL_ALREADY_PENDING_VERIFICATION_ERROR,
+          name: ErrorInstance.EMAIL_ALREADY_PENDING_VERIFICATION,
+          details: expect.objectContaining({
+            resendAvailable,
+            expiresAt,
+            sentAt,
+            remainingMs
+          })
+        })
+      })
+    );
+  });
+
+  it('Send Error Response with ValidateRequestBody', () => {
+    Object.defineProperty(env.app, 'NODE_ENV', {
+      writable: true,
+      value: 'dev'
+    });
+
+    const requestBody = {};
+
+    const result = registerLocalRequestBodySchema.safeParse(requestBody);
+    const error = new ValidateRequestBodyError({
+      errorDetails: result.error!.format()
+    });
+
+    sendErrorResponse({
+      response: res,
+      content: error
+    });
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
         success: false,
         statusCode: StatusCodes.BAD_REQUEST,
-        message: ReasonPhrases.BAD_REQUEST,
+        message: ErrorMessages.VALIDATION_REQUEST_BODY_ERROR,
         error: expect.objectContaining({
-          code: ErrorCodes.USER_MOT_FOUND,
-          message: ErrorMessages[ErrorCodes.USER_MOT_FOUND],
-          name: ErrorInstanceName[ErrorInstance.APP],
-          details: [{ field: 'name', value: 'invalid' }]
+          code: ErrorCodes.VALIDATION_REQUEST_BODY_ERROR,
+          name: ErrorInstance.VALIDATION_REQUEST_BODY,
+          details: expect.objectContaining({
+            _errors: [],
+            email: {
+              _errors: [ValidationMessages.userAuth.EMAIL_REQUIRED]
+            }
+          })
         })
       })
     );
   });
 
-  it('should handle error content with minimal details', () => {
+  it('Send Error Response with UnknownError', () => {
     Object.defineProperty(env.app, 'NODE_ENV', {
       writable: true,
       value: 'dev'
     });
 
-    const errorContent: ErrorResponseType = {
-      statusCode: StatusCodes.NOT_FOUND,
-      message: ReasonPhrases.NOT_FOUND,
-      error: {
-        code: ErrorCodes.USER_MOT_FOUND,
-        message: ErrorMessages[ErrorCodes.USER_MOT_FOUND],
-        name: ErrorInstanceName[ErrorInstance.APP],
-        devInfo: {
-          instance: ErrorInstance.APP,
-          stack: 'Minimal stack',
-          isOperational: true
-        }
-      }
-    };
+    const error = new UnknownError({});
+    sendErrorResponse({
+      response: res,
+      content: error
+    });
 
-    sendErrorResponse({ content: errorContent, response: res });
-
-    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.status).toHaveBeenCalledWith(StatusCodes.INTERNAL_SERVER_ERROR);
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
         success: false,
-        statusCode: StatusCodes.NOT_FOUND,
-        message: ReasonPhrases.NOT_FOUND,
+        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        message: ErrorMessages.UNKNOWN_ERROR,
         error: expect.objectContaining({
-          code: ErrorCodes.USER_MOT_FOUND,
-          message: ErrorMessages[ErrorCodes.USER_MOT_FOUND],
-          name: ErrorInstanceName[ErrorInstance.APP],
+          code: ErrorCodes.UNKNOWN_ERROR,
+          name: ErrorInstance.UNKNOWN,
           details: null,
-          devInfo: {
-            instance: ErrorInstance.APP,
-            stack: 'Minimal stack',
-            isOperational: true
-          }
+          devInfo: expect.objectContaining({
+            instance: ErrorInstance.UNKNOWN,
+            isOperational: false,
+            stack: expect.any(String)
+          })
         })
       })
     );

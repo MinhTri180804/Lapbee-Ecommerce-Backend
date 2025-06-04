@@ -4,6 +4,7 @@ import { sendSuccessResponse } from '../utils/responses.util.js';
 import { SuccessResponseType } from '../types/responses.type.js';
 
 describe('sendSuccessResponse util function', () => {
+  // eslint-disable-next-line
   let mockResponse: Partial<Response<SuccessResponseType<any, any>, Record<string, any>>>;
 
   beforeEach(() => {

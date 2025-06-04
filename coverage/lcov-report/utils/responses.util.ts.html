@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>7/7</span>
+                <span class='fraction'>10/10</span>
             </div>
         
             
@@ -143,34 +143,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -181,14 +157,39 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { env } from '../configs/env.config.js';
 import { Response } from 'express';
 import { ErrorResponseType, SuccessResponseType } from '../types/responses.type.js';
 import { StatusCodes } from 'http-status-codes';
+import { AppError } from 'src/errors/AppError.error.js';
 &nbsp;
 type SendSuccessResponseParams&lt;T, U&gt; = {
   response: Response&lt;SuccessResponseType&lt;T, U&gt;&gt;;
@@ -201,7 +202,7 @@ type SendSuccessNoContentResponseParams = {
 &nbsp;
 type SendErrorResponseParams&lt;T&gt; = {
   response: Response&lt;ErrorResponseType&lt;T&gt;&gt;;
-  content: ErrorResponseType&lt;T&gt;;
+  content: AppError&lt;T&gt;;
 };
 &nbsp;
 export const sendSuccessResponse = &lt;T = null, U = null&gt;(params: SendSuccessResponseParams&lt;T, U&gt;) =&gt; {
@@ -228,19 +229,18 @@ export const sendErrorResponse = &lt;T&gt;(params: SendErrorResponseParams&lt;T&
     statusCode: content.statusCode,
     message: content.message,
     error: {
-      code: content.error.code,
-      message: content.error.message,
-      name: content.error.name,
-      details: content.error?.details || null,
+      code: content.errorCode,
+      name: content.name,
+      details: content.details || null,
       devInfo: {
-        instance: content.error.devInfo!.instance,
-        stack: content.error.devInfo!.stack,
-        isOperational: content.error.devInfo!.isOperational
+        instance: content.errorInstance,
+        stack: content.stack,
+        isOperational: content.isOperational
       }
     }
   };
 &nbsp;
-  if (env.app.NODE_ENV !== 'dev') {
+  if (env.app.NODE_ENV !== 'dev' || (env.app.NODE_ENV === 'dev' &amp;&amp; content.isOperational)) {
     delete errorObjectResponse.error.devInfo;
   }
 &nbsp;
@@ -253,7 +253,7 @@ export const sendErrorResponse = &lt;T&gt;(params: SendErrorResponseParams&lt;T&
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-31T11:56:05.400Z
+                at 2025-06-04T13:46:55.064Z
             </div>
         <script src="../prettify.js"></script>
         <script>

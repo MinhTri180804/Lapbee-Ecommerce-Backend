@@ -1,4 +1,4 @@
-import { TypePinCodeEnum } from '../enums/typePinCode.enum.js';
+import { TypePinCode } from '../constants/typePinCode.constant.js';
 import { ModePinCodeEnum } from '../enums/modePinCode.enum.js';
 
 jest.mock('../configs/env.config.js', () => ({
@@ -34,7 +34,7 @@ describe('PinCodeVerifyEmail', () => {
       // @ts-expect-error _length is a protected property
       expect(instance._length).toBe(expectedLengthFromEnv);
       // @ts-expect-error _type is a protected property
-      expect(instance._type).toBe(TypePinCodeEnum.VERIFY_EMAIL);
+      expect(instance._type).toBe(TypePinCode.VERIFY_EMAIL);
       // @ts-expect-error _mode is a protected property
       expect(instance._mode).toBe(ModePinCodeEnum.ONLY_NUMERIC);
     });
@@ -61,7 +61,7 @@ describe('PinCodeVerifyEmail', () => {
       // @ts-expect-error _length is a protected property
       expect(instance._length).toBe(expectedDefaultLength);
       // @ts-expect-error _type is a protected property
-      expect(instance._type).toBe(TypePinCodeEnum.VERIFY_EMAIL);
+      expect(instance._type).toBe(TypePinCode.VERIFY_EMAIL);
       // @ts-expect-error _mode is a protected property
       expect(instance._mode).toBe(ModePinCodeEnum.ONLY_NUMERIC);
     });
