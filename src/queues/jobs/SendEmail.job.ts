@@ -10,6 +10,18 @@ type CreateVerifyEmailParams = {
   otpExpiredAt: number;
 };
 
+type CreateVerificationEmailSuccessParams = {
+  to: string;
+  tokenSetPassword: string;
+  expiresAt: number;
+};
+
+type CreateVerificationEmailSuccessReturns = {
+  data: CreateVerificationEmailSuccessParams;
+  name: JobsSendEmailValues;
+  jobOptions: JobsOptions;
+};
+
 type CreateVerifyEmailReturns = {
   data: CreateVerifyEmailParams;
   name: JobsSendEmailValues;
@@ -33,7 +45,12 @@ class _SendEmailJobs implements ISendEmailJobs {
     return _SendEmailJobs.instance;
   }
 
-  public createVerifyEmail(data: CreateVerifyEmailParams) {
+  private _writeLogCreateJobSuccess({ jobId }: { jobId: string }) {
+    this._logger.info('Created job send verify email, jobID: ', jobId);
+  }
+
+  public createVerifyEmail(data: CreateVerifyEmailParams): CreateVerifyEmailReturns {
+    const { to: email } = data;
     const jobOptions: JobsOptions = {
       attempts: 3,
       backoff: {
@@ -43,13 +60,35 @@ class _SendEmailJobs implements ISendEmailJobs {
       removeOnComplete: true,
       removeOnFail: {
         count: 10
-      }
+      },
+      jobId: `verifyEmail-${encodeURIComponent(email)}`
     };
-    this._logger.info('Created job send verify email, jobID: ', jobOptions.jobId);
+    this._writeLogCreateJobSuccess({ jobId: jobOptions.jobId as string });
     return { data, name: JobsSendEmail.VERIFY_EMAIL, jobOptions };
+  }
+
+  public createVerificationEmailSuccess(
+    data: CreateVerificationEmailSuccessParams
+  ): CreateVerificationEmailSuccessReturns {
+    const { to: email } = data;
+    const jobOptions: JobsOptions = {
+      attempts: 3,
+      backoff: {
+        type: 'exponential',
+        delay: 1000
+      },
+      removeOnComplete: true,
+      removeOnFail: {
+        count: 10
+      },
+      jobId: `verificationEmailSuccess-${encodeURIComponent(email)}`
+    };
+    this._writeLogCreateJobSuccess({ jobId: jobOptions.jobId as string });
+    return { data, jobOptions, name: JobsSendEmail.VERIFICATION_EMAIL_SUCCESS };
   }
 }
 
 export type VerifyEmailJobType = CreateVerifyEmailReturns;
+export type VerificationEmailSuccessType = CreateVerificationEmailSuccessReturns;
 
 export const SendEmailJobs = _SendEmailJobs.getInstance();
