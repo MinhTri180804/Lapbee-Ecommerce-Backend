@@ -3,7 +3,6 @@ import { ValidationMessages } from '../../constants/validationMessages.constant.
 import { UserAuthRoleEnum } from '../../enums/userAuthRole.enum.js';
 import { UserAuthProviderEnum } from '../../enums/userAuthProvider.enum.js';
 
-export type UserAuthSchemaType = z.infer<typeof userAuthZodSchema>;
 type ValidationContext = z.RefinementCtx;
 type ProviderForValidation = UserAuthProviderEnum.LOCAL | UserAuthProviderEnum.ZALO;
 
@@ -92,7 +91,8 @@ export const userAuthZodSchema = z
     provider: ProviderSchema,
     isVerify: z.boolean(),
     isFirstLogin: z.boolean(),
-    zaloId: z.string().optional()
+    zaloId: z.string().optional(),
+    jtiSetPassword: z.string().optional()
   })
   .superRefine((data, ctx) => {
     if (data.provider !== UserAuthProviderEnum.BOTH) {
@@ -103,3 +103,5 @@ export const userAuthZodSchema = z
 
     throw new Error(`Provider ${data.provider} is not support !`);
   });
+
+export type UserAuthSchemaType = z.infer<typeof userAuthZodSchema>;
