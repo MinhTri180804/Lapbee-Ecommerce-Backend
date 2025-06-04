@@ -24,6 +24,9 @@ export const env = {
   expiredTime: {
     minute: {
       PIN_CODE_VERIFY_EMAIL_REGISTER: process.env.EXPIRED_TIME_MINUTE_PIN_CODE_VERIFY_EMAIL_REGISTER
+    },
+    day: {
+      TOKEN_SET_PASSWORD: process.env.EXPIRED_TIME_DAY_TOKEN_SET_PASSWORD
     }
   },
   mailtrap: {
@@ -37,6 +40,7 @@ export const env = {
       ACCESS_TOKEN: process.env.JWT_SECRET_KEY_ACCESS_TOKEN,
       REFRESH_TOKEN: process.env.JWT_SECRET_KEY_REFRESH_TOKEN,
       UPDATE_PASSWORD: process.env.JWT_SECRET_KEY_UPDATE_PASSWORD,
+      SET_PASSWORD: process.env.JWT_SECRET_KEY_SET_PASSWORD,
       RESET_PASSWORD: process.env.JWT_SECRET_KEY_RESET_PASSWORD,
       FORGOT_PASSWORD: process.env.JWT_SECRET_KEY_FORGOT_PASSWORD
     }
