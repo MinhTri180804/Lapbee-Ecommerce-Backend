@@ -1,4 +1,6 @@
+import { UserAuthRoleEnum } from 'src/enums/userAuthRole.enum.js';
 import { IUserAuthDocument, UserAuth } from '../models/userAuth.model.js';
+import { UserAuthProviderEnum } from 'src/enums/userAuthProvider.enum.js';
 
 type FindByEmailParams = {
   email: string;
@@ -7,6 +9,10 @@ type FindByEmailParams = {
 type UpdateJtiSetPasswordParams = {
   userAuthId: string;
   jti: string;
+};
+
+type CreateRegisterLocalParams = {
+  email: string;
 };
 
 interface IUserAuthRepository {
@@ -24,5 +30,19 @@ export class UserAuthRepository implements IUserAuthRepository {
   public async updateJtiSetPassword({ userAuthId, jti }: UpdateJtiSetPasswordParams): Promise<boolean> {
     const result = await this._userAuthModel.updateOne({ id: userAuthId, jtiSetPassword: jti });
     return result.matchedCount > 0;
+  }
+
+  public async createRegisterLocal({ email }: CreateRegisterLocalParams): Promise<IUserAuthDocument> {
+    const userAuth = await this._userAuthModel.create({
+      email,
+      role: UserAuthRoleEnum.CUSTOMER,
+      provider: UserAuthProviderEnum.LOCAL,
+      isVerify: false,
+      isFirstLogin: false,
+      zaloId: false,
+      jtiSetPassword: false
+    });
+
+    return userAuth;
   }
 }

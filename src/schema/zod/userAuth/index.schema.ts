@@ -1,7 +1,18 @@
 import { z } from 'zod';
-import { ValidationMessages } from '../../constants/validationMessages.constant.js';
-import { UserAuthRoleEnum } from '../../enums/userAuthRole.enum.js';
-import { UserAuthProviderEnum } from '../../enums/userAuthProvider.enum.js';
+import { ValidationMessages } from '../../../constants/validationMessages.constant.js';
+import { UserAuthProviderEnum } from '../../../enums/userAuthProvider.enum.js';
+import { UserAuthRoleEnum } from '../../../enums/userAuthRole.enum.js';
+import {
+  emailSchema,
+  isFirstLoginSchema,
+  isVerifySchema,
+  jtiSetPasswordSchema,
+  passwordConfirmSchema,
+  passwordSchema,
+  providerSchema,
+  roleSchema,
+  zaloIdSchema
+} from './fields.schema.js';
 
 type ValidationContext = z.RefinementCtx;
 type ProviderForValidation = UserAuthProviderEnum.LOCAL | UserAuthProviderEnum.ZALO;
@@ -10,21 +21,8 @@ type ValidationBasedProvider = {
   [key in ProviderForValidation]: (data: UserAuthSchemaType, ctx: ValidationContext) => void;
 };
 
-const {
-  MIN_LENGTH_PASSWORD,
-  MAX_LENGTH_PASSWORD,
-  WEAK_PASSWORD,
-  PASSWORD_MISMATCH,
-  PASSWORD_REQUIRED,
-  PASSWORD_CONFIRM_REQUIRED,
-  EMAIL_REQUIRED,
-  INVALID_EMAIL,
-  ZALO_ID_REQUIRED
-} = ValidationMessages.userAuth;
-const REGEX_CHECK_PASSWORD = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
-
-const RoleSchema = z.nativeEnum(UserAuthRoleEnum);
-const ProviderSchema = z.nativeEnum(UserAuthProviderEnum);
+const { PASSWORD_MISMATCH, PASSWORD_REQUIRED, PASSWORD_CONFIRM_REQUIRED, EMAIL_REQUIRED, ZALO_ID_REQUIRED } =
+  ValidationMessages.userAuth;
 
 const validationBasedProvider: ValidationBasedProvider = {
   [UserAuthProviderEnum.LOCAL]: (data, ctx) => validationLocal(data, ctx),
@@ -79,20 +77,15 @@ const validationZalo = (data: UserAuthSchemaType, ctx: ValidationContext) => {
 
 export const userAuthZodSchema = z
   .object({
-    email: z.string().email(INVALID_EMAIL).optional(),
-    password: z
-      .string()
-      .min(8, MIN_LENGTH_PASSWORD)
-      .max(16, MAX_LENGTH_PASSWORD)
-      .regex(REGEX_CHECK_PASSWORD, WEAK_PASSWORD)
-      .optional(),
-    passwordConfirm: z.string().min(8, MIN_LENGTH_PASSWORD).max(16, MAX_LENGTH_PASSWORD).optional(),
-    role: RoleSchema,
-    provider: ProviderSchema,
-    isVerify: z.boolean(),
-    isFirstLogin: z.boolean(),
-    zaloId: z.string().optional(),
-    jtiSetPassword: z.string().optional()
+    email: emailSchema.optional(),
+    password: passwordSchema.optional(),
+    passwordConfirm: passwordConfirmSchema.optional(),
+    role: roleSchema,
+    provider: providerSchema,
+    isVerify: isVerifySchema,
+    isFirstLogin: isFirstLoginSchema,
+    zaloId: zaloIdSchema.optional(),
+    jtiSetPassword: jtiSetPasswordSchema.optional()
   })
   .superRefine((data, ctx) => {
     if (data.provider !== UserAuthProviderEnum.BOTH) {
