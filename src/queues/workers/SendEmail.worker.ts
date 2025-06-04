@@ -1,11 +1,11 @@
 import { Job, Worker } from 'bullmq';
-import { QueuesEnum } from '../../enums/queues.enum.js';
-import { JobsSendEmailEnum } from '../../enums/jobs.enum.js';
-import { WorkerLogger } from '../../loggers/bullMQ.logger.js';
-import { IoredisManager } from '../../configs/ioredisManager.config.js';
-import { ProcessorSendEmail } from '../processor/SendEmail.processor.js';
-import winston from 'winston';
 import { Redis } from 'ioredis';
+import winston from 'winston';
+import { IoredisManager } from '../../configs/ioredisManager.config.js';
+import { JobsSendEmailValues } from '../../constants/jobs.constant.js';
+import { Queues } from '../../constants/queues.constant.js';
+import { WorkerLogger } from '../../loggers/bullMQ.logger.js';
+import { ProcessorSendEmail } from '../processor/SendEmail.processor.js';
 
 export class SendEmailWorker {
   static instance: SendEmailWorker;
@@ -22,10 +22,14 @@ export class SendEmailWorker {
 
   public workerConnect() {
     this._worker = new Worker(
-      QueuesEnum.SEND_EMAIL,
+      Queues.SEND_EMAIL,
       async (job: Job) => {
-        const handle = ProcessorSendEmail.handle({ name: job.name as JobsSendEmailEnum });
-        return await handle({ data: job.data });
+        const handle = ProcessorSendEmail.handle({ name: job.name as JobsSendEmailValues });
+        if (handle) {
+          return await handle({ data: job.data });
+        }
+
+        //TODO: Implement throw error
       },
       {
         connection: this._connection

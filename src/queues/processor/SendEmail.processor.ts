@@ -1,16 +1,21 @@
-import { JobsSendEmailEnum } from '../../enums/jobs.enum.js';
-import { VerifyEmailJobType } from '../jobs/SendEmail.job.js';
+import { JobsSendEmailValues } from '../../constants/jobs.constant.js';
 import { SendEmailService } from '../../services/SendEmail.service.js';
+import { VerifyEmailJobType } from '../jobs/SendEmail.job.js';
 
 type SendEmailVerifyParams = Pick<VerifyEmailJobType, 'data'>;
 type HandleParams = {
-  name: JobsSendEmailEnum;
+  name: JobsSendEmailValues;
+};
+
+type MappingProcessor = {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+  [key in JobsSendEmailValues]: Function;
 };
 
 class _ProcessorSendEmail {
   static instance: _ProcessorSendEmail;
-  private _mappingProcessor = {
-    [JobsSendEmailEnum.VERIFY_EMAIL]: this._sendEmailVerify
+  private _mappingProcessor: MappingProcessor = {
+    send_email_verify: this._sendEmailVerify
   };
 
   private constructor() {}
@@ -29,7 +34,11 @@ class _ProcessorSendEmail {
   }
 
   public handle({ name }: HandleParams) {
-    return this._mappingProcessor[name];
+    const handler = this._mappingProcessor[name];
+    if (handler) {
+      return this._mappingProcessor[name];
+    }
+    // TODO: Implement write log and alert admin job name not define handler
   }
 }
 

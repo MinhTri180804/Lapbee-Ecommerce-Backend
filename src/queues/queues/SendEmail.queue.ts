@@ -1,5 +1,5 @@
 import { Queue } from 'bullmq';
-import { QueuesEnum } from '../../enums/queues.enum.js';
+import { Queues } from '../../constants/queues.constant.js';
 import { Redis } from 'ioredis';
 import { VerifyEmailJobType } from '../jobs/SendEmail.job.js';
 import { QueueLogger } from '../../loggers/bullMQ.logger.js';
@@ -10,7 +10,7 @@ export class SendEmailQueue {
   static instance: SendEmailQueue;
   private _logger: winston.Logger = QueueLogger;
   private readonly _connection: Redis;
-  private readonly _name: string = QueuesEnum.SEND_EMAIL;
+  private readonly _name: string = Queues.SEND_EMAIL;
   private _queue: Queue | undefined;
 
   constructor() {

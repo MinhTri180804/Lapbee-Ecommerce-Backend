@@ -1,5 +1,5 @@
 import winston from 'winston';
-import { JobsSendEmailEnum } from '../../enums/jobs.enum.js';
+import { JobsSendEmail, JobsSendEmailValues } from '../../constants/jobs.constant.js';
 import { JobLogger } from '../../loggers/bullMQ.logger.js';
 import { JobsOptions } from 'bullmq';
 
@@ -12,7 +12,7 @@ type CreateVerifyEmailParams = {
 
 type CreateVerifyEmailReturns = {
   data: CreateVerifyEmailParams;
-  name: JobsSendEmailEnum;
+  name: JobsSendEmailValues;
   jobOptions: JobsOptions;
 };
 
@@ -46,7 +46,7 @@ class _SendEmailJobs implements ISendEmailJobs {
       }
     };
     this._logger.info('Created job send verify email, jobID: ', jobOptions.jobId);
-    return { data, name: JobsSendEmailEnum.VERIFY_EMAIL, jobOptions };
+    return { data, name: JobsSendEmail.VERIFY_EMAIL, jobOptions };
   }
 }
 
