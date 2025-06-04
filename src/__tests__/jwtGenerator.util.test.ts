@@ -16,12 +16,14 @@ describe('JWTGenerator - setPassword', () => {
       SECRET_KEY: {
         SET_PASSWORD: 'test-secret-key'
       }
+      // eslint-disable-next-line
     } as any;
 
     env.expiredTime = {
       day: {
         TOKEN_SET_PASSWORD: '1d'
       }
+      // eslint-disable-next-line
     } as any;
   });
 
