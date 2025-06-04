@@ -1,6 +1,6 @@
-import { TypePinCodeEnum } from '../../../enums/typePinCode.enum.js';
-import { ModePinCodeEnum } from '../../../enums/modePinCode.enum.js';
 import crypto from 'node:crypto';
+import { TypePinCodeValue } from '../../../constants/typePinCode.constant.js';
+import { ModePinCodeEnum } from '../../../enums/modePinCode.enum.js';
 
 type VerifyModeType = {
   [key in ModePinCodeEnum]: (pinCode: string) => boolean;
@@ -12,7 +12,7 @@ type GeneratePinCodeBasedModeType = {
 
 type PinCodeConstructorParams = {
   length: number;
-  type: TypePinCodeEnum;
+  type: TypePinCodeValue;
   mode: ModePinCodeEnum;
 };
 
@@ -25,7 +25,7 @@ export abstract class PinCode {
   private _ALPHANUMERIC_CHARS: string;
 
   protected _length: number;
-  protected _type: TypePinCodeEnum;
+  protected _type: TypePinCodeValue;
   protected _mode: ModePinCodeEnum;
   protected _verifyMode: VerifyModeType = {
     [ModePinCodeEnum.ONLY_NUMERIC]: (pinCode: string) => this._isModeOnlyNumerics(pinCode),
