@@ -2,7 +2,7 @@ import { model, Schema, Document } from 'mongoose';
 import bcrypt from 'bcrypt';
 import { UserAuthRoleEnum } from '../enums/userAuthRole.enum.js';
 import { UserAuthProviderEnum } from '../enums/userAuthProvider.enum.js';
-import { UserAuthSchemaType } from '../schema/zod/userAuth.schema.js';
+import { UserAuthSchemaType } from '../schema/zod/userAuth/index.schema.js';
 
 const DOCUMENT_NAME = 'users_auth';
 const COLLECTION_NAME = 'user_auth';
@@ -43,6 +43,10 @@ const userAuthSchema = new Schema<IUserAuthDocument>(
       default: true
     },
     zaloId: {
+      type: String,
+      default: null
+    },
+    jtiSetPassword: {
       type: String,
       default: null
     }

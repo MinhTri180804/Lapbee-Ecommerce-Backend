@@ -1,10 +1,32 @@
 export const ValidationMessages = {
+  api: {
+    request: {
+      auth: {
+        local: {
+          register: {
+            EMAIL_REQUIRED: 'Email is required',
+            EMAIL_INVALID: 'Email invalid'
+          },
+          verifyEmailRegister: {
+            EMAIL_REQUIRED: 'Email is required',
+            EMAIL_INVALID: 'Email invalid',
+            OTP_REQUIRED: 'OTP Required',
+            OTP_MAX_LENGTH: 'Max length OTP is',
+            OTP_INVALID: 'OTP invalid'
+          }
+        }
+      }
+    }
+  },
   userAuth: {
     INVALID_EMAIL: 'Email invalid',
     WEAK_PASSWORD: 'Password must include at last one lowercase, uppercase, and number',
+    WEAK_PASSWORD_CONFIRM: 'Password confirm must include at last one lowercase, uppercase, and number',
     PASSWORD_MISMATCH: 'Password do not match',
     MIN_LENGTH_PASSWORD: 'Password must be length equal or greater than 8',
     MAX_LENGTH_PASSWORD: 'Password must be length equal or less than 16',
+    MIN_LENGTH_PASSWORD_CONFIRM: 'Password confirm must be length equal or greater than 8',
+    MAX_LENGTH_PASSWORD_CONFIRM: 'Password confirm must be length equal or less than 16',
     EMAIL_REQUIRED: 'Email is required for local provider',
     PASSWORD_REQUIRED: 'Password is required for local provider',
     PASSWORD_CONFIRM_REQUIRED: 'Password confirm is required for local provider',

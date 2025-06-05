@@ -6,3 +6,4 @@ logs/
 .env.dev
 .data
 .DS_Store
+coverage/*
