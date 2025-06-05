@@ -14,7 +14,8 @@ export const ErrorCodes: ErrorCodes = {
   [ErrorInstance.PIN_CODE_GONE]: 4010,
   [ErrorInstance.PIN_CODE_INVALID]: 4000,
   [ErrorInstance.PIN_CODE_EXPIRED]: 4001,
-  [ErrorInstance.JWT_TOKEN_INVALID]: 40002
+  [ErrorInstance.JWT_TOKEN_INVALID]: 40002,
+  [ErrorInstance.JWT_TOKEN_EXPIRED]: 40003
 } as const;
 
 export type ErrorCodesKeys = keyof typeof ErrorCodes;
