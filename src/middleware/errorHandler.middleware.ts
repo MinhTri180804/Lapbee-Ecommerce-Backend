@@ -1,11 +1,14 @@
 import { NextFunction, Request, Response } from 'express';
 import { EmailAlreadyPendingVerificationError } from 'src/errors/EmailAlreadyPendingVerification.error.js';
 import { EmailExistError } from 'src/errors/EmailExist.error.js';
+import { PinCodeExpiredError } from 'src/errors/PinCodeExpired.error.js';
+import { PinCodeInvalidError } from 'src/errors/PinCodeInValid.error.js';
 import { ValidateRequestBodyError } from 'src/errors/ValidateRequestBody.error.js';
 import { VerificationPendingOtpExpiredError } from 'src/errors/VerificationPendingOtpExpired.error.js';
 import { VerifiedNoPasswordError } from 'src/errors/VerifiedNoPassword.error.js';
 import { ErrorInstance } from '../constants/errorInstance.constant.js';
 import { AppError } from '../errors/AppError.error.js';
+import { PinCodeGoneError } from '../errors/PinCodeGone.error.js';
 import { UnknownError } from '../errors/Unknown.error.js';
 import { sendErrorResponse } from '../utils/responses.util.js';
 
@@ -18,6 +21,9 @@ type MappingHandler = {
   [ErrorInstance.VERIFICATION_PENDING_OTP_EXPIRED]: ErrorHandler<VerificationPendingOtpExpiredError>;
   [ErrorInstance.VERIFIED_NO_PASSWORD]: ErrorHandler<VerifiedNoPasswordError>;
   [ErrorInstance.UNKNOWN]: ErrorHandler<UnknownError>;
+  [ErrorInstance.PIN_CODE_GONE]: ErrorHandler<PinCodeGoneError>;
+  [ErrorInstance.PIN_CODE_EXPIRED]: ErrorHandler<PinCodeExpiredError>;
+  [ErrorInstance.PIN_CODE_INVALID]: ErrorHandler<PinCodeInvalidError>;
 };
 
 class _ErrorMiddlewareHandler {
@@ -28,7 +34,10 @@ class _ErrorMiddlewareHandler {
     [ErrorInstance.VALIDATION_REQUEST_BODY]: this._validateRequestBodyErrorHandler,
     [ErrorInstance.VERIFICATION_PENDING_OTP_EXPIRED]: this._verificationPendingOtpExpiredErrorHandler,
     [ErrorInstance.VERIFIED_NO_PASSWORD]: this._verifiedNoPasswordErrorHandler,
-    [ErrorInstance.UNKNOWN]: this._unknownErrorHandler
+    [ErrorInstance.UNKNOWN]: this._unknownErrorHandler,
+    [ErrorInstance.PIN_CODE_GONE]: this._pinCodeGoneErrorHandler,
+    [ErrorInstance.PIN_CODE_EXPIRED]: this._pinCodeExpiredErrorHandler,
+    [ErrorInstance.PIN_CODE_INVALID]: this._pinCodeInvalidErrorHandler
   };
 
   private constructor() {}
@@ -41,9 +50,9 @@ class _ErrorMiddlewareHandler {
     return _ErrorMiddlewareHandler.instance;
   }
 
-  // eslint-disable-next-line
-  private _unknownErrorHandler(response: Response, _: Error) {
-    const _error = new UnknownError({});
+  private _unknownErrorHandler(response: Response, error: Error) {
+    const { message } = error;
+    const _error = new UnknownError({ message });
     // TODO: Implement handle alert when have unknown error
 
     sendErrorResponse<null>({
@@ -85,6 +94,27 @@ class _ErrorMiddlewareHandler {
 
   private _verifiedNoPasswordErrorHandler(response: Response, error: VerifiedNoPasswordError) {
     sendErrorResponse<VerifiedNoPasswordError['details']>({
+      response,
+      content: error
+    });
+  }
+
+  private _pinCodeGoneErrorHandler(response: Response, error: PinCodeGoneError) {
+    sendErrorResponse<PinCodeGoneError['details']>({
+      response,
+      content: error
+    });
+  }
+
+  private _pinCodeExpiredErrorHandler(response: Response, error: PinCodeExpiredError) {
+    sendErrorResponse<PinCodeExpiredError['details']>({
+      response,
+      content: error
+    });
+  }
+
+  private _pinCodeInvalidErrorHandler(response: Response, error: PinCodeInvalidError) {
+    sendErrorResponse<PinCodeInvalidError['details']>({
       response,
       content: error
     });

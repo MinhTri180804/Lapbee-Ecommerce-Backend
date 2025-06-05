@@ -1,6 +1,7 @@
 import { env } from '../configs/env.config.js';
-import { sign } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import type { StringValue } from 'ms';
+import { v4 as uuidV4 } from 'uuid';
 
 type SetPasswordParams = {
   userAuthId: string;
@@ -20,11 +21,13 @@ class _JWTGenerator {
   }
 
   public setPassword({ userAuthId }: SetPasswordParams) {
+    const jti = uuidV4();
     const SECRET_KEY = env.jwt.SECRET_KEY.SET_PASSWORD as string;
     const EXPIRES = env.expiredTime.day.TOKEN_SET_PASSWORD as string;
-    const jwtToken = sign({}, SECRET_KEY, {
+    const jwtToken = jwt.sign({}, SECRET_KEY, {
       subject: userAuthId,
-      expiresIn: EXPIRES as StringValue
+      expiresIn: EXPIRES as StringValue,
+      jwtid: jti
     });
 
     return jwtToken;
