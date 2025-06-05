@@ -1,9 +1,15 @@
-import { sign } from 'jsonwebtoken';
+import { JwtPayload, sign } from 'jsonwebtoken';
 import { JWTGenerator } from '../utils/JwtGenerator.util.js';
 import { env } from '../configs/env.config';
+import jsonwebtoken from 'jsonwebtoken';
 
 jest.mock('jsonwebtoken', () => ({
-  sign: jest.fn(() => 'mocked.jwt.token')
+  sign: jest.fn(() => 'mocked.jwt.token'),
+  decode: jest.fn(() => ({ jti: 'mock-jti-uuid' }))
+}));
+
+jest.mock('uuid', () => ({
+  v4: jest.fn(() => 'mock-jti-uuid')
 }));
 
 describe('JWTGenerator - setPassword', () => {
@@ -29,10 +35,12 @@ describe('JWTGenerator - setPassword', () => {
 
   it('should generate JWT token with correct payload and secret', () => {
     const token = JWTGenerator.setPassword({ userAuthId: mockUserAuthId });
+    const { jti } = jsonwebtoken.decode(token) as JwtPayload;
 
     expect(sign).toHaveBeenCalledWith({}, 'test-secret-key', {
       subject: mockUserAuthId,
-      expiresIn: '1d'
+      expiresIn: '1d',
+      jwtid: jti
     });
 
     expect(token).toBe('mocked.jwt.token');
