@@ -7,7 +7,6 @@ const { EMAIL_REQUIRED: EMAIL_REQUIRED_REGISTER, EMAIL_INVALID: EMAIL_INVALID_RE
 const {
   EMAIL_INVALID: EMAIL_INVALID_VERIFY,
   EMAIL_REQUIRED: EMAIL_REQUIRED_VERIFY,
-  OTP_MAX_LENGTH: OTP_MAX_LENGTH_VERIFY,
   OTP_REQUIRED: OTP_REQUIRED_VERIFY,
   OTP_INVALID: OTP_INVALID_VERIFY
 } = ValidationMessages.api.request.auth.local.verifyEmailRegister;
@@ -27,12 +26,10 @@ export const verifyEmailRegisterRequestBodySchema = z.object({
     })
     .email(EMAIL_INVALID_VERIFY),
 
-  otp: z
-    .number({
-      required_error: OTP_REQUIRED_VERIFY,
-      invalid_type_error: OTP_INVALID_VERIFY
-    })
-    .max(6, OTP_MAX_LENGTH_VERIFY)
+  otp: z.string({
+    required_error: OTP_REQUIRED_VERIFY,
+    invalid_type_error: OTP_INVALID_VERIFY
+  })
 });
 
 export type RegisterLocalRequestBody = z.infer<typeof registerLocalRequestBodySchema>;

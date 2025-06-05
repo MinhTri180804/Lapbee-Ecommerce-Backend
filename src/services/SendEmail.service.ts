@@ -51,6 +51,7 @@ export class SendEmailService implements ISendEmailService {
         html: `<div>
               <div><h4>Bạn đã xác thực email đăng kí tài khoản thành công</h4></div>
               <h5>Dưới đây là đường dẫn đặt mật khẩu cho tài khoản phòng trường hợp bạn đã xác thực email nhưng chưa đặt mật khẩu cho tài khoản</h5>
+              <div>${urlCallback}</div>
               <button>
                 <a href=${urlCallback}>Đặt mật khẩu cho tài khoản</a>
               </button>

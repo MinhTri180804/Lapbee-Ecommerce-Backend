@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { ValidationMessages } from '../../../constants/validationMessages.constant.js';
 import { UserAuthProviderEnum } from '../../../enums/userAuthProvider.enum.js';
-import { UserAuthRoleEnum } from '../../../enums/userAuthRole.enum.js';
 import {
   emailSchema,
   isFirstLoginSchema,

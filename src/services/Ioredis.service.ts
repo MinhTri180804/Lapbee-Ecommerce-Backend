@@ -11,6 +11,11 @@ type GetPinCodeVerifyEmailParams = {
   email: string;
 };
 
+type GetPinCodeVerifyEmailReturns = {
+  pinCode: number;
+  expiredAt: number;
+} | null;
+
 type RemovePinCodeVerifyEmailParams = {
   email: string;
 };
@@ -69,10 +74,17 @@ export class IoredisService implements IIoredisService {
     return { expiredTimeAtPinCode };
   }
 
-  public async getPinCodeVerifyEmail({ email }: GetPinCodeVerifyEmailParams): Promise<string | null> {
+  public async getPinCodeVerifyEmail({ email }: GetPinCodeVerifyEmailParams): Promise<GetPinCodeVerifyEmailReturns> {
     const key = RedisKeyGenerator.pinCodeVerifyEmail({ email });
     const data = await this._redisInstance.get(key);
-    return data;
+    if (!data) {
+      return null;
+    }
+    const [pinCode, expiredAt] = data.split('-');
+    return {
+      pinCode: Number(pinCode),
+      expiredAt: Number(expiredAt)
+    };
   }
 
   public async removePinCodeVerifyEmail({ email }: RemovePinCodeVerifyEmailParams): Promise<void> {
