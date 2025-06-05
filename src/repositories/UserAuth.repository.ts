@@ -15,6 +15,11 @@ type CreateRegisterLocalParams = {
   email: string;
 };
 
+type CreatePasswordParams = {
+  userAuth: IUserAuthDocument;
+  password: string;
+};
+
 type FindByIdParams = {
   userAuthId: string;
 };
@@ -23,6 +28,7 @@ interface IUserAuthRepository {
   findByEmail: (params: FindByEmailParams) => Promise<IUserAuthDocument | null>;
   verifyEmailRegister: (params: VerifyEmailRegisterParams) => Promise<boolean>;
   findById: (params: FindByIdParams) => Promise<IUserAuthDocument | null>;
+  createPassword: (params: CreatePasswordParams) => Promise<IUserAuthDocument>;
 }
 
 export class UserAuthRepository implements IUserAuthRepository {
@@ -59,5 +65,12 @@ export class UserAuthRepository implements IUserAuthRepository {
   public async findById({ userAuthId }: FindByIdParams) {
     const userAuth = await this._userAuthModel.findById(userAuthId);
     return userAuth;
+  }
+
+  public async createPassword({ userAuth, password }: CreatePasswordParams): Promise<IUserAuthDocument> {
+    userAuth.password = password;
+    userAuth.jtiSetPassword = null;
+    const data = await userAuth.save();
+    return data;
   }
 }
