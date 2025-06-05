@@ -27,8 +27,16 @@ export class UserAuthRepository implements IUserAuthRepository {
     return await this._userAuthModel.findOne({ email });
   }
 
-  public async updateJtiSetPassword({ userAuthId, jti }: UpdateJtiSetPasswordParams): Promise<boolean> {
-    const result = await this._userAuthModel.updateOne({ id: userAuthId, jtiSetPassword: jti });
+  public async verifyEmailRegister({ userAuthId, jti }: UpdateJtiSetPasswordParams): Promise<boolean> {
+    const result = await this._userAuthModel.updateOne(
+      {
+        _id: userAuthId
+      },
+      {
+        jtiSetPassword: jti,
+        isVerify: true
+      }
+    );
     return result.matchedCount > 0;
   }
 
@@ -36,11 +44,7 @@ export class UserAuthRepository implements IUserAuthRepository {
     const userAuth = await this._userAuthModel.create({
       email,
       role: UserAuthRoleEnum.CUSTOMER,
-      provider: UserAuthProviderEnum.LOCAL,
-      isVerify: false,
-      isFirstLogin: false,
-      zaloId: false,
-      jtiSetPassword: false
+      provider: UserAuthProviderEnum.LOCAL
     });
 
     return userAuth;
