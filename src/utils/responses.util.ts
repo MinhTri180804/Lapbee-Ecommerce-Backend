@@ -1,7 +1,7 @@
 import { env } from '../configs/env.config.js';
 import { Response } from 'express';
 import { ErrorResponseType, SuccessResponseType } from '../types/responses.type.js';
-import { StatusCodes } from 'http-status-codes';
+import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import { AppError } from 'src/errors/AppError.error.js';
 
 type SendSuccessResponseParams<T, U> = {
@@ -55,6 +55,10 @@ export const sendErrorResponse = <T>(params: SendErrorResponseParams<T>) => {
 
   if (env.app.NODE_ENV !== 'dev' || (env.app.NODE_ENV === 'dev' && content.isOperational)) {
     delete errorObjectResponse.error.devInfo;
+
+    if (content.statusCode === StatusCodes.INTERNAL_SERVER_ERROR) {
+      errorObjectResponse.message = ReasonPhrases.INTERNAL_SERVER_ERROR;
+    }
   }
 
   response.status(content.statusCode).json(errorObjectResponse);
