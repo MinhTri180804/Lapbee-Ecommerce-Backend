@@ -16,5 +16,6 @@ export const ErrorMessages: ErrorMessagesType = {
   [ErrorInstance.PIN_CODE_GONE]: 'OTP has expired. Please request a new one.',
   [ErrorInstance.PIN_CODE_INVALID]: 'Invalid OTP code. Please try again.',
   [ErrorInstance.PIN_CODE_EXPIRED]: 'OTP has expired. Please request a new code.',
-  [ErrorInstance.JWT_TOKEN_INVALID]: 'Invalid token'
+  [ErrorInstance.JWT_TOKEN_INVALID]: 'Invalid token',
+  [ErrorInstance.JWT_TOKEN_EXPIRED]: 'Token expired'
 };
