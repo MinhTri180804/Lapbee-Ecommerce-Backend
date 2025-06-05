@@ -11,6 +11,7 @@ import { VerificationPendingOtpExpiredError } from '../errors/VerificationPendin
 import { registerLocalRequestBodySchema } from '../schema/zod/api/requests/auth/local.schema.js';
 import { sendErrorResponse } from '../utils/responses.util.js';
 import { UnknownError } from '../errors/Unknown.error.js';
+import { JWTTokenInvalidError } from '../errors/JwtTokenInvalid.error.js';
 
 const mockResponse = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -164,6 +165,33 @@ describe('sendErrorResponse', () => {
               _errors: [ValidationMessages.api.request.auth.local.register.EMAIL_REQUIRED]
             }
           })
+        })
+      })
+    );
+  });
+
+  it('Send Error Response with TokenInvalidError', () => {
+    Object.defineProperty(env.app, 'NODE_ENV', {
+      writable: true,
+      value: 'dev'
+    });
+
+    const error = new JWTTokenInvalidError();
+    sendErrorResponse({
+      response: res,
+      content: error
+    });
+
+    expect(res.status).toHaveBeenCalledWith(StatusCodes.UNAUTHORIZED);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        success: false,
+        statusCode: StatusCodes.UNAUTHORIZED,
+        message: ErrorMessages.JWT_TOKEN_INVALID,
+        error: expect.objectContaining({
+          code: ErrorCodes.JWT_TOKEN_INVALID,
+          name: ErrorInstance.JWT_TOKEN_INVALID,
+          details: null
         })
       })
     );
