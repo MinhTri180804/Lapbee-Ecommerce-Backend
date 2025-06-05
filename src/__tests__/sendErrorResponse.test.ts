@@ -177,7 +177,7 @@ describe('sendErrorResponse', () => {
       value: 'dev'
     });
 
-    const error = new JWTTokenInvalidError();
+    const error = new JWTTokenInvalidError({});
     sendErrorResponse({
       response: res,
       content: error
@@ -189,6 +189,34 @@ describe('sendErrorResponse', () => {
         success: false,
         statusCode: StatusCodes.UNAUTHORIZED,
         message: ErrorMessages.JWT_TOKEN_INVALID,
+        error: expect.objectContaining({
+          code: ErrorCodes.JWT_TOKEN_INVALID,
+          name: ErrorInstance.JWT_TOKEN_INVALID,
+          details: null
+        })
+      })
+    );
+  });
+
+  it('Send Error Response with TokenInvalidError and custom message', () => {
+    Object.defineProperty(env.app, 'NODE_ENV', {
+      writable: true,
+      value: 'dev'
+    });
+
+    const customMessage = 'custom message';
+    const error = new JWTTokenInvalidError({ message: customMessage });
+    sendErrorResponse({
+      response: res,
+      content: error
+    });
+
+    expect(res.status).toHaveBeenCalledWith(StatusCodes.UNAUTHORIZED);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        success: false,
+        statusCode: StatusCodes.UNAUTHORIZED,
+        message: customMessage,
         error: expect.objectContaining({
           code: ErrorCodes.JWT_TOKEN_INVALID,
           name: ErrorInstance.JWT_TOKEN_INVALID,
