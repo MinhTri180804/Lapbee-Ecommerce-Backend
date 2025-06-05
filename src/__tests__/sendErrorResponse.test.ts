@@ -13,6 +13,7 @@ import { sendErrorResponse } from '../utils/responses.util.js';
 import { UnknownError } from '../errors/Unknown.error.js';
 import { JWTTokenInvalidError } from '../errors/JwtTokenInvalid.error.js';
 import { JWTTokenExpiredError } from '../errors/JwtTokenExpired.error.js';
+import { AccountPasswordUpdatedError } from '../errors/AccountPasswordUpdated.error.js';
 
 const mockResponse = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -192,6 +193,33 @@ describe('sendErrorResponse', () => {
         error: expect.objectContaining({
           code: ErrorCodes.JWT_TOKEN_INVALID,
           name: ErrorInstance.JWT_TOKEN_INVALID,
+          details: null
+        })
+      })
+    );
+  });
+
+  it('Send Error Response with AccountPasswordUpdatedError', () => {
+    Object.defineProperty(env.app, 'NODE_ENV', {
+      writable: true,
+      value: 'dev'
+    });
+
+    const error = new AccountPasswordUpdatedError();
+    sendErrorResponse({
+      response: res,
+      content: error
+    });
+
+    expect(res.status).toHaveBeenCalledWith(StatusCodes.BAD_REQUEST);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        success: false,
+        statusCode: StatusCodes.BAD_REQUEST,
+        message: ErrorMessages.ACCOUNT_PASSWORD_UPDATED,
+        error: expect.objectContaining({
+          code: ErrorCodes.ACCOUNT_PASSWORD_UPDATED,
+          name: ErrorInstance.ACCOUNT_PASSWORD_UPDATED,
           details: null
         })
       })
