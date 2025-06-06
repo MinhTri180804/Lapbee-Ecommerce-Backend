@@ -15,6 +15,7 @@ import { JWTTokenInvalidError } from '../errors/JwtTokenInvalid.error.js';
 import { JWTTokenExpiredError } from '../errors/JwtTokenExpired.error.js';
 import { AccountPasswordUpdatedError } from '../errors/AccountPasswordUpdated.error.js';
 import { PinCodeRequestTooSoonError } from '../errors/PinCodeRequestTooSoon.error.js';
+import { PinCodeNotFoundError } from '../errors/PinCodeNotFound.error.js';
 
 const mockResponse = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -304,6 +305,61 @@ describe('sendErrorResponse', () => {
         error: expect.objectContaining({
           code: ErrorCodes.PIN_CODE_REQUEST_TOO_SOON_ERROR,
           name: ErrorInstance.PIN_CODE_REQUEST_TOO_SOON,
+          details: null
+        })
+      })
+    );
+  });
+
+  it('Send Error Response with PinCodeNotFoundError', () => {
+    Object.defineProperty(env.app, 'NODE_ENV', {
+      writable: true,
+      value: 'dev'
+    });
+
+    const error = new PinCodeNotFoundError({});
+    sendErrorResponse({
+      response: res,
+      content: error
+    });
+
+    expect(res.status).toHaveBeenCalledWith(StatusCodes.GONE);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        success: false,
+        statusCode: StatusCodes.GONE,
+        message: ErrorMessages.PIN_CODE_NOTFOUND_ERROR,
+        error: expect.objectContaining({
+          code: ErrorCodes.PIN_CODE_NOTFOUND_ERROR,
+          name: ErrorInstance.PIN_CODE_NOTFOUND,
+          details: null
+        })
+      })
+    );
+  });
+
+  it('Send Error Response with PinCodeNotFoundError with custom message', () => {
+    Object.defineProperty(env.app, 'NODE_ENV', {
+      writable: true,
+      value: 'dev'
+    });
+
+    const customMessage = 'custom message';
+    const error = new PinCodeNotFoundError({ message: customMessage });
+    sendErrorResponse({
+      response: res,
+      content: error
+    });
+
+    expect(res.status).toHaveBeenCalledWith(StatusCodes.GONE);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        success: false,
+        statusCode: StatusCodes.GONE,
+        message: customMessage,
+        error: expect.objectContaining({
+          code: ErrorCodes.PIN_CODE_NOTFOUND_ERROR,
+          name: ErrorInstance.PIN_CODE_NOTFOUND,
           details: null
         })
       })
