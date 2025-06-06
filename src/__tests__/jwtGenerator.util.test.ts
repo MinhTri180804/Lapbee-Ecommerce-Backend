@@ -56,7 +56,7 @@ describe('JWTGenerator - setPassword', () => {
 
   it('should generate JWT accessToken with correct payload and secret', () => {
     const token = JWTGenerator.accessToken({ userAuthId: mockUserAuthId, role: mockRole });
-    const { jti } = jsonwebtoken.decode(token) as JwtPayload;
+    const { jti } = jsonwebtoken.decode(token.accessToken) as JwtPayload;
 
     expect(sign).toHaveBeenCalledWith(
       {
@@ -70,12 +70,17 @@ describe('JWTGenerator - setPassword', () => {
       }
     );
 
-    expect(token).toBe('mocked.jwt.token');
+    expect(token).toEqual(
+      expect.objectContaining({
+        accessToken: 'mocked.jwt.token',
+        jti: 'mock-jti-uuid'
+      })
+    );
   });
 
   it('should generate JWT refreshToken with correct payload and secret', () => {
     const token = JWTGenerator.refreshToken({ userAuthId: mockUserAuthId });
-    const { jti } = jsonwebtoken.decode(token) as JwtPayload;
+    const { jti } = jsonwebtoken.decode(token.refreshToken) as JwtPayload;
 
     expect(sign).toHaveBeenCalledWith({}, 'test-refresh-token', {
       subject: mockUserAuthId,
@@ -83,7 +88,12 @@ describe('JWTGenerator - setPassword', () => {
       jwtid: jti
     });
 
-    expect(token).toBe('mocked.jwt.token');
+    expect(token).toEqual(
+      expect.objectContaining({
+        refreshToken: 'mocked.jwt.token',
+        jti: 'mock-jti-uuid'
+      })
+    );
   });
 });
 
