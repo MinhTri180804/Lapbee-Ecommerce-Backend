@@ -21,6 +21,11 @@ export const env = {
     HOST: process.env.REDIS_HOST || '127.0.0.1',
     PORT: process.env.REDIS_PORT || 6379
   },
+  coolDownTime: {
+    minute: {
+      PIN_CODE_VERIFY_EMAIL: process.env.COOL_DOWN_TIME_MINUTE_PIN_CODE_VERIFY_EMAIL
+    }
+  },
   expiredTime: {
     minute: {
       PIN_CODE_VERIFY_EMAIL_REGISTER: process.env.EXPIRED_TIME_MINUTE_PIN_CODE_VERIFY_EMAIL_REGISTER

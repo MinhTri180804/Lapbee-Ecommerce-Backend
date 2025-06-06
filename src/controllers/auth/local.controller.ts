@@ -5,6 +5,7 @@ import { UserAuthRepository } from 'src/repositories/UserAuth.repository.js';
 import { IoredisService } from 'src/services/Ioredis.service.js';
 import {
   RegisterLocalRequestBody,
+  ResendVerifyEmailRequestBody,
   SetPasswordRequestBody,
   VerifyEmailRegisterRequestBody
 } from '../../schema/zod/api/requests/auth/local.schema.js';
@@ -14,10 +15,13 @@ import { sendSuccessResponse } from '../../utils/responses.util.js';
 type RegisterRequestType = Request<unknown, unknown, RegisterLocalRequestBody>;
 type VerifyEmailRequestType = Request<unknown, unknown, VerifyEmailRegisterRequestBody>;
 type SetPasswordRequestType = Request<unknown, unknown, SetPasswordRequestBody>;
+type ResendVerifyEmailRequestType = Request<unknown, unknown, ResendVerifyEmailRequestBody>;
 
 interface IAuthLocalController {
   register: (request: RegisterRequestType, response: Response, next: NextFunction) => void;
   verifyEmail: (request: VerifyEmailRequestType, response: Response, next: NextFunction) => void;
+  setPassword: (request: SetPasswordRequestType, response: Response, next: NextFunction) => Promise<void>;
+  resendVerifyEmail: (request: ResendVerifyEmailRequestType, response: Response, next: NextFunction) => Promise<void>;
 }
 
 export class AuthLocalController implements IAuthLocalController {
@@ -79,6 +83,22 @@ export class AuthLocalController implements IAuthLocalController {
           accessToken,
           refreshToken
         }
+      }
+    });
+  }
+
+  public async resendVerifyEmail(request: ResendVerifyEmailRequestType, response: Response) {
+    const { email } = request.body;
+    const redis = IoredisManager.getInstance().getRedisClient();
+    const ioredisService = new IoredisService(redis);
+    const authLocalService = new AuthLocalService(this._userAuthRepository, ioredisService);
+    await authLocalService.resendVerifyEmail({ email });
+    sendSuccessResponse<null>({
+      response,
+      content: {
+        statusCode: StatusCodes.OK,
+        message: 'Resend pin code verify email success',
+        data: null
       }
     });
   }

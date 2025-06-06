@@ -4,6 +4,8 @@ import { validateRequestBody } from '../../middleware/validateRequestBody.middle
 import {
   RegisterLocalRequestBody,
   registerLocalRequestBodySchema,
+  ResendVerifyEmailRequestBody,
+  resendVerifyEmailRequestBodySchema,
   SetPasswordRequestBody,
   setPasswordRequestBodySchema,
   VerifyEmailRegisterRequestBody,
@@ -18,7 +20,15 @@ const validateRequestBodyVerifyEmail = validateRequestBody<VerifyEmailRegisterRe
   verifyEmailRegisterRequestBodySchema
 );
 const validateRequestBodySetPassword = validateRequestBody<SetPasswordRequestBody>(setPasswordRequestBodySchema);
+const validateRequestBodyResendVerifyEmail = validateRequestBody<ResendVerifyEmailRequestBody>(
+  resendVerifyEmailRequestBodySchema
+);
 
 router.post('/register', validateRequestBodyRegister, authLocalController.register.bind(authLocalController));
 router.post('/verify-email', validateRequestBodyVerifyEmail, authLocalController.verifyEmail.bind(authLocalController));
 router.post('/set-password', validateRequestBodySetPassword, authLocalController.setPassword.bind(authLocalController));
+router.post(
+  '/resend-verify-email',
+  validateRequestBodyResendVerifyEmail,
+  authLocalController.resendVerifyEmail.bind(authLocalController)
+);

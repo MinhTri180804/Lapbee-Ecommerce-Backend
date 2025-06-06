@@ -1,6 +1,7 @@
 import { decode, JwtPayload } from 'jsonwebtoken';
 import { PinCodeGoneError } from 'src/errors/PinCodeGone.error.js';
 import {
+  ResendVerifyEmailRequestBody,
   SetPasswordRequestBody,
   VerifyEmailRegisterRequestBody
 } from 'src/schema/zod/api/requests/auth/local.schema.js';
@@ -20,6 +21,8 @@ import { JWTGenerator } from '../../utils/JwtGenerator.util.js';
 import { PinCodeVerifyEmail } from '../../utils/pinCode/core/PinCodeVerifyEmail.js';
 import { SubjectSendEmail } from '../../utils/subjectSendEmail.util.js';
 import { IoredisService } from '../Ioredis.service.js';
+import { PinCodeNotFoundError } from 'src/errors/PinCodeNotFound.error.js';
+import { PinCodeRequestTooSoonError } from 'src/errors/PinCodeRequestTooSoon.error.js';
 
 type RegisterParams = {
   email: string;
@@ -29,6 +32,8 @@ type VerifyEmailRegisterParams = VerifyEmailRegisterRequestBody;
 
 type SetPasswordParams = SetPasswordRequestBody;
 
+type ResendVerifyEmailParam = ResendVerifyEmailRequestBody;
+
 type VerifyEmailRegisterReturns = {
   tokenSetPassword: string;
   email: string;
@@ -37,6 +42,7 @@ type VerifyEmailRegisterReturns = {
 interface IAuthLocalService {
   register: (params: RegisterParams) => Promise<void>;
   verifyEmailRegister: (params: VerifyEmailRegisterParams) => Promise<VerifyEmailRegisterReturns>;
+  resendVerifyEmail: (params: ResendVerifyEmailParam) => Promise<void>;
 }
 
 export class AuthLocalService implements IAuthLocalService {
@@ -44,6 +50,8 @@ export class AuthLocalService implements IAuthLocalService {
   private _pinCodeExpiredTimeMs: number = this._pinCodeExpiredTimeMinute * 60 * 1000;
   private _pinCodeResendAvailableMinute: number = Number(env.pinCode.verifyEmail.RESEND_AVAILABLE_MINUTE);
   private _pinCodeResendAvailableMs: number = this._pinCodeResendAvailableMinute * 60 * 1000;
+  private _pinCodeCoolDownTimeMinute: number = Number(env.coolDownTime.minute.PIN_CODE_VERIFY_EMAIL);
+  private _pinCodeCollDownTimeSecond: number = 60 * this._pinCodeCoolDownTimeMinute;
   private _userAuthRepository: UserAuthRepository;
   private _ioredisService: IoredisService;
 
@@ -173,5 +181,37 @@ export class AuthLocalService implements IAuthLocalService {
     const { refreshToken, jti: jtiRefreshToken } = JWTGenerator.refreshToken({ userAuthId: sub as string });
     await this._ioredisService.saveRefreshTokenWhitelist({ userAuthId: sub as string, jti: jtiRefreshToken });
     return { accessToken, refreshToken };
+  }
+
+  public async resendVerifyEmail({ email }: ResendVerifyEmailParam): Promise<void> {
+    const dataPinCode = await this._ioredisService.getPinCodeVerifyEmail({ email });
+    if (!dataPinCode) {
+      throw new PinCodeNotFoundError({});
+    }
+
+    const { createdAt } = dataPinCode;
+    const currentTime = Math.floor(Date.now() / 1000);
+    const conditionResend = currentTime >= createdAt + this._pinCodeCollDownTimeSecond;
+    if (!conditionResend) {
+      throw new PinCodeRequestTooSoonError({ message: 'Request resend pinCode verify email too soon, please wait.' });
+    }
+
+    const newPinCode = new PinCodeVerifyEmail().generate();
+    const { expiredTimeAtPinCode } = await this._ioredisService.savePinCodeVerifyEmail({
+      email,
+      pinCode: newPinCode
+    });
+
+    const subject = SubjectSendEmail.verifyEmail();
+
+    const job = SendEmailJobs.createVerifyEmail({
+      to: email,
+      subject: subject,
+      otp: newPinCode,
+      otpExpiredAt: expiredTimeAtPinCode
+    });
+
+    await SendEmailQueue.getInstance().addJobSendEmailVerify(job);
+    return;
   }
 }
