@@ -71,7 +71,10 @@ export class JWTGenerator {
     }
   }
 
-  static accessToken({ userAuthId, role }: AccessTokenParams): string {
+  static accessToken({ userAuthId, role }: AccessTokenParams): {
+    accessToken: string;
+    jti: string;
+  } {
     const jti = uuidV4();
     const SECRET_KEY = env.jwt.SECRET_KEY.ACCESS_TOKEN as string;
     const EXPIRES = env.expiredTime.hours.ACCESS_TOKEN as string;
@@ -86,10 +89,16 @@ export class JWTGenerator {
         jwtid: jti
       }
     );
-    return accessToken;
+    return {
+      accessToken,
+      jti
+    };
   }
 
-  static refreshToken({ userAuthId }: RefreshTokenParams): string {
+  static refreshToken({ userAuthId }: RefreshTokenParams): {
+    refreshToken: string;
+    jti: string;
+  } {
     const jti = uuidV4();
     const SECRET_KEY = env.jwt.SECRET_KEY.REFRESH_TOKEN as string;
     const EXPIRES = env.expiredTime.day.REFRESH_TOKEN as string;
@@ -98,7 +107,10 @@ export class JWTGenerator {
       expiresIn: EXPIRES as StringValue,
       jwtid: jti
     });
-    return refreshToken;
+    return {
+      refreshToken,
+      jti
+    };
   }
 
   static createPassword({ userAuthId }: CreatePasswordParams): string {
