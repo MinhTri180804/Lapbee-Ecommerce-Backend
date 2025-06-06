@@ -128,7 +128,7 @@ export class AuthLocalService implements IAuthLocalService {
 
     await this._ioredisService.removePinCodeVerifyEmail({ email });
     const userAuth = await this._userAuthRepository.createRegisterLocal({ email });
-    const tokenSetPassword = JWTGenerator.setPassword({ userAuthId: userAuth.id });
+    const tokenSetPassword = JWTGenerator.createPassword({ userAuthId: userAuth.id });
     const { jti, exp } = decode(tokenSetPassword) as JwtPayload;
     console.log(jti);
     await this._userAuthRepository.verifyEmailRegister({ userAuthId: userAuth.id, jti: jti as string });

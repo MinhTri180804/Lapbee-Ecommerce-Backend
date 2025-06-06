@@ -42,7 +42,7 @@ describe('JWTGenerator - setPassword', () => {
   });
 
   it('should generate JWT token with correct payload and secret', () => {
-    const token = JWTGenerator.setPassword({ userAuthId: mockUserAuthId });
+    const token = JWTGenerator.createPassword({ userAuthId: mockUserAuthId });
     const { jti } = jsonwebtoken.decode(token) as JwtPayload;
 
     expect(sign).toHaveBeenCalledWith({}, 'test-secret-key', {
