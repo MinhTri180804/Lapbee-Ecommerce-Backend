@@ -4,6 +4,10 @@ type PinCodeVerifyEmailParams = {
   email: string;
 };
 
+type RefreshTokenWhitelistParams = {
+  userAuthId: string;
+};
+
 export class RedisKeyGenerator {
   /**
    * Generates a Redis key specifically for storing or retrieving PIN codes
@@ -25,5 +29,9 @@ export class RedisKeyGenerator {
   static pinCodeVerifyEmail(params: PinCodeVerifyEmailParams): string {
     const { email } = params;
     return `${RedisKeys.PIN_CODE_VERIFY_EMAIL}:${email}`;
+  }
+
+  static refreshTokenWhitelist({ userAuthId }: RefreshTokenWhitelistParams): string {
+    return `${RedisKeys.REFRESH_TOKEN_WHITELIST}:${userAuthId}`;
   }
 }

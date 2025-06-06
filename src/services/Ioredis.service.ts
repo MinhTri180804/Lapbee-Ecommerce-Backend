@@ -7,8 +7,18 @@ type SavePinCodeVerifyEmailParams = {
   pinCode: string;
 };
 
+type SaveRefreshTokenWhitelistParams = {
+  jti: string;
+  userAuthId: string;
+};
+
 type GetPinCodeVerifyEmailParams = {
   email: string;
+};
+
+type CheckExistRefreshTokenWhitelistParams = {
+  userAuthId: string;
+  jti: string;
 };
 
 type GetPinCodeVerifyEmailReturns = {
@@ -20,12 +30,22 @@ type RemovePinCodeVerifyEmailParams = {
   email: string;
 };
 
+type RemoveRefreshTokenWhitelistParams = {
+  userAuthId: string;
+  jti: string;
+};
+
 type SavePinCodeVerifyEmailResponse = {
   expiredTimeAtPinCode: number;
 };
 
 interface IIoredisService {
   savePinCodeVerifyEmail: (params: SavePinCodeVerifyEmailParams) => Promise<SavePinCodeVerifyEmailResponse>;
+  getPinCodeVerifyEmail: (params: GetPinCodeVerifyEmailParams) => Promise<GetPinCodeVerifyEmailReturns>;
+  removePinCodeVerifyEmail: (params: RemovePinCodeVerifyEmailParams) => Promise<void>;
+  saveRefreshTokenWhitelist: (params: SaveRefreshTokenWhitelistParams) => Promise<void>;
+  checkExistRefreshTokenWhitelist: (params: CheckExistRefreshTokenWhitelistParams) => Promise<boolean>;
+  removeRefreshTokenWhitelist: (params: RemoveRefreshTokenWhitelistParams) => Promise<void>;
 }
 export class IoredisService implements IIoredisService {
   private _redisInstance: Redis;
@@ -90,5 +110,24 @@ export class IoredisService implements IIoredisService {
   public async removePinCodeVerifyEmail({ email }: RemovePinCodeVerifyEmailParams): Promise<void> {
     const key = RedisKeyGenerator.pinCodeVerifyEmail({ email });
     await this._redisInstance.del(key);
+  }
+
+  public async saveRefreshTokenWhitelist({ userAuthId, jti }: SaveRefreshTokenWhitelistParams): Promise<void> {
+    const key = RedisKeyGenerator.refreshTokenWhitelist({ userAuthId });
+    await this._redisInstance.sadd(key, jti);
+  }
+
+  public async checkExistRefreshTokenWhitelist({
+    userAuthId,
+    jti
+  }: CheckExistRefreshTokenWhitelistParams): Promise<boolean> {
+    const key = RedisKeyGenerator.refreshTokenWhitelist({ userAuthId });
+    const isExist = await this._redisInstance.sismember(key, jti);
+    return !!isExist;
+  }
+
+  public async removeRefreshTokenWhitelist({ userAuthId, jti }: RemoveRefreshTokenWhitelistParams): Promise<void> {
+    const key = RedisKeyGenerator.refreshTokenWhitelist({ userAuthId });
+    await this._redisInstance.srem(key, jti);
   }
 }
