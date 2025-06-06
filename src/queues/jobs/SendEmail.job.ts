@@ -16,6 +16,12 @@ type CreateVerificationEmailSuccessParams = {
   expiresAt: number;
 };
 
+type CreateResendSetPasswordTokenParams = {
+  to: string;
+  tokenSetPassword: string;
+  expiresAt: number;
+};
+
 type CreateVerificationEmailSuccessReturns = {
   data: CreateVerificationEmailSuccessParams;
   name: JobsSendEmailValues;
@@ -24,6 +30,12 @@ type CreateVerificationEmailSuccessReturns = {
 
 type CreateVerifyEmailReturns = {
   data: CreateVerifyEmailParams;
+  name: JobsSendEmailValues;
+  jobOptions: JobsOptions;
+};
+
+type CreateResendSetPasswordTokenReturns = {
+  data: CreateResendSetPasswordTokenParams;
   name: JobsSendEmailValues;
   jobOptions: JobsOptions;
 };
@@ -90,5 +102,6 @@ class _SendEmailJobs implements ISendEmailJobs {
 
 export type VerifyEmailJobType = CreateVerifyEmailReturns;
 export type VerificationEmailSuccessType = CreateVerificationEmailSuccessReturns;
+export type ResendSetPasswordTokenType = CreateResendSetPasswordTokenReturns;
 
 export const SendEmailJobs = _SendEmailJobs.getInstance();
