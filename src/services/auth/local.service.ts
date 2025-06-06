@@ -1,8 +1,14 @@
 import { decode, JwtPayload } from 'jsonwebtoken';
 import { PinCodeGoneError } from 'src/errors/PinCodeGone.error.js';
+import {
+  SetPasswordRequestBody,
+  VerifyEmailRegisterRequestBody
+} from 'src/schema/zod/api/requests/auth/local.schema.js';
 import { env } from '../../configs/env.config.js';
+import { AccountPasswordUpdatedError } from '../../errors/AccountPasswordUpdated.error.js';
 import { EmailAlreadyPendingVerificationError } from '../../errors/EmailAlreadyPendingVerification.error.js';
 import { EmailExistError } from '../../errors/EmailExist.error.js';
+import { JWTTokenInvalidError } from '../../errors/JwtTokenInvalid.error.js';
 import { PinCodeExpiredError } from '../../errors/PinCodeExpired.error.js';
 import { PinCodeInvalidError } from '../../errors/PinCodeInValid.error.js';
 import { VerificationPendingOtpExpiredError } from '../../errors/VerificationPendingOtpExpired.error.js';
@@ -14,13 +20,14 @@ import { JWTGenerator } from '../../utils/JwtGenerator.util.js';
 import { PinCodeVerifyEmail } from '../../utils/pinCode/core/PinCodeVerifyEmail.js';
 import { SubjectSendEmail } from '../../utils/subjectSendEmail.util.js';
 import { IoredisService } from '../Ioredis.service.js';
-import { VerifyEmailRegisterRequestBody } from 'src/schema/zod/api/requests/auth/local.schema.js';
 
 type RegisterParams = {
   email: string;
 };
 
 type VerifyEmailRegisterParams = VerifyEmailRegisterRequestBody;
+
+type SetPasswordParams = SetPasswordRequestBody;
 
 type VerifyEmailRegisterReturns = {
   tokenSetPassword: string;
@@ -49,7 +56,7 @@ export class AuthLocalService implements IAuthLocalService {
     const userAuthRepository = new UserAuthRepository();
     const userAuthDocument = await userAuthRepository.findByEmail({ email });
     if (userAuthDocument) {
-      if (userAuthDocument.isSetPassword) {
+      if (!userAuthDocument.isSetPassword) {
         throw new VerifiedNoPasswordError({});
       }
       throw new EmailExistError({});
@@ -128,7 +135,7 @@ export class AuthLocalService implements IAuthLocalService {
 
     await this._ioredisService.removePinCodeVerifyEmail({ email });
     const userAuth = await this._userAuthRepository.createRegisterLocal({ email });
-    const tokenSetPassword = JWTGenerator.setPassword({ userAuthId: userAuth.id });
+    const tokenSetPassword = JWTGenerator.createPassword({ userAuthId: userAuth.id });
     const { jti, exp } = decode(tokenSetPassword) as JwtPayload;
     console.log(jti);
     await this._userAuthRepository.verifyEmailRegister({ userAuthId: userAuth.id, jti: jti as string });
@@ -140,5 +147,31 @@ export class AuthLocalService implements IAuthLocalService {
 
     await SendEmailQueue.getInstance().addJobSendEmailVerificationSuccess(jobSendEmailVerificationSuccess);
     return { tokenSetPassword, email };
+  }
+
+  public async setPassword({ password, passwordConfirm, tokenSetPassword }: SetPasswordParams) {
+    const { sub, jti } = JWTGenerator.verifyToken({ token: tokenSetPassword, typeToken: 'CREATE_PASSWORD_TOKEN' });
+    const userAuth = await this._userAuthRepository.findById({ userAuthId: sub as string });
+    if (!userAuth) {
+      throw new JWTTokenInvalidError({ message: 'TokenSetPassword invalid' });
+    }
+
+    if (!userAuth.jtiSetPassword && userAuth.password) {
+      throw new AccountPasswordUpdatedError();
+    }
+
+    if (userAuth.jtiSetPassword !== jti) {
+      throw new JWTTokenInvalidError({ message: 'TokenSetPassword invalid' });
+    }
+
+    await this._userAuthRepository.createPassword({ userAuth: userAuth, password, passwordConfirm });
+
+    const { accessToken } = JWTGenerator.accessToken({
+      userAuthId: sub as string,
+      role: userAuth.role
+    });
+    const { refreshToken, jti: jtiRefreshToken } = JWTGenerator.refreshToken({ userAuthId: sub as string });
+    await this._ioredisService.saveRefreshTokenWhitelist({ userAuthId: sub as string, jti: jtiRefreshToken });
+    return { accessToken, refreshToken };
   }
 }

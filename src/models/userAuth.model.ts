@@ -67,7 +67,7 @@ userAuthSchema.virtual('isSetPassword').get(function () {
     this.password;
 
   if (condition) {
-    return !this.password;
+    return true;
   }
   return false;
 });

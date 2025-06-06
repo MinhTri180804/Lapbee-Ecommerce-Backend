@@ -11,6 +11,8 @@ import { AppError } from '../errors/AppError.error.js';
 import { PinCodeGoneError } from '../errors/PinCodeGone.error.js';
 import { UnknownError } from '../errors/Unknown.error.js';
 import { sendErrorResponse } from '../utils/responses.util.js';
+import { JWTTokenInvalidError } from '../errors/JwtTokenInvalid.error.js';
+import { JWTTokenExpiredError } from '../errors/JwtTokenExpired.error.js';
 
 type ErrorHandler<T extends AppError<unknown> | Error> = (response: Response, error: T) => void;
 
@@ -24,6 +26,8 @@ type MappingHandler = {
   [ErrorInstance.PIN_CODE_GONE]: ErrorHandler<PinCodeGoneError>;
   [ErrorInstance.PIN_CODE_EXPIRED]: ErrorHandler<PinCodeExpiredError>;
   [ErrorInstance.PIN_CODE_INVALID]: ErrorHandler<PinCodeInvalidError>;
+  [ErrorInstance.JWT_TOKEN_INVALID]: ErrorHandler<JWTTokenInvalidError>;
+  [ErrorInstance.JWT_TOKEN_EXPIRED]: ErrorHandler<JWTTokenExpiredError>;
 };
 
 class _ErrorMiddlewareHandler {
@@ -37,7 +41,9 @@ class _ErrorMiddlewareHandler {
     [ErrorInstance.UNKNOWN]: this._unknownErrorHandler,
     [ErrorInstance.PIN_CODE_GONE]: this._pinCodeGoneErrorHandler,
     [ErrorInstance.PIN_CODE_EXPIRED]: this._pinCodeExpiredErrorHandler,
-    [ErrorInstance.PIN_CODE_INVALID]: this._pinCodeInvalidErrorHandler
+    [ErrorInstance.PIN_CODE_INVALID]: this._pinCodeInvalidErrorHandler,
+    [ErrorInstance.JWT_TOKEN_INVALID]: this._tokenInvalidErrorHandler,
+    [ErrorInstance.JWT_TOKEN_EXPIRED]: this._tokenExpiredErrorHandler
   };
 
   private constructor() {}
@@ -115,6 +121,20 @@ class _ErrorMiddlewareHandler {
 
   private _pinCodeInvalidErrorHandler(response: Response, error: PinCodeInvalidError) {
     sendErrorResponse<PinCodeInvalidError['details']>({
+      response,
+      content: error
+    });
+  }
+
+  private _tokenInvalidErrorHandler(response: Response, error: JWTTokenInvalidError) {
+    sendErrorResponse<JWTTokenInvalidError['details']>({
+      response,
+      content: error
+    });
+  }
+
+  private _tokenExpiredErrorHandler(response: Response, error: JWTTokenExpiredError) {
+    sendErrorResponse<JWTTokenExpiredError>({
       response,
       content: error
     });

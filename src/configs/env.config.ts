@@ -26,7 +26,11 @@ export const env = {
       PIN_CODE_VERIFY_EMAIL_REGISTER: process.env.EXPIRED_TIME_MINUTE_PIN_CODE_VERIFY_EMAIL_REGISTER
     },
     day: {
-      TOKEN_SET_PASSWORD: process.env.EXPIRED_TIME_DAY_TOKEN_SET_PASSWORD
+      TOKEN_SET_PASSWORD: process.env.EXPIRED_TIME_DAY_TOKEN_SET_PASSWORD,
+      REFRESH_TOKEN: process.env.EXPIRED_TIME_DAY_REFRESH_TOKEN
+    },
+    hours: {
+      ACCESS_TOKEN: process.env.EXPIRED_TIME_HOURS_ACCESS_TOKEN
     }
   },
   mailtrap: {

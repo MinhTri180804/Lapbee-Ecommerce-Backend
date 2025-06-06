@@ -6,7 +6,7 @@ type FindByEmailParams = {
   email: string;
 };
 
-type UpdateJtiSetPasswordParams = {
+type VerifyEmailRegisterParams = {
   userAuthId: string;
   jti: string;
 };
@@ -15,8 +15,21 @@ type CreateRegisterLocalParams = {
   email: string;
 };
 
+type CreatePasswordParams = {
+  userAuth: IUserAuthDocument;
+  password: string;
+  passwordConfirm: string;
+};
+
+type FindByIdParams = {
+  userAuthId: string;
+};
+
 interface IUserAuthRepository {
   findByEmail: (params: FindByEmailParams) => Promise<IUserAuthDocument | null>;
+  verifyEmailRegister: (params: VerifyEmailRegisterParams) => Promise<boolean>;
+  findById: (params: FindByIdParams) => Promise<IUserAuthDocument | null>;
+  createPassword: (params: CreatePasswordParams) => Promise<IUserAuthDocument>;
 }
 
 export class UserAuthRepository implements IUserAuthRepository {
@@ -27,7 +40,7 @@ export class UserAuthRepository implements IUserAuthRepository {
     return await this._userAuthModel.findOne({ email });
   }
 
-  public async verifyEmailRegister({ userAuthId, jti }: UpdateJtiSetPasswordParams): Promise<boolean> {
+  public async verifyEmailRegister({ userAuthId, jti }: VerifyEmailRegisterParams): Promise<boolean> {
     const result = await this._userAuthModel.updateOne(
       {
         _id: userAuthId
@@ -48,5 +61,22 @@ export class UserAuthRepository implements IUserAuthRepository {
     });
 
     return userAuth;
+  }
+
+  public async findById({ userAuthId }: FindByIdParams) {
+    const userAuth = await this._userAuthModel.findById(userAuthId);
+    return userAuth;
+  }
+
+  public async createPassword({
+    userAuth,
+    password,
+    passwordConfirm
+  }: CreatePasswordParams): Promise<IUserAuthDocument> {
+    userAuth.password = password;
+    userAuth.passwordConfirm = passwordConfirm;
+    userAuth.jtiSetPassword = null;
+    const data = await userAuth.save();
+    return data;
   }
 }

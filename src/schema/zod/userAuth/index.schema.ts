@@ -84,7 +84,7 @@ export const userAuthZodSchema = z
     isVerify: isVerifySchema,
     isFirstLogin: isFirstLoginSchema,
     zaloId: zaloIdSchema.optional(),
-    jtiSetPassword: jtiSetPasswordSchema.optional()
+    jtiSetPassword: jtiSetPasswordSchema.optional().nullable()
   })
   .superRefine((data, ctx) => {
     if (data.provider !== UserAuthProviderEnum.BOTH) {
