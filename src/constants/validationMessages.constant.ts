@@ -23,6 +23,11 @@ export const ValidationMessages = {
             WEAK_PASSWORD: 'Password must include at last one lowercase, uppercase, and number',
             TOKEN_SET_PASSWORD_REQUIRED: 'Token set password is required',
             PASSWORD_CONFIRM_MISMATCH: 'Password confirm not match with password'
+          },
+
+          resendVerifyEmail: {
+            EMAIL_INVALID: 'Email invalid',
+            EMAIL_REQUIRED: 'Email is required'
           }
         }
       }

@@ -18,6 +18,9 @@ const {
   PASSWORD_CONFIRM_MISMATCH: PASSWORD_CONFIRM_MISMATCH_SET_PASSWORD
 } = ValidationMessages.api.request.auth.local.setPassword;
 
+const { EMAIL_INVALID: EMAIL_INVALID_RESEND, EMAIL_REQUIRED: EMAIL_REQUIRED_RESEND } =
+  ValidationMessages.api.request.auth.local.resendVerifyEmail;
+
 export const registerLocalRequestBodySchema = z.object({
   email: z
     .string({
@@ -55,6 +58,11 @@ export const setPasswordRequestBodySchema = z
     }
   });
 
+export const resendVerifyEmailRequestBodySchema = z.object({
+  email: z.string({ required_error: EMAIL_REQUIRED_RESEND }).email(EMAIL_INVALID_RESEND)
+});
+
 export type RegisterLocalRequestBody = z.infer<typeof registerLocalRequestBodySchema>;
 export type VerifyEmailRegisterRequestBody = z.infer<typeof verifyEmailRegisterRequestBodySchema>;
 export type SetPasswordRequestBody = z.infer<typeof setPasswordRequestBodySchema>;
+export type ResendVerifyEmailRequestBody = z.infer<typeof resendVerifyEmailRequestBodySchema>;
