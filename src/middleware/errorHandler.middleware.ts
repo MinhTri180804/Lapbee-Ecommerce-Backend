@@ -13,6 +13,8 @@ import { UnknownError } from '../errors/Unknown.error.js';
 import { sendErrorResponse } from '../utils/responses.util.js';
 import { JWTTokenInvalidError } from '../errors/JwtTokenInvalid.error.js';
 import { JWTTokenExpiredError } from '../errors/JwtTokenExpired.error.js';
+import { PinCodeRequestTooSoonError } from '../errors/PinCodeRequestTooSoon.error.js';
+import { AccountPasswordUpdatedError } from 'src/errors/AccountPasswordUpdated.error.js';
 
 type ErrorHandler<T extends AppError<unknown> | Error> = (response: Response, error: T) => void;
 
@@ -28,6 +30,8 @@ type MappingHandler = {
   [ErrorInstance.PIN_CODE_INVALID]: ErrorHandler<PinCodeInvalidError>;
   [ErrorInstance.JWT_TOKEN_INVALID]: ErrorHandler<JWTTokenInvalidError>;
   [ErrorInstance.JWT_TOKEN_EXPIRED]: ErrorHandler<JWTTokenExpiredError>;
+  [ErrorInstance.PIN_CODE_REQUEST_TOO_SOON]: ErrorHandler<PinCodeRequestTooSoonError>;
+  [ErrorInstance.ACCOUNT_PASSWORD_UPDATED]: ErrorHandler<AccountPasswordUpdatedError>;
 };
 
 class _ErrorMiddlewareHandler {
@@ -43,7 +47,9 @@ class _ErrorMiddlewareHandler {
     [ErrorInstance.PIN_CODE_EXPIRED]: this._pinCodeExpiredErrorHandler,
     [ErrorInstance.PIN_CODE_INVALID]: this._pinCodeInvalidErrorHandler,
     [ErrorInstance.JWT_TOKEN_INVALID]: this._tokenInvalidErrorHandler,
-    [ErrorInstance.JWT_TOKEN_EXPIRED]: this._tokenExpiredErrorHandler
+    [ErrorInstance.JWT_TOKEN_EXPIRED]: this._tokenExpiredErrorHandler,
+    [ErrorInstance.PIN_CODE_REQUEST_TOO_SOON]: this._pinCodeRequestTooSoonErrorHandler,
+    [ErrorInstance.ACCOUNT_PASSWORD_UPDATED]: this._accountPasswordUpdatedErrorHandler
   };
 
   private constructor() {}
@@ -135,6 +141,20 @@ class _ErrorMiddlewareHandler {
 
   private _tokenExpiredErrorHandler(response: Response, error: JWTTokenExpiredError) {
     sendErrorResponse<JWTTokenExpiredError>({
+      response,
+      content: error
+    });
+  }
+
+  private _pinCodeRequestTooSoonErrorHandler(response: Response, error: PinCodeRequestTooSoonError) {
+    sendErrorResponse<PinCodeRequestTooSoonError['details']>({
+      response,
+      content: error
+    });
+  }
+
+  private _accountPasswordUpdatedErrorHandler(response: Response, error: AccountPasswordUpdatedError) {
+    sendErrorResponse<AccountPasswordUpdatedError['details']>({
       response,
       content: error
     });
