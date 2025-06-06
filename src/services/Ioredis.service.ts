@@ -24,6 +24,7 @@ type CheckExistRefreshTokenWhitelistParams = {
 type GetPinCodeVerifyEmailReturns = {
   pinCode: number;
   expiredAt: number;
+  createdAt: number;
 } | null;
 
 type RemovePinCodeVerifyEmailParams = {
@@ -89,7 +90,7 @@ export class IoredisService implements IIoredisService {
     const expiredTimeAtRedisInSecond = 60 * (this._pinCodeVerifyEmailExpiresInMinute + 15);
 
     const key = RedisKeyGenerator.pinCodeVerifyEmail({ email });
-    const value = `${pinCode}-${expiredTimeAtPinCode}`;
+    const value = `${pinCode}-${expiredTimeAtPinCode}-${currentTime}`;
     await this._redisInstance.setex(key, expiredTimeAtRedisInSecond, value);
     return { expiredTimeAtPinCode };
   }
@@ -100,10 +101,11 @@ export class IoredisService implements IIoredisService {
     if (!data) {
       return null;
     }
-    const [pinCode, expiredAt] = data.split('-');
+    const [pinCode, expiredAt, createdAt] = data.split('-');
     return {
       pinCode: Number(pinCode),
-      expiredAt: Number(expiredAt)
+      expiredAt: Number(expiredAt),
+      createdAt: Number(createdAt)
     };
   }
 

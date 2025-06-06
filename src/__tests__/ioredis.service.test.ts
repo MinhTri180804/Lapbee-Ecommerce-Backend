@@ -58,11 +58,12 @@ describe('IoredisService', () => {
       const envPinCodeExpiresInMinute = Number(env.expiredTime.minute.PIN_CODE_VERIFY_EMAIL_REGISTER);
       const envPinCodeExpiresInSecond = 60 * envPinCodeExpiresInMinute;
 
+      const currentTime = Math.floor(MOCK_CURRENT_TIME / 1000);
       const expectedExpiredTimeAtPinCode = Math.floor(MOCK_CURRENT_TIME / 1000) + envPinCodeExpiresInSecond;
 
       const expectedExpiredTimeAtRedis = 60 * (envPinCodeExpiresInMinute + 15); // (10 + 15) * 60 = 1500 second
 
-      const expectedValueToSave = `${pinCode}-${expectedExpiredTimeAtPinCode}`;
+      const expectedValueToSave = `${pinCode}-${expectedExpiredTimeAtPinCode}-${currentTime}`;
 
       const result = await ioredisService.savePinCodeVerifyEmail({ email, pinCode });
 
@@ -108,11 +109,12 @@ describe('IoredisService', () => {
       const newEnvPinCodeExpiresInMinute = Number(newEnv.expiredTime.minute.PIN_CODE_VERIFY_EMAIL_REGISTER);
       const newEnvPinCodeExpiresInSecond = 60 * newEnvPinCodeExpiresInMinute;
 
+      const currentTime = Math.floor(MOCK_CURRENT_TIME / 1000);
       const expectedExpiredTimeAtPinCode = Math.floor(MOCK_CURRENT_TIME / 1000) + newEnvPinCodeExpiresInSecond;
 
       const expectedExpiredTimeAtRedis = 60 * (newEnvPinCodeExpiresInMinute + 15);
 
-      const expectedValueToSave = `${pinCode}-${expectedExpiredTimeAtPinCode}`;
+      const expectedValueToSave = `${pinCode}-${expectedExpiredTimeAtPinCode}-${currentTime}`;
 
       const result = await newIoredisService.savePinCodeVerifyEmail({ email, pinCode });
 
