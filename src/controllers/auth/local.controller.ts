@@ -5,6 +5,7 @@ import { UserAuthRepository } from 'src/repositories/UserAuth.repository.js';
 import { IoredisService } from 'src/services/Ioredis.service.js';
 import {
   RegisterLocalRequestBody,
+  SetPasswordRequestBody,
   VerifyEmailRegisterRequestBody
 } from '../../schema/zod/api/requests/auth/local.schema.js';
 import { AuthLocalService } from '../../services/auth/local.service.js';
@@ -12,6 +13,7 @@ import { sendSuccessResponse } from '../../utils/responses.util.js';
 
 type RegisterRequestType = Request<unknown, unknown, RegisterLocalRequestBody>;
 type VerifyEmailRequestType = Request<unknown, unknown, VerifyEmailRegisterRequestBody>;
+type SetPasswordRequestType = Request<unknown, unknown, SetPasswordRequestBody>;
 
 interface IAuthLocalController {
   register: (request: RegisterRequestType, response: Response, next: NextFunction) => void;
@@ -53,6 +55,29 @@ export class AuthLocalController implements IAuthLocalController {
         data: {
           email: emailVerifyRegister,
           tokenSetPassword
+        }
+      }
+    });
+  }
+
+  public async setPassword(request: SetPasswordRequestType, response: Response) {
+    const { tokenSetPassword, password, passwordConfirm } = request.body;
+    const redis = IoredisManager.getInstance().getRedisClient();
+    const ioredisService = new IoredisService(redis);
+    const authLocalService = new AuthLocalService(this._userAuthRepository, ioredisService);
+    const { accessToken, refreshToken } = await authLocalService.setPassword({
+      tokenSetPassword,
+      password,
+      passwordConfirm
+    });
+    sendSuccessResponse<{ accessToken: typeof accessToken; refreshToken: typeof refreshToken }>({
+      response,
+      content: {
+        statusCode: StatusCodes.CREATED,
+        message: 'Create account password success',
+        data: {
+          accessToken,
+          refreshToken
         }
       }
     });

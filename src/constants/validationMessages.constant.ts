@@ -13,6 +13,16 @@ export const ValidationMessages = {
             OTP_REQUIRED: 'OTP Required',
             OTP_MAX_LENGTH: 'Max length OTP is',
             OTP_INVALID: 'OTP invalid'
+          },
+
+          setPassword: {
+            EMAIL_INVALID: 'Email invalid',
+            EMAIL_REQUIRED: 'Email is required',
+            PASSWORD_REQUIRED: 'Password is required',
+            PASSWORD_CONFIRM_REQUIRED: 'Password confirm is required',
+            WEAK_PASSWORD: 'Password must include at last one lowercase, uppercase, and number',
+            TOKEN_SET_PASSWORD_REQUIRED: 'Token set password is required',
+            PASSWORD_CONFIRM_MISMATCH: 'Password confirm not match with password'
           }
         }
       }

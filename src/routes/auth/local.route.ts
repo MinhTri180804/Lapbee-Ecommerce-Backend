@@ -4,6 +4,8 @@ import { validateRequestBody } from '../../middleware/validateRequestBody.middle
 import {
   RegisterLocalRequestBody,
   registerLocalRequestBodySchema,
+  SetPasswordRequestBody,
+  setPasswordRequestBodySchema,
   VerifyEmailRegisterRequestBody,
   verifyEmailRegisterRequestBodySchema
 } from '../../schema/zod/api/requests/auth/local.schema.js';
@@ -15,6 +17,8 @@ const validateRequestBodyRegister = validateRequestBody<RegisterLocalRequestBody
 const validateRequestBodyVerifyEmail = validateRequestBody<VerifyEmailRegisterRequestBody>(
   verifyEmailRegisterRequestBodySchema
 );
+const validateRequestBodySetPassword = validateRequestBody<SetPasswordRequestBody>(setPasswordRequestBodySchema);
 
 router.post('/register', validateRequestBodyRegister, authLocalController.register.bind(authLocalController));
 router.post('/verify-email', validateRequestBodyVerifyEmail, authLocalController.verifyEmail.bind(authLocalController));
+router.post('/set-password', validateRequestBodySetPassword, authLocalController.setPassword.bind(authLocalController));

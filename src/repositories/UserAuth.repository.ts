@@ -18,6 +18,7 @@ type CreateRegisterLocalParams = {
 type CreatePasswordParams = {
   userAuth: IUserAuthDocument;
   password: string;
+  passwordConfirm: string;
 };
 
 type FindByIdParams = {
@@ -67,8 +68,13 @@ export class UserAuthRepository implements IUserAuthRepository {
     return userAuth;
   }
 
-  public async createPassword({ userAuth, password }: CreatePasswordParams): Promise<IUserAuthDocument> {
+  public async createPassword({
+    userAuth,
+    password,
+    passwordConfirm
+  }: CreatePasswordParams): Promise<IUserAuthDocument> {
     userAuth.password = password;
+    userAuth.passwordConfirm = passwordConfirm;
     userAuth.jtiSetPassword = null;
     const data = await userAuth.save();
     return data;
