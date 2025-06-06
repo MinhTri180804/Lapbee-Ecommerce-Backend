@@ -20,5 +20,6 @@ export const ErrorMessages: ErrorMessagesType = {
   [ErrorInstance.JWT_TOKEN_EXPIRED]: 'Token expired',
   [ErrorInstance.ACCOUNT_PASSWORD_UPDATED]: 'Account password has already been created',
   [ErrorInstance.PIN_CODE_REQUEST_TOO_SOON]: 'Please wait before requesting a new OTP.',
-  [ErrorInstance.PIN_CODE_NOTFOUND]: 'No valid OTP found for this email.'
+  [ErrorInstance.PIN_CODE_NOTFOUND]: 'No valid OTP found for this email.',
+  [ErrorInstance.NOTFOUND_EMAIL_SET_PASSWORD]: 'Email address does not exist in case setPassword.'
 };
