@@ -329,10 +329,10 @@ describe('sendErrorResponse', () => {
       expect.objectContaining({
         success: false,
         statusCode: StatusCodes.BAD_REQUEST,
-        message: ErrorMessages.NOTFOUND_EMAIL_SET_PASSWORD_ERROR,
+        message: ErrorMessages.NOTFOUND_EMAIL_SET_PASSWORD_TOKEN_ERROR,
         error: expect.objectContaining({
-          code: ErrorCodes.NOTFOUND_EMAIL_SET_PASSWORD_ERROR,
-          name: ErrorInstance.NOTFOUND_EMAIL_SET_PASSWORD,
+          code: ErrorCodes.NOTFOUND_EMAIL_SET_PASSWORD_TOKEN_ERROR,
+          name: ErrorInstance.NOTFOUND_EMAIL_SET_PASSWORD_TOKEN,
           details: null
         })
       })
@@ -359,8 +359,8 @@ describe('sendErrorResponse', () => {
         statusCode: StatusCodes.BAD_REQUEST,
         message: customMessage,
         error: expect.objectContaining({
-          code: ErrorCodes.NOTFOUND_EMAIL_SET_PASSWORD_ERROR,
-          name: ErrorInstance.NOTFOUND_EMAIL_SET_PASSWORD,
+          code: ErrorCodes.NOTFOUND_EMAIL_SET_PASSWORD_TOKEN_ERROR,
+          name: ErrorInstance.NOTFOUND_EMAIL_SET_PASSWORD_TOKEN,
           details: null
         })
       })

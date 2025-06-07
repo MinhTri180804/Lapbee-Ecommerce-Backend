@@ -1,6 +1,7 @@
 import { decode, JwtPayload } from 'jsonwebtoken';
 import { PinCodeGoneError } from 'src/errors/PinCodeGone.error.js';
 import {
+  ResendSetPasswordTokenRequestBody,
   ResendVerifyEmailRequestBody,
   SetPasswordRequestBody,
   VerifyEmailRegisterRequestBody
@@ -23,6 +24,7 @@ import { SubjectSendEmail } from '../../utils/subjectSendEmail.util.js';
 import { IoredisService } from '../Ioredis.service.js';
 import { PinCodeNotFoundError } from 'src/errors/PinCodeNotFound.error.js';
 import { PinCodeRequestTooSoonError } from 'src/errors/PinCodeRequestTooSoon.error.js';
+import { NotFoundEmailSetPasswordError } from '../../errors/NotFoundEmailSetPassword.error.js';
 
 type RegisterParams = {
   email: string;
@@ -34,6 +36,8 @@ type SetPasswordParams = SetPasswordRequestBody;
 
 type ResendVerifyEmailParam = ResendVerifyEmailRequestBody;
 
+type ResendSetPasswordTokenParams = ResendSetPasswordTokenRequestBody;
+
 type VerifyEmailRegisterReturns = {
   tokenSetPassword: string;
   email: string;
@@ -43,6 +47,7 @@ interface IAuthLocalService {
   register: (params: RegisterParams) => Promise<void>;
   verifyEmailRegister: (params: VerifyEmailRegisterParams) => Promise<VerifyEmailRegisterReturns>;
   resendVerifyEmail: (params: ResendVerifyEmailParam) => Promise<void>;
+  resendSetPasswordToken: (params: ResendSetPasswordTokenParams) => Promise<void>;
 }
 
 export class AuthLocalService implements IAuthLocalService {
@@ -213,5 +218,30 @@ export class AuthLocalService implements IAuthLocalService {
 
     await SendEmailQueue.getInstance().addJobSendEmailVerify(job);
     return;
+  }
+
+  public async resendSetPasswordToken({ email }: ResendSetPasswordTokenParams) {
+    const userAuthDocument = await this._userAuthRepository.findByEmail({ email });
+
+    if (!userAuthDocument) {
+      throw new NotFoundEmailSetPasswordError({});
+    }
+
+    if (!userAuthDocument.jtiSetPassword) {
+      throw new AccountPasswordUpdatedError();
+    }
+
+    const setPasswordToken = JWTGenerator.createPassword({ userAuthId: userAuthDocument.id as string });
+    const { jti, exp } = decode(setPasswordToken) as JwtPayload;
+
+    await this._userAuthRepository.updateJtiSetPassword({ userAuth: userAuthDocument, jtiSetPassword: jti as string });
+
+    const job = SendEmailJobs.createResendSetPasswordToken({
+      to: email,
+      expiresAt: exp as number,
+      tokenSetPassword: setPasswordToken
+    });
+
+    await SendEmailQueue.getInstance().addJobResendSetPasswordToken(job);
   }
 }

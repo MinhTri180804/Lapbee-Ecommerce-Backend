@@ -16,6 +16,7 @@ import { JWTTokenExpiredError } from '../errors/JwtTokenExpired.error.js';
 import { PinCodeRequestTooSoonError } from '../errors/PinCodeRequestTooSoon.error.js';
 import { AccountPasswordUpdatedError } from 'src/errors/AccountPasswordUpdated.error.js';
 import { PinCodeNotFoundError } from '../errors/PinCodeNotFound.error.js';
+import { NotFoundEmailSetPasswordError } from 'src/errors/NotFoundEmailSetPassword.error.js';
 
 type ErrorHandler<T extends AppError<unknown> | Error> = (response: Response, error: T) => void;
 
@@ -34,6 +35,7 @@ type MappingHandler = {
   [ErrorInstance.PIN_CODE_REQUEST_TOO_SOON]: ErrorHandler<PinCodeRequestTooSoonError>;
   [ErrorInstance.ACCOUNT_PASSWORD_UPDATED]: ErrorHandler<AccountPasswordUpdatedError>;
   [ErrorInstance.PIN_CODE_NOTFOUND]: ErrorHandler<PinCodeNotFoundError>;
+  [ErrorInstance.NOTFOUND_EMAIL_SET_PASSWORD_TOKEN]: ErrorHandler<NotFoundEmailSetPasswordError>;
 };
 
 class _ErrorMiddlewareHandler {
@@ -52,7 +54,8 @@ class _ErrorMiddlewareHandler {
     [ErrorInstance.JWT_TOKEN_EXPIRED]: this._tokenExpiredErrorHandler,
     [ErrorInstance.PIN_CODE_REQUEST_TOO_SOON]: this._pinCodeRequestTooSoonErrorHandler,
     [ErrorInstance.ACCOUNT_PASSWORD_UPDATED]: this._accountPasswordUpdatedErrorHandler,
-    [ErrorInstance.PIN_CODE_NOTFOUND]: this._pinCodeNotFoundErrorHandler
+    [ErrorInstance.PIN_CODE_NOTFOUND]: this._pinCodeNotFoundErrorHandler,
+    [ErrorInstance.NOTFOUND_EMAIL_SET_PASSWORD_TOKEN]: this._NotFoundEmailSetPasswordTokenErrorHandler
   };
 
   private constructor() {}
@@ -165,6 +168,13 @@ class _ErrorMiddlewareHandler {
 
   private _pinCodeNotFoundErrorHandler(response: Response, error: PinCodeNotFoundError) {
     sendErrorResponse<PinCodeNotFoundError['details']>({
+      response,
+      content: error
+    });
+  }
+
+  private _NotFoundEmailSetPasswordTokenErrorHandler(response: Response, error: NotFoundEmailSetPasswordError) {
+    sendErrorResponse<NotFoundEmailSetPasswordError['details']>({
       response,
       content: error
     });

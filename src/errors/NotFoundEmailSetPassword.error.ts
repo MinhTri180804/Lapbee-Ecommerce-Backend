@@ -11,7 +11,7 @@ export class NotFoundEmailSetPasswordError extends AppError<Details> {
   constructor({ message = null }: ConstructorParams) {
     super({
       statusCode: StatusCodes.BAD_REQUEST,
-      errorInstanceKey: 'NOTFOUND_EMAIL_SET_PASSWORD',
+      errorInstanceKey: 'NOTFOUND_EMAIL_SET_PASSWORD_TOKEN',
       details: null,
       message
     });

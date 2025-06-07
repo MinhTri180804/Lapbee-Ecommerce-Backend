@@ -74,7 +74,7 @@ export class SendEmailService implements ISendEmailService {
   public async resendSetPasswordToken({ data }: ResendSetPasswordTokenParams) {
     try {
       const { to, expiresAt, tokenSetPassword } = data;
-      const subject = SubjectSendEmail.VERIFICATION_EMAIL_SUCCESS;
+      const subject = SubjectSendEmail.RESEND_SET_PASSWORD_TOKEN;
       const urlCallback = `${env.client.urlCallback.SET_PASSWORD}?token=${tokenSetPassword}`;
       const timeExpiresFormat = formatTime({ second: expiresAt });
       await this._transporter.sendMail({

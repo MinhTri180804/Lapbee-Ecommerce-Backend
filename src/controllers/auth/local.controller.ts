@@ -5,6 +5,7 @@ import { UserAuthRepository } from 'src/repositories/UserAuth.repository.js';
 import { IoredisService } from 'src/services/Ioredis.service.js';
 import {
   RegisterLocalRequestBody,
+  ResendSetPasswordTokenRequestBody,
   ResendVerifyEmailRequestBody,
   SetPasswordRequestBody,
   VerifyEmailRegisterRequestBody
@@ -16,12 +17,18 @@ type RegisterRequestType = Request<unknown, unknown, RegisterLocalRequestBody>;
 type VerifyEmailRequestType = Request<unknown, unknown, VerifyEmailRegisterRequestBody>;
 type SetPasswordRequestType = Request<unknown, unknown, SetPasswordRequestBody>;
 type ResendVerifyEmailRequestType = Request<unknown, unknown, ResendVerifyEmailRequestBody>;
+type ResendSetPasswordTokenRequestType = Request<unknown, unknown, ResendSetPasswordTokenRequestBody>;
 
 interface IAuthLocalController {
   register: (request: RegisterRequestType, response: Response, next: NextFunction) => void;
   verifyEmail: (request: VerifyEmailRequestType, response: Response, next: NextFunction) => void;
   setPassword: (request: SetPasswordRequestType, response: Response, next: NextFunction) => Promise<void>;
   resendVerifyEmail: (request: ResendVerifyEmailRequestType, response: Response, next: NextFunction) => Promise<void>;
+  resendSetPasswordToken: (
+    request: ResendSetPasswordTokenRequestType,
+    response: Response,
+    next: NextFunction
+  ) => Promise<void>;
 }
 
 export class AuthLocalController implements IAuthLocalController {
@@ -99,6 +106,21 @@ export class AuthLocalController implements IAuthLocalController {
         statusCode: StatusCodes.OK,
         message: 'Resend pin code verify email success',
         data: null
+      }
+    });
+  }
+
+  public async resendSetPasswordToken(request: ResendSetPasswordTokenRequestType, response: Response): Promise<void> {
+    const { email } = request.body;
+    const redis = IoredisManager.getInstance().getRedisClient();
+    const ioredisService = new IoredisService(redis);
+    const authLocalService = new AuthLocalService(this._userAuthRepository, ioredisService);
+    await authLocalService.resendSetPasswordToken({ email });
+    sendSuccessResponse<null>({
+      response,
+      content: {
+        statusCode: StatusCodes.OK,
+        message: 'Resend setPasswordToken success'
       }
     });
   }
