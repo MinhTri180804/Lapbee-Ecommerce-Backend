@@ -21,6 +21,11 @@ type CreatePasswordParams = {
   passwordConfirm: string;
 };
 
+type UpdateJtiSetPasswordParams = {
+  userAuth: IUserAuthDocument;
+  jtiSetPassword: string;
+};
+
 type FindByIdParams = {
   userAuthId: string;
 };
@@ -30,6 +35,7 @@ interface IUserAuthRepository {
   verifyEmailRegister: (params: VerifyEmailRegisterParams) => Promise<boolean>;
   findById: (params: FindByIdParams) => Promise<IUserAuthDocument | null>;
   createPassword: (params: CreatePasswordParams) => Promise<IUserAuthDocument>;
+  updateJtiSetPassword: (params: UpdateJtiSetPasswordParams) => Promise<IUserAuthDocument>;
 }
 
 export class UserAuthRepository implements IUserAuthRepository {
@@ -78,5 +84,14 @@ export class UserAuthRepository implements IUserAuthRepository {
     userAuth.jtiSetPassword = null;
     const data = await userAuth.save();
     return data;
+  }
+
+  public async updateJtiSetPassword({
+    userAuth,
+    jtiSetPassword
+  }: UpdateJtiSetPasswordParams): Promise<IUserAuthDocument> {
+    userAuth.jtiSetPassword = jtiSetPassword;
+    await userAuth.save();
+    return userAuth;
   }
 }

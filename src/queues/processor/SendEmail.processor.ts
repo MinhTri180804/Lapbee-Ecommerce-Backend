@@ -1,9 +1,15 @@
 import { JobsSendEmail, JobsSendEmailValues } from '../../constants/jobs.constant.js';
 import { SendEmailService } from '../../services/SendEmail.service.js';
-import { VerificationEmailSuccessType, VerifyEmailJobType } from '../jobs/SendEmail.job.js';
+import {
+  ResendSetPasswordTokenJobType,
+  VerificationEmailSuccessJobType,
+  VerifyEmailJobType
+} from '../jobs/SendEmail.job.js';
 
 type SendEmailVerifyParams = Pick<VerifyEmailJobType, 'data'>;
-type SendEmailVerificationSuccessParams = Pick<VerificationEmailSuccessType, 'data'>;
+type SendEmailVerificationSuccessParams = Pick<VerificationEmailSuccessJobType, 'data'>;
+type ResendSetPasswordTokenParams = Pick<ResendSetPasswordTokenJobType, 'data'>;
+
 type HandleParams = {
   name: JobsSendEmailValues;
 };
@@ -17,7 +23,8 @@ class _ProcessorSendEmail {
   static instance: _ProcessorSendEmail;
   private _mappingProcessor: MappingProcessor = {
     [JobsSendEmail['VERIFY_EMAIL']]: this._sendEmailVerify,
-    [JobsSendEmail.VERIFICATION_EMAIL_SUCCESS]: this._sendEmailVerificationSuccess
+    [JobsSendEmail.VERIFICATION_EMAIL_SUCCESS]: this._sendEmailVerificationSuccess,
+    [JobsSendEmail.RESEND_SET_PASSWORD_TOKEN]: this._resendSetPasswordToken
   };
 
   private constructor() {}
@@ -38,6 +45,11 @@ class _ProcessorSendEmail {
   private async _sendEmailVerificationSuccess({ data }: SendEmailVerificationSuccessParams): Promise<void> {
     const sendEmailService = new SendEmailService();
     await sendEmailService.verificationEmailSuccess({ data });
+  }
+
+  private async _resendSetPasswordToken({ data }: ResendSetPasswordTokenParams): Promise<void> {
+    const sendEmailService = new SendEmailService();
+    await sendEmailService.resendSetPasswordToken({ data });
   }
 
   public handle({ name }: HandleParams) {

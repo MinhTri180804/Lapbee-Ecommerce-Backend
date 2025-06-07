@@ -28,6 +28,10 @@ export const ValidationMessages = {
           resendVerifyEmail: {
             EMAIL_INVALID: 'Email invalid',
             EMAIL_REQUIRED: 'Email is required'
+          },
+          resendSetPasswordToken: {
+            EMAIL_INVALID: 'Email invalid',
+            EMAIL_REQUIRED: 'Email is required'
           }
         }
       }
