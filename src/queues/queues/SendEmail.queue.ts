@@ -1,7 +1,11 @@
 import { Queue } from 'bullmq';
 import { Queues } from '../../constants/queues.constant.js';
 import { Redis } from 'ioredis';
-import { VerificationEmailSuccessType, VerifyEmailJobType } from '../jobs/SendEmail.job.js';
+import {
+  ResendSetPasswordTokenJobType,
+  VerificationEmailSuccessJobType,
+  VerifyEmailJobType
+} from '../jobs/SendEmail.job.js';
 import { QueueLogger } from '../../loggers/bullMQ.logger.js';
 import winston from 'winston';
 import { bullMQConnection } from '../../utils/bullMQConnection.util.js';
@@ -60,7 +64,7 @@ export class SendEmailQueue {
     }
   }
 
-  public async addJobSendEmailVerificationSuccess(job: VerificationEmailSuccessType) {
+  public async addJobSendEmailVerificationSuccess(job: VerificationEmailSuccessJobType) {
     this._isSendEmailQueueInstance();
     const { data, jobOptions, name } = job;
     try {
@@ -69,6 +73,19 @@ export class SendEmailQueue {
     } catch (error) {
       this._writeLogAddJobError({ error });
       throw new Error(`Add job sendEmailVerificationSuccess fail with error: ${(error as Error).message}`);
+    }
+  }
+
+  public async addJobResendSetPasswordToken(job: ResendSetPasswordTokenJobType) {
+    this._isSendEmailQueueInstance();
+    const { data, jobOptions, name } = job;
+
+    try {
+      await this._queue!.add(name, data, jobOptions);
+      this._writeLogAddJobSuccess({ jobName: name, jobId: jobOptions.jobId as string });
+    } catch (error) {
+      this._writeLogAddJobError({ error });
+      throw new Error(`Add job resendSetPasswordToken fail with error: ${(error as Error).message}`);
     }
   }
 }

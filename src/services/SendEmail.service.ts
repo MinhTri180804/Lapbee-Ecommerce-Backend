@@ -1,8 +1,8 @@
 import { env } from '../configs/env.config.js';
 import { SubjectSendEmail } from '../constants/subjectSendEmail.constant.js';
 import {
-  ResendSetPasswordTokenType,
-  VerificationEmailSuccessType,
+  ResendSetPasswordTokenJobType,
+  VerificationEmailSuccessJobType,
   VerifyEmailJobType
 } from '../queues/jobs/SendEmail.job.js';
 import { NodemailerManager } from '../configs/NodemailerManager.config.js';
@@ -10,8 +10,8 @@ import { formatTime } from '../utils/formatTime.util.js';
 import { Transporter } from 'nodemailer';
 
 type VerifyEmailParams = Pick<VerifyEmailJobType, 'data'>;
-type VerificationEmailSuccessParams = Pick<VerificationEmailSuccessType, 'data'>;
-type ResendSetPasswordTokenParams = Pick<ResendSetPasswordTokenType, 'data'>;
+type VerificationEmailSuccessParams = Pick<VerificationEmailSuccessJobType, 'data'>;
+type ResendSetPasswordTokenParams = Pick<ResendSetPasswordTokenJobType, 'data'>;
 
 interface ISendEmailService {
   verifyEmail: (params: VerifyEmailParams) => Promise<void>;
