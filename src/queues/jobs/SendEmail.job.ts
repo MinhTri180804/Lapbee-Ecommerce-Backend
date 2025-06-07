@@ -98,10 +98,30 @@ class _SendEmailJobs implements ISendEmailJobs {
     this._writeLogCreateJobSuccess({ jobId: jobOptions.jobId as string });
     return { data, jobOptions, name: JobsSendEmail.VERIFICATION_EMAIL_SUCCESS };
   }
+
+  public createResendSetPasswordToken(data: CreateResendSetPasswordTokenParams): CreateResendSetPasswordTokenReturns {
+    const { to: email } = data;
+
+    const jobOptions: JobsOptions = {
+      attempts: 3,
+      backoff: {
+        type: 'exponential',
+        delay: 1000
+      },
+      removeOnComplete: true,
+      removeOnFail: {
+        count: 10
+      },
+      jobId: `resendSetPasswordToken-${encodeURIComponent(email)}`
+    };
+
+    this._writeLogCreateJobSuccess({ jobId: jobOptions.jobId as string });
+    return { data, jobOptions, name: JobsSendEmail.RESEND_SET_PASSWORD_TOKEN };
+  }
 }
 
 export type VerifyEmailJobType = CreateVerifyEmailReturns;
-export type VerificationEmailSuccessType = CreateVerificationEmailSuccessReturns;
-export type ResendSetPasswordTokenType = CreateResendSetPasswordTokenReturns;
+export type VerificationEmailSuccessJobType = CreateVerificationEmailSuccessReturns;
+export type ResendSetPasswordTokenJobType = CreateResendSetPasswordTokenReturns;
 
 export const SendEmailJobs = _SendEmailJobs.getInstance();
