@@ -49,6 +49,20 @@ const userAuthSchema = new Schema<IUserAuthDocument>(
     jtiSetPassword: {
       type: String,
       default: null
+    },
+    blockedStatus: {
+      isBlocked: {
+        type: Boolean,
+        default: false
+      },
+      message: {
+        type: String,
+        default: null
+      },
+      default: {
+        isBlocked: false,
+        message: null
+      }
     }
   },
   {

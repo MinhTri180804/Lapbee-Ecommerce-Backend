@@ -14,7 +14,8 @@ const {
   INVALID_EMAIL,
   ZALO_ID_REQUIRED,
   MAX_LENGTH_PASSWORD_CONFIRM,
-  MIN_LENGTH_PASSWORD_CONFIRM
+  MIN_LENGTH_PASSWORD_CONFIRM,
+  BLOCKED_STATUS_MESSAGE_REQUIRED
 } = ValidationMessages.userAuth;
 
 const REGEX_CHECK_PASSWORD = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
@@ -38,3 +39,7 @@ export const isFirstLoginSchema = z.boolean();
 export const isVerifySchema = z.boolean();
 export const zaloIdSchema = z.string({ required_error: ZALO_ID_REQUIRED });
 export const jtiSetPasswordSchema = z.string();
+export const blockedStatusSchema = z.object({
+  isBlocked: z.boolean().default(false),
+  message: z.string({ required_error: BLOCKED_STATUS_MESSAGE_REQUIRED }).optional().nullable()
+});
