@@ -8,6 +8,10 @@ type RefreshTokenWhitelistParams = {
   userAuthId: string;
 };
 
+type ResetPasswordTokenParams = {
+  userAuthId: string;
+};
+
 export class RedisKeyGenerator {
   /**
    * Generates a Redis key specifically for storing or retrieving PIN codes
@@ -33,5 +37,9 @@ export class RedisKeyGenerator {
 
   static refreshTokenWhitelist({ userAuthId }: RefreshTokenWhitelistParams): string {
     return `${RedisKeys.REFRESH_TOKEN_WHITELIST}:${userAuthId}`;
+  }
+
+  static resetPasswordToken({ userAuthId }: ResetPasswordTokenParams): string {
+    return `${RedisKeys.RESET_PASSWORD_TOKEN}:${userAuthId}`;
   }
 }
