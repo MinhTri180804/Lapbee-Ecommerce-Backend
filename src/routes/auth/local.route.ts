@@ -2,6 +2,8 @@ import { Router } from 'express';
 import { AuthLocalController } from '../../controllers/auth/local.controller.js';
 import { validateRequestBody } from '../../middleware/validateRequestBody.middleware.js';
 import {
+  LoginRequestBody,
+  loginRequestBodySchema,
   RegisterLocalRequestBody,
   registerLocalRequestBodySchema,
   ResendSetPasswordTokenRequestBody,
@@ -28,6 +30,7 @@ const validateRequestBodyResendVerifyEmail = validateRequestBody<ResendVerifyEma
 const validateRequestBodyResendSetPasswordToken = validateRequestBody<ResendSetPasswordTokenRequestBody>(
   resendSetPasswordTokenRequestBodySchema
 );
+const validateRequestBodyLogin = validateRequestBody<LoginRequestBody>(loginRequestBodySchema);
 
 router.post('/register', validateRequestBodyRegister, authLocalController.register.bind(authLocalController));
 router.post('/verify-email', validateRequestBodyVerifyEmail, authLocalController.verifyEmail.bind(authLocalController));
@@ -42,3 +45,4 @@ router.post(
   validateRequestBodyResendSetPasswordToken,
   authLocalController.resendSetPasswordToken.bind(authLocalController)
 );
+router.post('/login', validateRequestBodyLogin, authLocalController.login.bind(authLocalController));

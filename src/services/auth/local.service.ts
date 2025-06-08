@@ -1,6 +1,7 @@
 import { decode, JwtPayload } from 'jsonwebtoken';
 import { PinCodeGoneError } from 'src/errors/PinCodeGone.error.js';
 import {
+  LoginRequestBody,
   ResendSetPasswordTokenRequestBody,
   ResendVerifyEmailRequestBody,
   SetPasswordRequestBody,
@@ -25,6 +26,9 @@ import { IoredisService } from '../Ioredis.service.js';
 import { PinCodeNotFoundError } from 'src/errors/PinCodeNotFound.error.js';
 import { PinCodeRequestTooSoonError } from 'src/errors/PinCodeRequestTooSoon.error.js';
 import { NotFoundEmailSetPasswordError } from '../../errors/NotFoundEmailSetPassword.error.js';
+import { InvalidCredentialsError } from '../../errors/InvalidCredentials.error.js';
+import { comparePassword } from '../../utils/password.util.js';
+import { AccountLockedError } from '../../errors/AccountLocked.error.js';
 
 type RegisterParams = {
   email: string;
@@ -38,6 +42,13 @@ type ResendVerifyEmailParam = ResendVerifyEmailRequestBody;
 
 type ResendSetPasswordTokenParams = ResendSetPasswordTokenRequestBody;
 
+type LoginParams = LoginRequestBody;
+
+type LoginReturns = {
+  accessToken: string;
+  refreshToken: string;
+};
+
 type VerifyEmailRegisterReturns = {
   tokenSetPassword: string;
   email: string;
@@ -48,6 +59,7 @@ interface IAuthLocalService {
   verifyEmailRegister: (params: VerifyEmailRegisterParams) => Promise<VerifyEmailRegisterReturns>;
   resendVerifyEmail: (params: ResendVerifyEmailParam) => Promise<void>;
   resendSetPasswordToken: (params: ResendSetPasswordTokenParams) => Promise<void>;
+  login: (params: LoginParams) => Promise<LoginReturns>;
 }
 
 export class AuthLocalService implements IAuthLocalService {
@@ -243,5 +255,29 @@ export class AuthLocalService implements IAuthLocalService {
     });
 
     await SendEmailQueue.getInstance().addJobResendSetPasswordToken(job);
+  }
+
+  public async login({ email, password }: LoginParams): Promise<LoginReturns> {
+    const userAuth = await this._userAuthRepository.findByEmail({ email });
+    if (!userAuth) {
+      throw new InvalidCredentialsError({});
+    }
+
+    const isMatchPassword = comparePassword({ password, encryptedPassword: userAuth.password as string });
+    if (!isMatchPassword) {
+      throw new InvalidCredentialsError({});
+    }
+
+    if (userAuth.blockedStatus?.isBlocked) {
+      throw new AccountLockedError({
+        messageBlocked: userAuth.blockedStatus.message || ''
+      });
+    }
+
+    const { accessToken } = JWTGenerator.accessToken({ userAuthId: userAuth.id, role: userAuth.role });
+    const { refreshToken, jti } = JWTGenerator.refreshToken({ userAuthId: userAuth.id });
+    await this._ioredisService.saveRefreshTokenWhitelist({ userAuthId: userAuth.id, jti });
+
+    return { accessToken, refreshToken };
   }
 }
