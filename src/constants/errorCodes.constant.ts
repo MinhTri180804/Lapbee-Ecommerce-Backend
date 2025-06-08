@@ -19,7 +19,8 @@ export const ErrorCodes: ErrorCodes = {
   [ErrorInstance.ACCOUNT_PASSWORD_UPDATED]: 4004,
   [ErrorInstance.PIN_CODE_REQUEST_TOO_SOON]: 4029,
   [ErrorInstance.PIN_CODE_NOTFOUND]: 4010,
-  [ErrorInstance.NOTFOUND_EMAIL_SET_PASSWORD_TOKEN]: 4000
+  [ErrorInstance.NOTFOUND_EMAIL_SET_PASSWORD_TOKEN]: 4000,
+  [ErrorInstance.ACCOUNT_LOCKED]: 4030
 } as const;
 
 export type ErrorCodesKeys = keyof typeof ErrorCodes;
