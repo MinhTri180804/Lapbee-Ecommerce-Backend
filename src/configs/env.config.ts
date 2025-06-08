@@ -63,7 +63,8 @@ export const env = {
   },
   client: {
     urlCallback: {
-      SET_PASSWORD: process.env.URL_CALLBACK_SET_PASSWORD
+      SET_PASSWORD: process.env.URL_CALLBACK_SET_PASSWORD,
+      RESET_PASSWORD: process.env.URL_CALLBACK_RESET_PASSWORD
     }
   }
 };

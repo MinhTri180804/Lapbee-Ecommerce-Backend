@@ -2,6 +2,7 @@ import { env } from '../configs/env.config.js';
 import { SubjectSendEmail } from '../constants/subjectSendEmail.constant.js';
 import {
   ResendSetPasswordTokenJobType,
+  ResetPasswordTokenJobType,
   VerificationEmailSuccessJobType,
   VerifyEmailJobType
 } from '../queues/jobs/SendEmail.job.js';
@@ -12,11 +13,13 @@ import { Transporter } from 'nodemailer';
 type VerifyEmailParams = Pick<VerifyEmailJobType, 'data'>;
 type VerificationEmailSuccessParams = Pick<VerificationEmailSuccessJobType, 'data'>;
 type ResendSetPasswordTokenParams = Pick<ResendSetPasswordTokenJobType, 'data'>;
+type ResetPasswordTokenParams = Pick<ResetPasswordTokenJobType, 'data'>;
 
 interface ISendEmailService {
   verifyEmail: (params: VerifyEmailParams) => Promise<void>;
   verificationEmailSuccess: (params: VerificationEmailSuccessParams) => Promise<void>;
   resendSetPasswordToken: (params: ResendSetPasswordTokenParams) => Promise<void>;
+  resetPasswordToken: (params: ResetPasswordTokenParams) => Promise<void>;
 }
 
 export class SendEmailService implements ISendEmailService {
@@ -85,7 +88,7 @@ export class SendEmailService implements ISendEmailService {
               <h5>Dưới đây là đường dẫn đặt mật khẩu cho tài khoản của bạn</h5>
               <div>${urlCallback}</div>
               <button>
-                <a href=${urlCallback}>Đặt mật khẩu cho tài khoản</a>
+                <a href="${urlCallback}">Đặt mật khẩu cho tài khoản</a>
               </button>
               <div>Thời hạn sử dụng của đường dẫn đặt lại mật khẩu đến ${timeExpiresFormat}</div>
             </div>`
@@ -93,6 +96,31 @@ export class SendEmailService implements ISendEmailService {
     } catch (error) {
       console.log('Send email resend setPasswordToken success error: ', error);
       throw new Error(`Send email resend setPasswordToken success error: ${(error as Error).message}`);
+    }
+  }
+
+  public async resetPasswordToken({ data }: ResetPasswordTokenParams): Promise<void> {
+    const { to, tokenResetPassword, expiresAt } = data;
+    const urlCallback = `${env.client.urlCallback.RESET_PASSWORD}?token=${tokenResetPassword}`;
+    const timeExpiresFormat = formatTime({ second: expiresAt });
+    const subject = `Lapbee: ${SubjectSendEmail.RESET_PASSWORD_TOKEN}`;
+    try {
+      await this._transporter.sendMail({
+        from: 'lapbee@gmail.com',
+        to,
+        subject,
+        html: `<div>
+              <h5>Dưới đây là đường dẫn đặt mật khẩu cho tài khoản của bạn</h5>
+              <div>${urlCallback}</div>
+              <button>
+                <a href="${urlCallback}">Đặt mật khẩu cho tài khoản</a>
+              </button>
+              <div>Thời hạn sử dụng của đường dẫn đặt lại mật khẩu đến ${timeExpiresFormat}</div>
+            </div>`
+      });
+    } catch (error) {
+      console.log('Send email resetPassword fail error: ', error);
+      throw new Error(`Send email resetPassword fail error: ${(error as Error).message}`);
     }
   }
 }
