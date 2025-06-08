@@ -1,8 +1,8 @@
-import { model, Schema, Document } from 'mongoose';
-import bcrypt from 'bcrypt';
-import { UserAuthRoleEnum } from '../enums/userAuthRole.enum.js';
+import { Document, model, Schema } from 'mongoose';
 import { UserAuthProviderEnum } from '../enums/userAuthProvider.enum.js';
+import { UserAuthRoleEnum } from '../enums/userAuthRole.enum.js';
 import { UserAuthSchemaType } from '../schema/zod/userAuth/index.schema.js';
+import { hashPassword } from '../utils/password.util.js';
 
 const DOCUMENT_NAME = 'users_auth';
 const COLLECTION_NAME = 'user_auth';
@@ -58,10 +58,6 @@ const userAuthSchema = new Schema<IUserAuthDocument>(
       message: {
         type: String,
         default: null
-      },
-      default: {
-        isBlocked: false,
-        message: null
       }
     }
   },
@@ -91,8 +87,8 @@ userAuthSchema.pre('save', async function (next) {
   if (!this.password) return next();
 
   this.passwordConfirm = undefined;
-  const hashPassword = await bcrypt.hash(this.password, 10);
-  this.password = hashPassword;
+  const encryptPassword = await hashPassword({ password: this.password });
+  this.password = encryptPassword;
   return next();
 });
 

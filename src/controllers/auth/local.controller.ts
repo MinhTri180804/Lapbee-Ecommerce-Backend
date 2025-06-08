@@ -4,6 +4,7 @@ import { IoredisManager } from 'src/configs/ioredisManager.config.js';
 import { UserAuthRepository } from 'src/repositories/UserAuth.repository.js';
 import { IoredisService } from 'src/services/Ioredis.service.js';
 import {
+  LoginRequestBody,
   RegisterLocalRequestBody,
   ResendSetPasswordTokenRequestBody,
   ResendVerifyEmailRequestBody,
@@ -18,6 +19,7 @@ type VerifyEmailRequestType = Request<unknown, unknown, VerifyEmailRegisterReque
 type SetPasswordRequestType = Request<unknown, unknown, SetPasswordRequestBody>;
 type ResendVerifyEmailRequestType = Request<unknown, unknown, ResendVerifyEmailRequestBody>;
 type ResendSetPasswordTokenRequestType = Request<unknown, unknown, ResendSetPasswordTokenRequestBody>;
+type LoginRequestType = Request<unknown, unknown, LoginRequestBody>;
 
 interface IAuthLocalController {
   register: (request: RegisterRequestType, response: Response, next: NextFunction) => void;
@@ -29,6 +31,7 @@ interface IAuthLocalController {
     response: Response,
     next: NextFunction
   ) => Promise<void>;
+  login: (request: LoginRequestType, response: Response, next: NextFunction) => Promise<void>;
 }
 
 export class AuthLocalController implements IAuthLocalController {
@@ -121,6 +124,25 @@ export class AuthLocalController implements IAuthLocalController {
       content: {
         statusCode: StatusCodes.OK,
         message: 'Resend setPasswordToken success'
+      }
+    });
+  }
+
+  public async login(request: LoginRequestType, response: Response) {
+    const { email, password } = request.body;
+    const redis = IoredisManager.getInstance().getRedisClient();
+    const ioredisService = new IoredisService(redis);
+    const authLocalService = new AuthLocalService(this._userAuthRepository, ioredisService);
+    const { accessToken, refreshToken } = await authLocalService.login({ email, password });
+    sendSuccessResponse<{ accessToken: string; refreshToken: string }>({
+      response,
+      content: {
+        statusCode: StatusCodes.OK,
+        message: 'Login success',
+        data: {
+          accessToken,
+          refreshToken
+        }
       }
     });
   }

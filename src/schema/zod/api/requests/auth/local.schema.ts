@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { ValidationMessages } from '../../../../../constants/validationMessages.constant.js';
-import { passwordSchema } from '../../../userAuth/fields.schema.js';
+import { emailSchema, passwordSchema } from '../../../userAuth/fields.schema.js';
 
 const { EMAIL_REQUIRED: EMAIL_REQUIRED_REGISTER, EMAIL_INVALID: EMAIL_INVALID_REGISTER } =
   ValidationMessages.api.request.auth.local.register;
@@ -72,8 +72,14 @@ export const resendSetPasswordTokenRequestBodySchema = z.object({
     .email(EMAIL_INVALID_RESEND_SET_PASSWORD_TOKEN)
 });
 
+export const loginRequestBodySchema = z.object({
+  email: emailSchema,
+  password: passwordSchema
+});
+
 export type RegisterLocalRequestBody = z.infer<typeof registerLocalRequestBodySchema>;
 export type VerifyEmailRegisterRequestBody = z.infer<typeof verifyEmailRegisterRequestBodySchema>;
 export type SetPasswordRequestBody = z.infer<typeof setPasswordRequestBodySchema>;
 export type ResendVerifyEmailRequestBody = z.infer<typeof resendVerifyEmailRequestBodySchema>;
 export type ResendSetPasswordTokenRequestBody = z.infer<typeof resendSetPasswordTokenRequestBodySchema>;
+export type LoginRequestBody = z.infer<typeof loginRequestBodySchema>;

@@ -17,6 +17,8 @@ import { PinCodeRequestTooSoonError } from '../errors/PinCodeRequestTooSoon.erro
 import { AccountPasswordUpdatedError } from 'src/errors/AccountPasswordUpdated.error.js';
 import { PinCodeNotFoundError } from '../errors/PinCodeNotFound.error.js';
 import { NotFoundEmailSetPasswordError } from 'src/errors/NotFoundEmailSetPassword.error.js';
+import { AccountLockedError } from 'src/errors/AccountLocked.error.js';
+import { InvalidCredentialsError } from 'src/errors/InvalidCredentials.error.js';
 
 type ErrorHandler<T extends AppError<unknown> | Error> = (response: Response, error: T) => void;
 
@@ -36,6 +38,8 @@ type MappingHandler = {
   [ErrorInstance.ACCOUNT_PASSWORD_UPDATED]: ErrorHandler<AccountPasswordUpdatedError>;
   [ErrorInstance.PIN_CODE_NOTFOUND]: ErrorHandler<PinCodeNotFoundError>;
   [ErrorInstance.NOTFOUND_EMAIL_SET_PASSWORD_TOKEN]: ErrorHandler<NotFoundEmailSetPasswordError>;
+  [ErrorInstance.ACCOUNT_LOCKED]: ErrorHandler<AccountLockedError>;
+  [ErrorInstance.INVALID_CREDENTIALS]: ErrorHandler<InvalidCredentialsError>;
 };
 
 class _ErrorMiddlewareHandler {
@@ -55,7 +59,9 @@ class _ErrorMiddlewareHandler {
     [ErrorInstance.PIN_CODE_REQUEST_TOO_SOON]: this._pinCodeRequestTooSoonErrorHandler,
     [ErrorInstance.ACCOUNT_PASSWORD_UPDATED]: this._accountPasswordUpdatedErrorHandler,
     [ErrorInstance.PIN_CODE_NOTFOUND]: this._pinCodeNotFoundErrorHandler,
-    [ErrorInstance.NOTFOUND_EMAIL_SET_PASSWORD_TOKEN]: this._NotFoundEmailSetPasswordTokenErrorHandler
+    [ErrorInstance.NOTFOUND_EMAIL_SET_PASSWORD_TOKEN]: this._notFoundEmailSetPasswordTokenErrorHandler,
+    [ErrorInstance.ACCOUNT_LOCKED]: this._accountLockedErrorHandler,
+    [ErrorInstance.INVALID_CREDENTIALS]: this._invalidCredentialsErrorHandler
   };
 
   private constructor() {}
@@ -173,11 +179,19 @@ class _ErrorMiddlewareHandler {
     });
   }
 
-  private _NotFoundEmailSetPasswordTokenErrorHandler(response: Response, error: NotFoundEmailSetPasswordError) {
+  private _notFoundEmailSetPasswordTokenErrorHandler(response: Response, error: NotFoundEmailSetPasswordError) {
     sendErrorResponse<NotFoundEmailSetPasswordError['details']>({
       response,
       content: error
     });
+  }
+
+  private _accountLockedErrorHandler(response: Response, error: AccountLockedError) {
+    sendErrorResponse<AccountLockedError['details']>({ response, content: error });
+  }
+
+  private _invalidCredentialsErrorHandler(response: Response, error: InvalidCredentialsError) {
+    sendErrorResponse<InvalidCredentialsError['details']>({ response, content: error });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
