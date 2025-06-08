@@ -54,6 +54,11 @@ type CreateResetPasswordTokenReturns = {
 
 interface ISendEmailJobs {
   createVerifyEmail: (params: CreateVerifyEmailParams) => CreateVerifyEmailReturns;
+  createVerificationEmailSuccess: (
+    params: CreateVerificationEmailSuccessParams
+  ) => CreateVerificationEmailSuccessReturns;
+  createResendSetPasswordToken: (params: CreateResendSetPasswordTokenParams) => CreateResendSetPasswordTokenReturns;
+  createResetPasswordToken: (params: CreateResetPasswordTokenParams) => CreateResetPasswordTokenReturns;
 }
 
 class _SendEmailJobs implements ISendEmailJobs {
@@ -129,6 +134,26 @@ class _SendEmailJobs implements ISendEmailJobs {
 
     this._writeLogCreateJobSuccess({ jobId: jobOptions.jobId as string });
     return { data, jobOptions, name: JobsSendEmail.RESEND_SET_PASSWORD_TOKEN };
+  }
+
+  public createResetPasswordToken(data: CreateResetPasswordTokenParams): CreateResetPasswordTokenReturns {
+    const { to: email } = data;
+
+    const jobOptions: JobsOptions = {
+      attempts: 3,
+      backoff: {
+        type: 'exponential',
+        delay: 1000
+      },
+      removeOnComplete: true,
+      removeOnFail: {
+        count: 10
+      },
+      jobId: `resetPasswordToken-${encodeURIComponent(email)}`
+    };
+
+    this._writeLogCreateJobSuccess({ jobId: jobOptions.jobId as string });
+    return { data, jobOptions, name: JobsSendEmail.RESET_PASSWORD_TOKEN };
   }
 }
 
