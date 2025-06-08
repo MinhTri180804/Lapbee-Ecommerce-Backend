@@ -19,6 +19,7 @@ import { PinCodeNotFoundError } from '../errors/PinCodeNotFound.error.js';
 import { NotFoundEmailSetPasswordError } from 'src/errors/NotFoundEmailSetPassword.error.js';
 import { AccountLockedError } from 'src/errors/AccountLocked.error.js';
 import { InvalidCredentialsError } from 'src/errors/InvalidCredentials.error.js';
+import { ResetPasswordTokenRequestTooSoonError } from '../errors/ResetPasswordTokenTooSoon.error.js';
 
 type ErrorHandler<T extends AppError<unknown> | Error> = (response: Response, error: T) => void;
 
@@ -40,6 +41,7 @@ type MappingHandler = {
   [ErrorInstance.NOTFOUND_EMAIL_SET_PASSWORD_TOKEN]: ErrorHandler<NotFoundEmailSetPasswordError>;
   [ErrorInstance.ACCOUNT_LOCKED]: ErrorHandler<AccountLockedError>;
   [ErrorInstance.INVALID_CREDENTIALS]: ErrorHandler<InvalidCredentialsError>;
+  [ErrorInstance.RESET_PASSWORD_TOKEN_REQUEST_TOO_SOON]: ErrorHandler<ResetPasswordTokenRequestTooSoonError>;
 };
 
 class _ErrorMiddlewareHandler {
@@ -61,7 +63,8 @@ class _ErrorMiddlewareHandler {
     [ErrorInstance.PIN_CODE_NOTFOUND]: this._pinCodeNotFoundErrorHandler,
     [ErrorInstance.NOTFOUND_EMAIL_SET_PASSWORD_TOKEN]: this._notFoundEmailSetPasswordTokenErrorHandler,
     [ErrorInstance.ACCOUNT_LOCKED]: this._accountLockedErrorHandler,
-    [ErrorInstance.INVALID_CREDENTIALS]: this._invalidCredentialsErrorHandler
+    [ErrorInstance.INVALID_CREDENTIALS]: this._invalidCredentialsErrorHandler,
+    [ErrorInstance.RESET_PASSWORD_TOKEN_REQUEST_TOO_SOON]: this._resetPasswordTokenRequestTooSoonErrorHandler
   };
 
   private constructor() {}
@@ -192,6 +195,16 @@ class _ErrorMiddlewareHandler {
 
   private _invalidCredentialsErrorHandler(response: Response, error: InvalidCredentialsError) {
     sendErrorResponse<InvalidCredentialsError['details']>({ response, content: error });
+  }
+
+  private _resetPasswordTokenRequestTooSoonErrorHandler(
+    response: Response,
+    error: ResetPasswordTokenRequestTooSoonError
+  ) {
+    sendErrorResponse<ResetPasswordTokenRequestTooSoonError['details']>({
+      response,
+      content: error
+    });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
