@@ -24,6 +24,10 @@ type VerifyTokenParams = {
   typeToken: TypeTokenKeys;
 };
 
+type ResetPasswordTokenParams = {
+  userAuthId: string;
+};
+
 type TokenMessageErrorExpired = {
   [key in TypeTokenKeys]: string;
 };
@@ -35,19 +39,22 @@ type TokenMessageErrorInvalid = {
 const TypeToken = {
   ACCESS_TOKEN: env.jwt.SECRET_KEY.ACCESS_TOKEN,
   REFRESH_TOKEN: env.jwt.SECRET_KEY.REFRESH_TOKEN,
-  CREATE_PASSWORD_TOKEN: env.jwt.SECRET_KEY.SET_PASSWORD
+  CREATE_PASSWORD_TOKEN: env.jwt.SECRET_KEY.SET_PASSWORD,
+  RESET_PASSWORD_TOKEN: env.jwt.SECRET_KEY.RESET_PASSWORD_TOKEN
 } as const;
 
 const tokenMessageErrorExpired: TokenMessageErrorExpired = {
   ACCESS_TOKEN: 'AccessToken expired',
   REFRESH_TOKEN: 'RefreshToken expired',
-  CREATE_PASSWORD_TOKEN: 'CreatePasswordToken expired'
+  CREATE_PASSWORD_TOKEN: 'CreatePasswordToken expired',
+  RESET_PASSWORD_TOKEN: 'ResetPasswordToken expired'
 };
 
 const tokenMessageErrorInvalid: TokenMessageErrorInvalid = {
   ACCESS_TOKEN: 'AccessToken Invalid',
   REFRESH_TOKEN: 'RefreshToken Invalid',
-  CREATE_PASSWORD_TOKEN: 'CreatePasswordToken Invalid'
+  CREATE_PASSWORD_TOKEN: 'CreatePasswordToken Invalid',
+  RESET_PASSWORD_TOKEN: 'ResetPasswordToken invalid'
 };
 
 type TypeTokenKeys = keyof typeof TypeToken;
@@ -124,6 +131,27 @@ export class JWTGenerator {
     });
 
     return jwtToken;
+  }
+
+  static resetPasswordToken({ userAuthId }: ResetPasswordTokenParams): {
+    token: string;
+    expiresAt: number;
+    jti: string;
+  } {
+    const jti = uuidV4();
+    const SECRET_KEY = TypeToken.RESET_PASSWORD_TOKEN as string;
+    const EXPIRES_SECOND = Number(env.expiredTime.minute.RESET_PASSWORD_TOKEN) * 60;
+    const token = jwt.sign({}, SECRET_KEY, {
+      subject: userAuthId,
+      expiresIn: EXPIRES_SECOND,
+      jwtid: jti
+    });
+
+    return {
+      token,
+      jti,
+      expiresAt: EXPIRES_SECOND
+    };
   }
 
   static isMatchWithTypeStringValue(value: string): boolean {
