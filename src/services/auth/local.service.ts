@@ -1,6 +1,7 @@
 import { decode, JwtPayload } from 'jsonwebtoken';
 import { PinCodeGoneError } from 'src/errors/PinCodeGone.error.js';
 import {
+  ForgotPasswordRequestBody,
   LoginRequestBody,
   ResendSetPasswordTokenRequestBody,
   ResendVerifyEmailRequestBody,
@@ -29,6 +30,7 @@ import { NotFoundEmailSetPasswordError } from '../../errors/NotFoundEmailSetPass
 import { InvalidCredentialsError } from '../../errors/InvalidCredentials.error.js';
 import { comparePassword } from '../../utils/password.util.js';
 import { AccountLockedError } from '../../errors/AccountLocked.error.js';
+import { ResetPasswordTokenRequestTooSoonError } from 'src/errors/ResetPasswordTokenTooSoon.error.js';
 
 type RegisterParams = {
   email: string;
@@ -43,6 +45,8 @@ type ResendVerifyEmailParam = ResendVerifyEmailRequestBody;
 type ResendSetPasswordTokenParams = ResendSetPasswordTokenRequestBody;
 
 type LoginParams = LoginRequestBody;
+
+type ForgotPasswordParams = ForgotPasswordRequestBody;
 
 type LoginReturns = {
   accessToken: string;
@@ -60,6 +64,7 @@ interface IAuthLocalService {
   resendVerifyEmail: (params: ResendVerifyEmailParam) => Promise<void>;
   resendSetPasswordToken: (params: ResendSetPasswordTokenParams) => Promise<void>;
   login: (params: LoginParams) => Promise<LoginReturns>;
+  forgotPassword: (params: ForgotPasswordParams) => Promise<void>;
 }
 
 export class AuthLocalService implements IAuthLocalService {
@@ -68,7 +73,9 @@ export class AuthLocalService implements IAuthLocalService {
   private _pinCodeResendAvailableMinute: number = Number(env.pinCode.verifyEmail.RESEND_AVAILABLE_MINUTE);
   private _pinCodeResendAvailableMs: number = this._pinCodeResendAvailableMinute * 60 * 1000;
   private _pinCodeCoolDownTimeMinute: number = Number(env.coolDownTime.minute.PIN_CODE_VERIFY_EMAIL);
-  private _pinCodeCollDownTimeSecond: number = 60 * this._pinCodeCoolDownTimeMinute;
+  private _pinCodeCoolDownTimeSecond: number = 60 * this._pinCodeCoolDownTimeMinute;
+  private _resetPasswordTokenCoolDownTimeMinute: number = Number(env.coolDownTime.minute.RESET_PASSWORD_TOKEN);
+  private _resetPasswordTokenCoolDownTimeSecond: number = this._resetPasswordTokenCoolDownTimeMinute * 60;
   private _userAuthRepository: UserAuthRepository;
   private _ioredisService: IoredisService;
 
@@ -208,7 +215,7 @@ export class AuthLocalService implements IAuthLocalService {
 
     const { createdAt } = dataPinCode;
     const currentTime = Math.floor(Date.now() / 1000);
-    const conditionResend = currentTime >= createdAt + this._pinCodeCollDownTimeSecond;
+    const conditionResend = currentTime >= createdAt + this._pinCodeCoolDownTimeSecond;
     if (!conditionResend) {
       throw new PinCodeRequestTooSoonError({ message: 'Request resend pinCode verify email too soon, please wait.' });
     }
@@ -279,5 +286,34 @@ export class AuthLocalService implements IAuthLocalService {
     await this._ioredisService.saveRefreshTokenWhitelist({ userAuthId: userAuth.id, jti });
 
     return { accessToken, refreshToken };
+  }
+
+  public async forgotPassword({ email }: ForgotPasswordParams): Promise<void> {
+    const userAuth = await this._userAuthRepository.findByEmail({ email });
+    if (!userAuth || !userAuth.password) return;
+    const resetPasswordTokenInRedis = await this._ioredisService.getResetPasswordToken({ userAuthId: userAuth.id });
+    if (resetPasswordTokenInRedis) {
+      const { expiredAt, createdAt } = resetPasswordTokenInRedis;
+      const currentTime = Math.floor(Date.now() / 1000);
+      if (currentTime < expiredAt) {
+        const isResendAvailable = currentTime - (createdAt + this._resetPasswordTokenCoolDownTimeSecond) > 0;
+        const remainingMS = isResendAvailable
+          ? 0
+          : createdAt + this._resetPasswordTokenCoolDownTimeSecond - currentTime;
+        throw new ResetPasswordTokenRequestTooSoonError({
+          errorDetails: {
+            resendAvailable: isResendAvailable,
+            sentAt: createdAt,
+            expiresAt: expiredAt,
+            remainingMs: remainingMS
+          }
+        });
+      }
+    }
+    const { token, expiresAt, jti } = JWTGenerator.resetPasswordToken({ userAuthId: userAuth.id });
+    await this._ioredisService.saveResetPasswordToken({ userAuthId: userAuth.id, jti, expiresAt });
+    const job = SendEmailJobs.createResetPasswordToken({ to: email, tokenResetPassword: token, expiresAt });
+    await SendEmailQueue.getInstance().addJobResetPasswordToken(job);
+    return;
   }
 }

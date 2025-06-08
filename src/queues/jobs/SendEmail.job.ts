@@ -22,6 +22,12 @@ type CreateResendSetPasswordTokenParams = {
   expiresAt: number;
 };
 
+type CreateResetPasswordTokenParams = {
+  to: string;
+  tokenResetPassword: string;
+  expiresAt: number;
+};
+
 type CreateVerificationEmailSuccessReturns = {
   data: CreateVerificationEmailSuccessParams;
   name: JobsSendEmailValues;
@@ -40,8 +46,19 @@ type CreateResendSetPasswordTokenReturns = {
   jobOptions: JobsOptions;
 };
 
+type CreateResetPasswordTokenReturns = {
+  data: CreateResetPasswordTokenParams;
+  name: JobsSendEmailValues;
+  jobOptions: JobsOptions;
+};
+
 interface ISendEmailJobs {
   createVerifyEmail: (params: CreateVerifyEmailParams) => CreateVerifyEmailReturns;
+  createVerificationEmailSuccess: (
+    params: CreateVerificationEmailSuccessParams
+  ) => CreateVerificationEmailSuccessReturns;
+  createResendSetPasswordToken: (params: CreateResendSetPasswordTokenParams) => CreateResendSetPasswordTokenReturns;
+  createResetPasswordToken: (params: CreateResetPasswordTokenParams) => CreateResetPasswordTokenReturns;
 }
 
 class _SendEmailJobs implements ISendEmailJobs {
@@ -118,10 +135,31 @@ class _SendEmailJobs implements ISendEmailJobs {
     this._writeLogCreateJobSuccess({ jobId: jobOptions.jobId as string });
     return { data, jobOptions, name: JobsSendEmail.RESEND_SET_PASSWORD_TOKEN };
   }
+
+  public createResetPasswordToken(data: CreateResetPasswordTokenParams): CreateResetPasswordTokenReturns {
+    const { to: email } = data;
+
+    const jobOptions: JobsOptions = {
+      attempts: 3,
+      backoff: {
+        type: 'exponential',
+        delay: 1000
+      },
+      removeOnComplete: true,
+      removeOnFail: {
+        count: 10
+      },
+      jobId: `resetPasswordToken-${encodeURIComponent(email)}`
+    };
+
+    this._writeLogCreateJobSuccess({ jobId: jobOptions.jobId as string });
+    return { data, jobOptions, name: JobsSendEmail.RESET_PASSWORD_TOKEN };
+  }
 }
 
 export type VerifyEmailJobType = CreateVerifyEmailReturns;
 export type VerificationEmailSuccessJobType = CreateVerificationEmailSuccessReturns;
 export type ResendSetPasswordTokenJobType = CreateResendSetPasswordTokenReturns;
+export type ResetPasswordTokenJobType = CreateResetPasswordTokenReturns;
 
 export const SendEmailJobs = _SendEmailJobs.getInstance();

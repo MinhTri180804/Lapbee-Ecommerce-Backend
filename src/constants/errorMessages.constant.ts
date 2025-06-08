@@ -23,5 +23,6 @@ export const ErrorMessages: ErrorMessagesType = {
   [ErrorInstance.PIN_CODE_NOTFOUND]: 'No valid OTP found for this email.',
   [ErrorInstance.NOTFOUND_EMAIL_SET_PASSWORD_TOKEN]: 'Email address does not exist in case setPassword.',
   [ErrorInstance.ACCOUNT_LOCKED]: 'Your account has been locked. Please contact support.',
-  [ErrorInstance.INVALID_CREDENTIALS]: 'Email or password is incorrect.'
+  [ErrorInstance.INVALID_CREDENTIALS]: 'Email or password is incorrect.',
+  [ErrorInstance.RESET_PASSWORD_TOKEN_REQUEST_TOO_SOON]: 'Please wait before requesting a new resetPasswordToken.'
 };
