@@ -17,6 +17,7 @@ import { AccountPasswordUpdatedError } from '../errors/AccountPasswordUpdated.er
 import { PinCodeRequestTooSoonError } from '../errors/PinCodeRequestTooSoon.error.js';
 import { PinCodeNotFoundError } from '../errors/PinCodeNotFound.error.js';
 import { NotFoundEmailSetPasswordError } from '../errors/NotFoundEmailSetPassword.error.js';
+import { AccountLockedError } from '../errors/AccountLocked.error.js';
 
 const mockResponse = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -417,6 +418,67 @@ describe('sendErrorResponse', () => {
           code: ErrorCodes.PIN_CODE_NOTFOUND_ERROR,
           name: ErrorInstance.PIN_CODE_NOTFOUND,
           details: null
+        })
+      })
+    );
+  });
+
+  it('Send Error Response with AccountLockedError with custom message', () => {
+    Object.defineProperty(env.app, 'NODE_ENV', {
+      writable: true,
+      value: 'dev'
+    });
+
+    const mockMessage = 'mock message';
+    const messageBlocked = 'Mock message blocked';
+    const error = new AccountLockedError({ messageBlocked, message: mockMessage });
+    sendErrorResponse({
+      response: res,
+      content: error
+    });
+
+    expect(res.status).toHaveBeenCalledWith(StatusCodes.FORBIDDEN);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        success: false,
+        statusCode: StatusCodes.FORBIDDEN,
+        message: mockMessage,
+        error: expect.objectContaining({
+          code: ErrorCodes.ACCOUNT_LOCKED_ERROR,
+          name: ErrorInstance.ACCOUNT_LOCKED,
+          details: {
+            messageBlocked
+          }
+        })
+      })
+    );
+  });
+
+  it('Send Error Response with AccountLockedError', () => {
+    Object.defineProperty(env.app, 'NODE_ENV', {
+      writable: true,
+      value: 'dev'
+    });
+
+    const messageBlocked = 'Mock message blocked';
+    const error = new AccountLockedError({ messageBlocked });
+    sendErrorResponse({
+      response: res,
+      content: error
+    });
+
+    expect(res.status).toHaveBeenCalledWith(StatusCodes.FORBIDDEN);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        success: false,
+        statusCode: StatusCodes.FORBIDDEN,
+        message: ErrorMessages.ACCOUNT_LOCKED_ERROR,
+        error: expect.objectContaining({
+          code: ErrorCodes.ACCOUNT_LOCKED_ERROR,
+          name: ErrorInstance.ACCOUNT_LOCKED,
+          details: {
+            messageBlocked
+          }
         })
       })
     );
