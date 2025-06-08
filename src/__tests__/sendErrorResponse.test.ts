@@ -18,6 +18,7 @@ import { PinCodeRequestTooSoonError } from '../errors/PinCodeRequestTooSoon.erro
 import { PinCodeNotFoundError } from '../errors/PinCodeNotFound.error.js';
 import { NotFoundEmailSetPasswordError } from '../errors/NotFoundEmailSetPassword.error.js';
 import { AccountLockedError } from '../errors/AccountLocked.error.js';
+import { InvalidCredentialsError } from '../errors/InvalidCredentials.error.js';
 
 const mockResponse = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -479,6 +480,63 @@ describe('sendErrorResponse', () => {
           details: {
             messageBlocked
           }
+        })
+      })
+    );
+  });
+
+  it('Send Error Response with InvalidCredentialsError', () => {
+    Object.defineProperty(env.app, 'NODE_ENV', {
+      writable: true,
+      value: 'dev'
+    });
+
+    const error = new InvalidCredentialsError({});
+    sendErrorResponse({
+      response: res,
+      content: error
+    });
+
+    expect(res.status).toHaveBeenCalledWith(StatusCodes.UNAUTHORIZED);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        success: false,
+        statusCode: StatusCodes.UNAUTHORIZED,
+        message: ErrorMessages.INVALID_CREDENTIALS_ERROR,
+        error: expect.objectContaining({
+          code: ErrorCodes.INVALID_CREDENTIALS_ERROR,
+          name: ErrorInstance.INVALID_CREDENTIALS,
+          details: null
+        })
+      })
+    );
+  });
+
+  it('Send Error Response with InvalidCredentialsError with custom message', () => {
+    Object.defineProperty(env.app, 'NODE_ENV', {
+      writable: true,
+      value: 'dev'
+    });
+
+    const customMessage = 'custom message';
+    const error = new InvalidCredentialsError({
+      message: customMessage
+    });
+    sendErrorResponse({
+      response: res,
+      content: error
+    });
+
+    expect(res.status).toHaveBeenCalledWith(StatusCodes.UNAUTHORIZED);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        success: false,
+        statusCode: StatusCodes.UNAUTHORIZED,
+        message: customMessage,
+        error: expect.objectContaining({
+          code: ErrorCodes.INVALID_CREDENTIALS_ERROR,
+          name: ErrorInstance.INVALID_CREDENTIALS,
+          details: null
         })
       })
     );
