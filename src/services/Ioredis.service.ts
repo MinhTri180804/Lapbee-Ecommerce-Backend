@@ -31,10 +31,7 @@ type GetResetPasswordTokenParams = {
   userAuthId: string;
 };
 
-type GetResetPasswordTokenReturns = {
-  jti: string;
-  expiredAt: number;
-} | null;
+type GetResetPasswordTokenReturns = SaveResetPasswordTokenValue | null;
 
 type RemovePinCodeVerifyEmailParams = {
   email: string;
@@ -59,6 +56,12 @@ type GetPinCodeVerifyEmailReturns = {
   createdAt: number;
 } | null;
 
+type SaveResetPasswordTokenValue = {
+  jti: string;
+  expiredAt: number;
+  createdAt: number;
+};
+
 interface IIoredisService {
   savePinCodeVerifyEmail: (params: SavePinCodeVerifyEmailParams) => Promise<SavePinCodeVerifyEmailResponse>;
   getPinCodeVerifyEmail: (params: GetPinCodeVerifyEmailParams) => Promise<GetPinCodeVerifyEmailReturns>;
@@ -74,6 +77,8 @@ export class IoredisService implements IIoredisService {
   private _redisInstance: Redis;
   private readonly _pinCodeVerifyEmailExpiresInMinute = Number(env.expiredTime.minute.PIN_CODE_VERIFY_EMAIL_REGISTER);
   private readonly _pinCodeVerifyEmailExpiresInSecond = 60 * this._pinCodeVerifyEmailExpiresInMinute;
+  private readonly _resetPasswordTokenExpiresInMinute = Number(env.expiredTime.minute.RESET_PASSWORD_TOKEN);
+  private readonly _resetPasswordTokenExpiresInSecond = 60 * this._resetPasswordTokenExpiresInMinute;
 
   constructor(redis: Redis) {
     this._redisInstance = redis;
@@ -155,11 +160,17 @@ export class IoredisService implements IIoredisService {
     await this._redisInstance.srem(key, jti);
   }
 
-  public async saveResetPasswordToken({ userAuthId, jti, expiresAt }: SaveResetPasswordTokenParams): Promise<void> {
+  public async saveResetPasswordToken({ userAuthId, jti }: SaveResetPasswordTokenParams): Promise<void> {
     const key = RedisKeyGenerator.resetPasswordToken({ userAuthId });
-    const value = `${jti}-${expiresAt}`;
-    const expiresAtInRedis = expiresAt + 15 * 60;
-    await this._redisInstance.setex(key, expiresAtInRedis, value);
+    const currentTime = Math.floor(Date.now() / 1000);
+    const tokenExpiresAt = currentTime + this._resetPasswordTokenExpiresInSecond;
+    const value: SaveResetPasswordTokenValue = {
+      jti: jti,
+      expiredAt: tokenExpiresAt,
+      createdAt: currentTime
+    };
+    const expiresAtInRedis = this._resetPasswordTokenExpiresInSecond + 15 * 60;
+    await this._redisInstance.setex(key, expiresAtInRedis, JSON.stringify(value));
     return;
   }
 
@@ -169,10 +180,11 @@ export class IoredisService implements IIoredisService {
     const key = RedisKeyGenerator.resetPasswordToken({ userAuthId });
     const data = await this._redisInstance.get(key);
     if (!data) return null;
-    const [jti, expiredAt] = data.split('-');
+    const { expiredAt, jti, createdAt } = JSON.parse(data) as SaveResetPasswordTokenValue;
     return {
       jti,
-      expiredAt: Number(expiredAt)
+      expiredAt: Number(expiredAt),
+      createdAt: Number(createdAt)
     };
   }
 

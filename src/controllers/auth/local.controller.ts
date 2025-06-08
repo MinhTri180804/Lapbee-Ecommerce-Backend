@@ -4,6 +4,7 @@ import { IoredisManager } from 'src/configs/ioredisManager.config.js';
 import { UserAuthRepository } from 'src/repositories/UserAuth.repository.js';
 import { IoredisService } from 'src/services/Ioredis.service.js';
 import {
+  ForgotPasswordRequestBody,
   LoginRequestBody,
   RegisterLocalRequestBody,
   ResendSetPasswordTokenRequestBody,
@@ -20,6 +21,7 @@ type SetPasswordRequestType = Request<unknown, unknown, SetPasswordRequestBody>;
 type ResendVerifyEmailRequestType = Request<unknown, unknown, ResendVerifyEmailRequestBody>;
 type ResendSetPasswordTokenRequestType = Request<unknown, unknown, ResendSetPasswordTokenRequestBody>;
 type LoginRequestType = Request<unknown, unknown, LoginRequestBody>;
+type ForgotPasswordRequestType = Request<unknown, unknown, ForgotPasswordRequestBody>;
 
 interface IAuthLocalController {
   register: (request: RegisterRequestType, response: Response, next: NextFunction) => void;
@@ -32,6 +34,7 @@ interface IAuthLocalController {
     next: NextFunction
   ) => Promise<void>;
   login: (request: LoginRequestType, response: Response, next: NextFunction) => Promise<void>;
+  forgotPassword: (request: ForgotPasswordRequestType, response: Response, next: NextFunction) => Promise<void>;
 }
 
 export class AuthLocalController implements IAuthLocalController {
@@ -143,6 +146,21 @@ export class AuthLocalController implements IAuthLocalController {
           accessToken,
           refreshToken
         }
+      }
+    });
+  }
+
+  public async forgotPassword(request: ForgotPasswordRequestType, response: Response) {
+    const { email } = request.body;
+    const redis = IoredisManager.getInstance().getRedisClient();
+    const ioredisService = new IoredisService(redis);
+    const authLocalService = new AuthLocalService(this._userAuthRepository, ioredisService);
+    await authLocalService.forgotPassword({ email });
+    sendSuccessResponse<null>({
+      response,
+      content: {
+        statusCode: StatusCodes.OK,
+        message: 'If your email exists in our system, a reset link has been sent.'
       }
     });
   }

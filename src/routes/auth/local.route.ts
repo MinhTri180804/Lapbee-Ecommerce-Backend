@@ -2,6 +2,8 @@ import { Router } from 'express';
 import { AuthLocalController } from '../../controllers/auth/local.controller.js';
 import { validateRequestBody } from '../../middleware/validateRequestBody.middleware.js';
 import {
+  ForgotPasswordRequestBody,
+  forgotPasswordRequestBodySchema,
   LoginRequestBody,
   loginRequestBodySchema,
   RegisterLocalRequestBody,
@@ -31,6 +33,9 @@ const validateRequestBodyResendSetPasswordToken = validateRequestBody<ResendSetP
   resendSetPasswordTokenRequestBodySchema
 );
 const validateRequestBodyLogin = validateRequestBody<LoginRequestBody>(loginRequestBodySchema);
+const validateRequestBodyForgotPassword = validateRequestBody<ForgotPasswordRequestBody>(
+  forgotPasswordRequestBodySchema
+);
 
 router.post('/register', validateRequestBodyRegister, authLocalController.register.bind(authLocalController));
 router.post('/verify-email', validateRequestBodyVerifyEmail, authLocalController.verifyEmail.bind(authLocalController));
@@ -46,3 +51,8 @@ router.post(
   authLocalController.resendSetPasswordToken.bind(authLocalController)
 );
 router.post('/login', validateRequestBodyLogin, authLocalController.login.bind(authLocalController));
+router.post(
+  '/forgot-password',
+  validateRequestBodyForgotPassword,
+  authLocalController.forgotPassword.bind(authLocalController)
+);

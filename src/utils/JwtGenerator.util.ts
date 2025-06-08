@@ -139,6 +139,7 @@ export class JWTGenerator {
     jti: string;
   } {
     const jti = uuidV4();
+    const currentTime = Math.floor(Date.now() / 1000);
     const SECRET_KEY = TypeToken.RESET_PASSWORD_TOKEN as string;
     const EXPIRES_SECOND = Number(env.expiredTime.minute.RESET_PASSWORD_TOKEN) * 60;
     const token = jwt.sign({}, SECRET_KEY, {
@@ -150,7 +151,7 @@ export class JWTGenerator {
     return {
       token,
       jti,
-      expiresAt: EXPIRES_SECOND
+      expiresAt: EXPIRES_SECOND + currentTime
     };
   }
 

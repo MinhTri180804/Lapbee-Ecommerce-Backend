@@ -23,7 +23,8 @@ export const env = {
   },
   coolDownTime: {
     minute: {
-      PIN_CODE_VERIFY_EMAIL: process.env.COOL_DOWN_TIME_MINUTE_PIN_CODE_VERIFY_EMAIL
+      PIN_CODE_VERIFY_EMAIL: process.env.COOL_DOWN_TIME_MINUTE_PIN_CODE_VERIFY_EMAIL,
+      RESET_PASSWORD_TOKEN: process.env.COOL_DOWN_TIME_MINUTE_RESET_PASSWORD_TOKEN
     }
   },
   expiredTime: {
