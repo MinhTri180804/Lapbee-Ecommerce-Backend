@@ -1,6 +1,7 @@
 import { env } from '../configs/env.config.js';
 import { SubjectSendEmail } from '../constants/subjectSendEmail.constant.js';
 import {
+  ResendResetPasswordTokenJobType,
   ResendSetPasswordTokenJobType,
   ResetPasswordTokenJobType,
   VerificationEmailSuccessJobType,
@@ -14,12 +15,14 @@ type VerifyEmailParams = Pick<VerifyEmailJobType, 'data'>;
 type VerificationEmailSuccessParams = Pick<VerificationEmailSuccessJobType, 'data'>;
 type ResendSetPasswordTokenParams = Pick<ResendSetPasswordTokenJobType, 'data'>;
 type ResetPasswordTokenParams = Pick<ResetPasswordTokenJobType, 'data'>;
+type ResendResetPasswordTokenParams = Pick<ResendResetPasswordTokenJobType, 'data'>;
 
 interface ISendEmailService {
   verifyEmail: (params: VerifyEmailParams) => Promise<void>;
   verificationEmailSuccess: (params: VerificationEmailSuccessParams) => Promise<void>;
   resendSetPasswordToken: (params: ResendSetPasswordTokenParams) => Promise<void>;
   resetPasswordToken: (params: ResetPasswordTokenParams) => Promise<void>;
+  resendResetPasswordToken: (params: ResendResetPasswordTokenParams) => Promise<void>;
 }
 
 export class SendEmailService implements ISendEmailService {
@@ -121,6 +124,31 @@ export class SendEmailService implements ISendEmailService {
     } catch (error) {
       console.log('Send email resetPassword fail error: ', error);
       throw new Error(`Send email resetPassword fail error: ${(error as Error).message}`);
+    }
+  }
+
+  public async resendResetPasswordToken({ data }: ResendResetPasswordTokenParams): Promise<void> {
+    const { to, tokenResetPassword, expiresAt } = data;
+    const urlCallback = `${env.client.urlCallback.RESET_PASSWORD}?token=${tokenResetPassword}`;
+    const timeExpiresFormat = formatTime({ second: expiresAt });
+    const subject = `Lapbee: ${SubjectSendEmail.RESEND_RESET_PASSWORD_TOKEN}`;
+    try {
+      await this._transporter.sendMail({
+        from: 'lapbee@gmail.com',
+        to,
+        subject,
+        html: `<div>
+              <h5>Dưới đây là đường dẫn đặt mật khẩu cho tài khoản của bạn</h5>
+              <div>${urlCallback}</div>
+              <button>
+                <a href="${urlCallback}">Đặt mật khẩu cho tài khoản</a>
+              </button>
+              <div>Thời hạn sử dụng của đường dẫn đặt lại mật khẩu đến ${timeExpiresFormat}</div>
+            </div>`
+      });
+    } catch (error) {
+      console.log('Send email resendResetPassword fail error: ', error);
+      throw new Error(`Send email resendResetPassword fail error: ${(error as Error).message}`);
     }
   }
 }
