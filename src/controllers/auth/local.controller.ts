@@ -7,6 +7,7 @@ import {
   ForgotPasswordRequestBody,
   LoginRequestBody,
   RegisterLocalRequestBody,
+  ResendResetPasswordTokenRequestBody,
   ResendSetPasswordTokenRequestBody,
   ResendVerifyEmailRequestBody,
   ResetPasswordRequestBody,
@@ -24,6 +25,7 @@ type ResendSetPasswordTokenRequestType = Request<unknown, unknown, ResendSetPass
 type LoginRequestType = Request<unknown, unknown, LoginRequestBody>;
 type ForgotPasswordRequestType = Request<unknown, unknown, ForgotPasswordRequestBody>;
 type ResetPasswordRequestType = Request<unknown, unknown, ResetPasswordRequestBody>;
+type ResendResetPasswordTokenRequestType = Request<unknown, unknown, ResendResetPasswordTokenRequestBody>;
 
 interface IAuthLocalController {
   register: (request: RegisterRequestType, response: Response, next: NextFunction) => void;
@@ -38,6 +40,11 @@ interface IAuthLocalController {
   login: (request: LoginRequestType, response: Response, next: NextFunction) => Promise<void>;
   forgotPassword: (request: ForgotPasswordRequestType, response: Response, next: NextFunction) => Promise<void>;
   resetPassword: (request: ResetPasswordRequestType, response: Response, next: NextFunction) => Promise<void>;
+  resendResetPasswordToken: (
+    request: ResendResetPasswordTokenRequestType,
+    response: Response,
+    next: NextFunction
+  ) => Promise<void>;
 }
 
 export class AuthLocalController implements IAuthLocalController {
@@ -187,6 +194,22 @@ export class AuthLocalController implements IAuthLocalController {
           accessToken,
           refreshToken
         }
+      }
+    });
+  }
+
+  public async resendResetPasswordToken(request: ResendResetPasswordTokenRequestType, response: Response) {
+    const { email } = request.body;
+    const redis = IoredisManager.getInstance().getRedisClient();
+    const ioredisService = new IoredisService(redis);
+
+    const authLocalService = new AuthLocalService(this._userAuthRepository, ioredisService);
+    await authLocalService.resendResetPasswordToken({ email });
+    sendSuccessResponse<null>({
+      response,
+      content: {
+        statusCode: StatusCodes.OK,
+        message: 'Resend resetPasswordToken success'
       }
     });
   }

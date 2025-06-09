@@ -28,6 +28,8 @@ type CreateResetPasswordTokenParams = {
   expiresAt: number;
 };
 
+type CreateResendResetPasswordTokenParams = CreateResetPasswordTokenParams;
+
 type CreateVerificationEmailSuccessReturns = {
   data: CreateVerificationEmailSuccessParams;
   name: JobsSendEmailValues;
@@ -52,6 +54,12 @@ type CreateResetPasswordTokenReturns = {
   jobOptions: JobsOptions;
 };
 
+type CreateResendResetpasswordTokenReturns = {
+  data: CreateResendResetPasswordTokenParams;
+  name: JobsSendEmailValues;
+  jobOptions: JobsOptions;
+};
+
 interface ISendEmailJobs {
   createVerifyEmail: (params: CreateVerifyEmailParams) => CreateVerifyEmailReturns;
   createVerificationEmailSuccess: (
@@ -59,6 +67,9 @@ interface ISendEmailJobs {
   ) => CreateVerificationEmailSuccessReturns;
   createResendSetPasswordToken: (params: CreateResendSetPasswordTokenParams) => CreateResendSetPasswordTokenReturns;
   createResetPasswordToken: (params: CreateResetPasswordTokenParams) => CreateResetPasswordTokenReturns;
+  createResendResetPasswordToken: (
+    params: CreateResendResetPasswordTokenParams
+  ) => CreateResendResetpasswordTokenReturns;
 }
 
 class _SendEmailJobs implements ISendEmailJobs {
@@ -155,11 +166,34 @@ class _SendEmailJobs implements ISendEmailJobs {
     this._writeLogCreateJobSuccess({ jobId: jobOptions.jobId as string });
     return { data, jobOptions, name: JobsSendEmail.RESET_PASSWORD_TOKEN };
   }
+
+  public createResendResetPasswordToken(
+    data: CreateResendResetPasswordTokenParams
+  ): CreateResendResetpasswordTokenReturns {
+    const { to: email } = data;
+
+    const jobOptions: JobsOptions = {
+      attempts: 3,
+      backoff: {
+        type: 'exponential',
+        delay: 1000
+      },
+      removeOnComplete: true,
+      removeOnFail: {
+        count: 10
+      },
+      jobId: `resendResetPasswordToken-${encodeURIComponent(email)}`
+    };
+
+    this._writeLogCreateJobSuccess({ jobId: jobOptions.jobId as string });
+    return { data, jobOptions, name: JobsSendEmail.RESEND_RESET_PASSWORD_TOKEN };
+  }
 }
 
 export type VerifyEmailJobType = CreateVerifyEmailReturns;
 export type VerificationEmailSuccessJobType = CreateVerificationEmailSuccessReturns;
 export type ResendSetPasswordTokenJobType = CreateResendSetPasswordTokenReturns;
 export type ResetPasswordTokenJobType = CreateResetPasswordTokenReturns;
+export type ResendResetPasswordTokenJobType = CreateResendResetpasswordTokenReturns;
 
 export const SendEmailJobs = _SendEmailJobs.getInstance();
