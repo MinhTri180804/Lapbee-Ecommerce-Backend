@@ -8,6 +8,7 @@ import { ResetPasswordTokenAccountPendingError } from 'src/errors/ResetPasswordT
 import {
   ForgotPasswordRequestBody,
   LoginRequestBody,
+  ResendResetPasswordTokenRequestBody,
   ResendSetPasswordTokenRequestBody,
   ResendVerifyEmailRequestBody,
   ResetPasswordRequestBody,
@@ -34,6 +35,9 @@ import { comparePassword, hashPassword } from '../../utils/password.util.js';
 import { PinCodeVerifyEmail } from '../../utils/pinCode/core/PinCodeVerifyEmail.js';
 import { SubjectSendEmail } from '../../utils/subjectSendEmail.util.js';
 import { IoredisService } from '../Ioredis.service.js';
+import { EmailNotExistError } from 'src/errors/EmailNotExist.error.js';
+import { ResetPasswordTokenNotFoundError } from 'src/errors/ResetPasswordTokenNotFound.error.js';
+import { ResetPasswordTokenRequestTooSoonError } from 'src/errors/ResetPasswordTokenTooSoon.error.js';
 
 type RegisterParams = {
   email: string;
@@ -53,6 +57,8 @@ type ForgotPasswordParams = ForgotPasswordRequestBody;
 
 type ResetPasswordParams = ResetPasswordRequestBody;
 
+type ResendResetPasswordTokenParams = ResendResetPasswordTokenRequestBody;
+
 type LoginReturns = {
   accessToken: string;
   refreshToken: string;
@@ -71,6 +77,7 @@ interface IAuthLocalService {
   login: (params: LoginParams) => Promise<LoginReturns>;
   forgotPassword: (params: ForgotPasswordParams) => Promise<void>;
   resetPassword: (params: ResetPasswordParams) => Promise<{ accessToken: string; refreshToken: string }>;
+  resendResetPasswordToken: (params: ResendResetPasswordTokenParams) => Promise<void>;
 }
 
 export class AuthLocalService implements IAuthLocalService {
@@ -355,5 +362,50 @@ export class AuthLocalService implements IAuthLocalService {
     await this._ioredisService.saveRefreshTokenWhitelist({ userAuthId: sub as string, jti: jtiRefreshToken });
 
     return { accessToken, refreshToken };
+  }
+
+  public async resendResetPasswordToken({ email }: ResendResetPasswordTokenParams): Promise<void> {
+    const userAuth = await this._userAuthRepository.findByEmail({ email });
+    if (!userAuth) {
+      throw new EmailNotExistError({});
+    }
+    const resetPasswordTokenData = await this._ioredisService.getResetPasswordToken({ userAuthId: userAuth.id });
+    if (!resetPasswordTokenData) {
+      throw new ResetPasswordTokenNotFoundError({});
+    }
+
+    const { createdAt, expiredAt } = resetPasswordTokenData;
+    const currentTime = Math.floor(Date.now() / 1000);
+    if (createdAt + this._resetPasswordTokenCoolDownTimeSecond > currentTime) {
+      throw new ResetPasswordTokenRequestTooSoonError({
+        errorDetails: {
+          resendAvailable: false,
+          expiresAt: expiredAt,
+          remainingMs: createdAt + this._resetPasswordTokenCoolDownTimeSecond - currentTime,
+          sentAt: createdAt
+        }
+      });
+    }
+
+    const {
+      token: newResetPasswordToken,
+      jti: newJtiResetPasswordToken,
+      expiresAt: newExpiresAtResetPasswordToken
+    } = JWTGenerator.resetPasswordToken({ userAuthId: userAuth.id });
+
+    await this._ioredisService.saveResetPasswordToken({
+      userAuthId: userAuth.id as string,
+      jti: newJtiResetPasswordToken,
+      expiresAt: newExpiresAtResetPasswordToken
+    });
+
+    const job = SendEmailJobs.createResendResetPasswordToken({
+      to: email,
+      expiresAt: newExpiresAtResetPasswordToken,
+      tokenResetPassword: newResetPasswordToken
+    });
+
+    await SendEmailQueue.getInstance().addJobResendResetPasswordToken(job);
+    return;
   }
 }

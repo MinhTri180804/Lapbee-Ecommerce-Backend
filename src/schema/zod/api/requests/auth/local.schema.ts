@@ -35,6 +35,11 @@ const {
   PASSWORD_CONFIRM_REQUIRED: PASSWORD_CONFIRM_REQUIRED_RESET_PASSWORD
 } = ValidationMessages.api.request.auth.local.resetPassword;
 
+const {
+  EMAIL_INVALID: EMAIL_INVALID_RESEND_RESET_PASSWORD_TOKEN,
+  EMAIL_REQUIRED: EMAIL_REQUIRED_RESEND_RESET_PASSWORD_TOKEN
+} = ValidationMessages.api.request.auth.local.resendResetPasswordToken;
+
 export const registerLocalRequestBodySchema = z.object({
   email: z
     .string({
@@ -107,6 +112,12 @@ export const resetPasswordRequestBodySchema = z
     }
   });
 
+export const resendResetPasswordTokenRequestBodySchema = z.object({
+  email: z
+    .string({ required_error: EMAIL_REQUIRED_RESEND_RESET_PASSWORD_TOKEN })
+    .email(EMAIL_INVALID_RESEND_RESET_PASSWORD_TOKEN)
+});
+
 export type RegisterLocalRequestBody = z.infer<typeof registerLocalRequestBodySchema>;
 export type VerifyEmailRegisterRequestBody = z.infer<typeof verifyEmailRegisterRequestBodySchema>;
 export type SetPasswordRequestBody = z.infer<typeof setPasswordRequestBodySchema>;
@@ -115,3 +126,4 @@ export type ResendSetPasswordTokenRequestBody = z.infer<typeof resendSetPassword
 export type LoginRequestBody = z.infer<typeof loginRequestBodySchema>;
 export type ForgotPasswordRequestBody = z.infer<typeof forgotPasswordRequestBodySchema>;
 export type ResetPasswordRequestBody = z.infer<typeof resetPasswordRequestBodySchema>;
+export type ResendResetPasswordTokenRequestBody = z.infer<typeof resendResetPasswordTokenRequestBodySchema>;

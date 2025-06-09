@@ -41,6 +41,10 @@ export const ValidationMessages = {
             RESET_PASSWORD_TOKEN_REQUIRED: 'ResetPasswordToken is required',
             PASSWORD_CONFIRM_MISMATCH: 'Password confirm mismatch with password',
             PASSWORD_CONFIRM_REQUIRED: 'Password confirm is required'
+          },
+          resendResetPasswordToken: {
+            EMAIL_INVALID: 'Email invalid',
+            EMAIL_REQUIRED: 'Email is required'
           }
         }
       }
