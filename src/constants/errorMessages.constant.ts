@@ -27,5 +27,6 @@ export const ErrorMessages: ErrorMessagesType = {
   [ErrorInstance.RESET_PASSWORD_TOKEN_REQUEST_TOO_SOON]: 'Please wait before requesting a new resetPasswordToken.',
   [ErrorInstance.RESET_PASSWORD_TOKEN_ACCOUNT_PENDING]:
     'ResetPasswordToken was already sent and is awaiting confirmation',
-  [ErrorInstance.NOT_MATCH_ACCOUNT_UPDATE_PASSWORD]: 'Not match account update password'
+  [ErrorInstance.NOT_MATCH_ACCOUNT_UPDATE_PASSWORD]: 'Not match account update password',
+  [ErrorInstance.RESET_PASSWORD_TOKEN_NOT_FOUND]: 'No reset password request found for this email or it has expired.'
 };
