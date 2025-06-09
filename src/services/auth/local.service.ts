@@ -8,6 +8,7 @@ import { ResetPasswordTokenAccountPendingError } from 'src/errors/ResetPasswordT
 import {
   ForgotPasswordRequestBody,
   LoginRequestBody,
+  RefreshTokenRequestBody,
   ResendResetPasswordTokenRequestBody,
   ResendSetPasswordTokenRequestBody,
   ResendVerifyEmailRequestBody,
@@ -59,6 +60,8 @@ type ResetPasswordParams = ResetPasswordRequestBody;
 
 type ResendResetPasswordTokenParams = ResendResetPasswordTokenRequestBody;
 
+type RefreshTokenParams = RefreshTokenRequestBody;
+
 type LoginReturns = {
   accessToken: string;
   refreshToken: string;
@@ -78,6 +81,10 @@ interface IAuthLocalService {
   forgotPassword: (params: ForgotPasswordParams) => Promise<void>;
   resetPassword: (params: ResetPasswordParams) => Promise<{ accessToken: string; refreshToken: string }>;
   resendResetPasswordToken: (params: ResendResetPasswordTokenParams) => Promise<void>;
+  refreshToken: (params: RefreshTokenParams) => Promise<{
+    accessToken: string;
+    refreshToken: string;
+  }>;
 }
 
 export class AuthLocalService implements IAuthLocalService {
@@ -278,6 +285,7 @@ export class AuthLocalService implements IAuthLocalService {
   }
 
   public async login({ email, password }: LoginParams): Promise<LoginReturns> {
+    //TODO: Optimization logic accessToken and refreshToken generator for many devices
     const userAuth = await this._userAuthRepository.findByEmail({ email });
     if (!userAuth) {
       throw new InvalidCredentialsError({});
@@ -407,5 +415,36 @@ export class AuthLocalService implements IAuthLocalService {
 
     await SendEmailQueue.getInstance().addJobResendResetPasswordToken(job);
     return;
+  }
+
+  public async refreshToken({ refreshToken }: RefreshTokenParams): Promise<{
+    accessToken: string;
+    refreshToken: string;
+  }> {
+    //TODO: Optimization logic refreshToken for many devices
+    const { jti, sub } = decode(refreshToken) as JwtPayload;
+
+    const jtiExistInWhitelist = await this._ioredisService.checkExistRefreshTokenWhitelist({
+      userAuthId: sub as string,
+      jti: jti as string
+    });
+
+    if (!jtiExistInWhitelist) {
+      throw new JWTTokenInvalidError({ message: 'RefreshToken invalid' });
+    }
+
+    await this._ioredisService.removeRefreshTokenWhitelist({ userAuthId: sub as string, jti: jti as string });
+
+    const { accessToken: newAccessToken } = JWTGenerator.accessToken({
+      userAuthId: sub as string,
+      role: UserAuthRoleEnum.CUSTOMER
+    });
+    const { refreshToken: newRefreshToken, jti: newJtiRefreshToken } = JWTGenerator.refreshToken({
+      userAuthId: sub as string
+    });
+
+    await this._ioredisService.saveRefreshTokenWhitelist({ userAuthId: sub as string, jti: newJtiRefreshToken });
+
+    return { accessToken: newAccessToken, refreshToken: newRefreshToken };
   }
 }

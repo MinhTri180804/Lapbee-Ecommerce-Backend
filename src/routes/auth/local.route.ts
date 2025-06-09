@@ -6,6 +6,8 @@ import {
   forgotPasswordRequestBodySchema,
   LoginRequestBody,
   loginRequestBodySchema,
+  RefreshTokenRequestBody,
+  refreshTokenRequestBodySchema,
   RegisterLocalRequestBody,
   registerLocalRequestBodySchema,
   ResendResetPasswordTokenRequestBody,
@@ -44,6 +46,7 @@ const validateRequestBodyResetPassword = validateRequestBody<ResetPasswordReques
 const validateRequestBodyResendResetPasswordToken = validateRequestBody<ResendResetPasswordTokenRequestBody>(
   resendResetPasswordTokenRequestBodySchema
 );
+const validateRequestBodyRefreshToken = validateRequestBody<RefreshTokenRequestBody>(refreshTokenRequestBodySchema);
 
 router.post('/register', validateRequestBodyRegister, authLocalController.register.bind(authLocalController));
 router.post('/verify-email', validateRequestBodyVerifyEmail, authLocalController.verifyEmail.bind(authLocalController));
@@ -74,4 +77,9 @@ router.post(
   '/resend-reset-password-token',
   validateRequestBodyResendResetPasswordToken,
   authLocalController.resendResetPasswordToken.bind(authLocalController)
+);
+router.post(
+  '/refresh-token',
+  validateRequestBodyRefreshToken,
+  authLocalController.refreshToken.bind(authLocalController)
 );

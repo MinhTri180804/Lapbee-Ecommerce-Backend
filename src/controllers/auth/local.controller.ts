@@ -6,6 +6,7 @@ import { IoredisService } from 'src/services/Ioredis.service.js';
 import {
   ForgotPasswordRequestBody,
   LoginRequestBody,
+  RefreshTokenRequestBody,
   RegisterLocalRequestBody,
   ResendResetPasswordTokenRequestBody,
   ResendSetPasswordTokenRequestBody,
@@ -26,6 +27,7 @@ type LoginRequestType = Request<unknown, unknown, LoginRequestBody>;
 type ForgotPasswordRequestType = Request<unknown, unknown, ForgotPasswordRequestBody>;
 type ResetPasswordRequestType = Request<unknown, unknown, ResetPasswordRequestBody>;
 type ResendResetPasswordTokenRequestType = Request<unknown, unknown, ResendResetPasswordTokenRequestBody>;
+type RefreshTokenRequestType = Request<unknown, unknown, RefreshTokenRequestBody>;
 
 interface IAuthLocalController {
   register: (request: RegisterRequestType, response: Response, next: NextFunction) => void;
@@ -45,6 +47,7 @@ interface IAuthLocalController {
     response: Response,
     next: NextFunction
   ) => Promise<void>;
+  refreshToken: (params: RefreshTokenRequestType, response: Response, next: NextFunction) => Promise<void>;
 }
 
 export class AuthLocalController implements IAuthLocalController {
@@ -210,6 +213,30 @@ export class AuthLocalController implements IAuthLocalController {
       content: {
         statusCode: StatusCodes.OK,
         message: 'Resend resetPasswordToken success'
+      }
+    });
+  }
+
+  public async refreshToken(request: RefreshTokenRequestType, response: Response): Promise<void> {
+    const { refreshToken } = request.body;
+    const redis = IoredisManager.getInstance().getRedisClient();
+    const ioredisService = new IoredisService(redis);
+    const authLocalService = new AuthLocalService(this._userAuthRepository, ioredisService);
+    const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await authLocalService.refreshToken({
+      refreshToken
+    });
+    sendSuccessResponse<{
+      accessToken: string;
+      refreshToken: string;
+    }>({
+      response,
+      content: {
+        statusCode: StatusCodes.OK,
+        message: 'RefreshToken success',
+        data: {
+          accessToken: newAccessToken,
+          refreshToken: newRefreshToken
+        }
       }
     });
   }
