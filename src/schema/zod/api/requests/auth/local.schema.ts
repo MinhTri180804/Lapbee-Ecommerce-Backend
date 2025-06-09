@@ -29,6 +29,12 @@ const {
 const { EMAIL_INVALID: EMAIL_INVALID_FORGOT_PASSWORD, EMAIL_REQUIRED: EMAIL_REQUIRED_FORGOT_PASSWORD } =
   ValidationMessages.api.request.auth.local.forgotPassword;
 
+const {
+  RESET_PASSWORD_TOKEN_REQUIRED,
+  PASSWORD_CONFIRM_MISMATCH: PASSWORD_CONFIRM_MISMATCH_RESET_PASSWORD,
+  PASSWORD_CONFIRM_REQUIRED: PASSWORD_CONFIRM_REQUIRED_RESET_PASSWORD
+} = ValidationMessages.api.request.auth.local.resetPassword;
+
 export const registerLocalRequestBodySchema = z.object({
   email: z
     .string({
@@ -85,6 +91,22 @@ export const forgotPasswordRequestBodySchema = z.object({
   email: z.string({ required_error: EMAIL_REQUIRED_FORGOT_PASSWORD }).email(EMAIL_INVALID_FORGOT_PASSWORD)
 });
 
+export const resetPasswordRequestBodySchema = z
+  .object({
+    resetPasswordToken: z.string({ required_error: RESET_PASSWORD_TOKEN_REQUIRED }),
+    password: passwordSchema,
+    passwordConfirm: z.string({ required_error: PASSWORD_CONFIRM_REQUIRED_RESET_PASSWORD })
+  })
+  .superRefine(({ password, passwordConfirm }, ctx) => {
+    if (password !== passwordConfirm) {
+      ctx.addIssue({
+        path: ['passwordConfirm'],
+        code: z.ZodIssueCode.custom,
+        message: PASSWORD_CONFIRM_MISMATCH_RESET_PASSWORD
+      });
+    }
+  });
+
 export type RegisterLocalRequestBody = z.infer<typeof registerLocalRequestBodySchema>;
 export type VerifyEmailRegisterRequestBody = z.infer<typeof verifyEmailRegisterRequestBodySchema>;
 export type SetPasswordRequestBody = z.infer<typeof setPasswordRequestBodySchema>;
@@ -92,3 +114,4 @@ export type ResendVerifyEmailRequestBody = z.infer<typeof resendVerifyEmailReque
 export type ResendSetPasswordTokenRequestBody = z.infer<typeof resendSetPasswordTokenRequestBodySchema>;
 export type LoginRequestBody = z.infer<typeof loginRequestBodySchema>;
 export type ForgotPasswordRequestBody = z.infer<typeof forgotPasswordRequestBodySchema>;
+export type ResetPasswordRequestBody = z.infer<typeof resetPasswordRequestBodySchema>;
