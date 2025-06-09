@@ -20,7 +20,8 @@ import { NotFoundEmailSetPasswordError } from 'src/errors/NotFoundEmailSetPasswo
 import { AccountLockedError } from 'src/errors/AccountLocked.error.js';
 import { InvalidCredentialsError } from 'src/errors/InvalidCredentials.error.js';
 import { ResetPasswordTokenRequestTooSoonError } from '../errors/ResetPasswordTokenTooSoon.error.js';
-import { ResetPasswordTokenAccountPendingError } from '../errors/ResetPasswordTokenAccountPending.erorr.js';
+import { ResetPasswordTokenAccountPendingError } from '../errors/ResetPasswordTokenAccountPending.error.js';
+import { NotMatchAccountUpdatePasswordError } from '../errors/NotMatchAccountUpdatePassword.error.js';
 
 type ErrorHandler<T extends AppError<unknown> | Error> = (response: Response, error: T) => void;
 
@@ -44,6 +45,7 @@ type MappingHandler = {
   [ErrorInstance.INVALID_CREDENTIALS]: ErrorHandler<InvalidCredentialsError>;
   [ErrorInstance.RESET_PASSWORD_TOKEN_REQUEST_TOO_SOON]: ErrorHandler<ResetPasswordTokenRequestTooSoonError>;
   [ErrorInstance.RESET_PASSWORD_TOKEN_ACCOUNT_PENDING]: ErrorHandler<ResetPasswordTokenAccountPendingError>;
+  [ErrorInstance.NOT_MATCH_ACCOUNT_UPDATE_PASSWORD]: ErrorHandler<NotMatchAccountUpdatePasswordError>;
 };
 
 class _ErrorMiddlewareHandler {
@@ -67,7 +69,8 @@ class _ErrorMiddlewareHandler {
     [ErrorInstance.ACCOUNT_LOCKED]: this._accountLockedErrorHandler,
     [ErrorInstance.INVALID_CREDENTIALS]: this._invalidCredentialsErrorHandler,
     [ErrorInstance.RESET_PASSWORD_TOKEN_REQUEST_TOO_SOON]: this._resetPasswordTokenRequestTooSoonErrorHandler,
-    [ErrorInstance.RESET_PASSWORD_TOKEN_ACCOUNT_PENDING]: this._resetPasswordTokenAccountPendingErrorHandler
+    [ErrorInstance.RESET_PASSWORD_TOKEN_ACCOUNT_PENDING]: this._resetPasswordTokenAccountPendingErrorHandler,
+    [ErrorInstance.NOT_MATCH_ACCOUNT_UPDATE_PASSWORD]: this._notMatchAccountUpdatePasswordErrorHandler
   };
 
   private constructor() {}
@@ -218,6 +221,10 @@ class _ErrorMiddlewareHandler {
       response,
       content: error
     });
+  }
+
+  private _notMatchAccountUpdatePasswordErrorHandler(response: Response, error: NotMatchAccountUpdatePasswordError) {
+    sendErrorResponse({ response, content: error });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

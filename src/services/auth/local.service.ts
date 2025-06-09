@@ -1,18 +1,27 @@
 import { decode, JwtPayload } from 'jsonwebtoken';
+import { UserAuthRoleEnum } from 'src/enums/userAuthRole.enum.js';
+import { NotMatchAccountUpdatePasswordError } from 'src/errors/NotMatchAccountUpdatePassword.error.js';
 import { PinCodeGoneError } from 'src/errors/PinCodeGone.error.js';
+import { PinCodeNotFoundError } from 'src/errors/PinCodeNotFound.error.js';
+import { PinCodeRequestTooSoonError } from 'src/errors/PinCodeRequestTooSoon.error.js';
+import { ResetPasswordTokenAccountPendingError } from 'src/errors/ResetPasswordTokenAccountPending.error.js';
 import {
   ForgotPasswordRequestBody,
   LoginRequestBody,
   ResendSetPasswordTokenRequestBody,
   ResendVerifyEmailRequestBody,
+  ResetPasswordRequestBody,
   SetPasswordRequestBody,
   VerifyEmailRegisterRequestBody
 } from 'src/schema/zod/api/requests/auth/local.schema.js';
 import { env } from '../../configs/env.config.js';
+import { AccountLockedError } from '../../errors/AccountLocked.error.js';
 import { AccountPasswordUpdatedError } from '../../errors/AccountPasswordUpdated.error.js';
 import { EmailAlreadyPendingVerificationError } from '../../errors/EmailAlreadyPendingVerification.error.js';
 import { EmailExistError } from '../../errors/EmailExist.error.js';
+import { InvalidCredentialsError } from '../../errors/InvalidCredentials.error.js';
 import { JWTTokenInvalidError } from '../../errors/JwtTokenInvalid.error.js';
+import { NotFoundEmailSetPasswordError } from '../../errors/NotFoundEmailSetPassword.error.js';
 import { PinCodeExpiredError } from '../../errors/PinCodeExpired.error.js';
 import { PinCodeInvalidError } from '../../errors/PinCodeInValid.error.js';
 import { VerificationPendingOtpExpiredError } from '../../errors/VerificationPendingOtpExpired.error.js';
@@ -21,17 +30,10 @@ import { SendEmailJobs } from '../../queues/jobs/SendEmail.job.js';
 import { SendEmailQueue } from '../../queues/queues/SendEmail.queue.js';
 import { UserAuthRepository } from '../../repositories/UserAuth.repository.js';
 import { JWTGenerator } from '../../utils/JwtGenerator.util.js';
+import { comparePassword, hashPassword } from '../../utils/password.util.js';
 import { PinCodeVerifyEmail } from '../../utils/pinCode/core/PinCodeVerifyEmail.js';
 import { SubjectSendEmail } from '../../utils/subjectSendEmail.util.js';
 import { IoredisService } from '../Ioredis.service.js';
-import { PinCodeNotFoundError } from 'src/errors/PinCodeNotFound.error.js';
-import { PinCodeRequestTooSoonError } from 'src/errors/PinCodeRequestTooSoon.error.js';
-import { NotFoundEmailSetPasswordError } from '../../errors/NotFoundEmailSetPassword.error.js';
-import { InvalidCredentialsError } from '../../errors/InvalidCredentials.error.js';
-import { comparePassword } from '../../utils/password.util.js';
-import { AccountLockedError } from '../../errors/AccountLocked.error.js';
-import { ResetPasswordTokenRequestTooSoonError } from 'src/errors/ResetPasswordTokenTooSoon.error.js';
-import { ResetPasswordTokenAccountPendingError } from 'src/errors/ResetPasswordTokenAccountPending.erorr.js';
 
 type RegisterParams = {
   email: string;
@@ -48,6 +50,8 @@ type ResendSetPasswordTokenParams = ResendSetPasswordTokenRequestBody;
 type LoginParams = LoginRequestBody;
 
 type ForgotPasswordParams = ForgotPasswordRequestBody;
+
+type ResetPasswordParams = ResetPasswordRequestBody;
 
 type LoginReturns = {
   accessToken: string;
@@ -66,6 +70,7 @@ interface IAuthLocalService {
   resendSetPasswordToken: (params: ResendSetPasswordTokenParams) => Promise<void>;
   login: (params: LoginParams) => Promise<LoginReturns>;
   forgotPassword: (params: ForgotPasswordParams) => Promise<void>;
+  resetPassword: (params: ResetPasswordParams) => Promise<{ accessToken: string; refreshToken: string }>;
 }
 
 export class AuthLocalService implements IAuthLocalService {
@@ -271,7 +276,7 @@ export class AuthLocalService implements IAuthLocalService {
       throw new InvalidCredentialsError({});
     }
 
-    const isMatchPassword = comparePassword({ password, encryptedPassword: userAuth.password as string });
+    const isMatchPassword = await comparePassword({ password, encryptedPassword: userAuth.password as string });
     if (!isMatchPassword) {
       throw new InvalidCredentialsError({});
     }
@@ -316,5 +321,39 @@ export class AuthLocalService implements IAuthLocalService {
     const job = SendEmailJobs.createResetPasswordToken({ to: email, tokenResetPassword: token, expiresAt });
     await SendEmailQueue.getInstance().addJobResetPasswordToken(job);
     return;
+  }
+
+  public async resetPassword({
+    resetPasswordToken,
+    password
+  }: ResetPasswordParams): Promise<{ accessToken: string; refreshToken: string }> {
+    const { sub, jti } = JWTGenerator.verifyToken({
+      token: resetPasswordToken,
+      typeToken: 'RESET_PASSWORD_TOKEN'
+    });
+
+    const dataRedis = await this._ioredisService.getResetPasswordToken({ userAuthId: sub as string });
+    if (!dataRedis) {
+      throw new JWTTokenInvalidError({ message: 'ResetPasswordToken invalid' });
+    }
+
+    const { jti: jtiOfRedis } = dataRedis;
+
+    if (jti !== jtiOfRedis) {
+      throw new JWTTokenInvalidError({ message: 'ResetPasswordToken invalid' });
+    }
+
+    const newPassword = await hashPassword({ password });
+    const updatePassword = await this._userAuthRepository.updatePassword({ userAuthId: sub as string, newPassword });
+    if (!updatePassword) {
+      throw new NotMatchAccountUpdatePasswordError({});
+    }
+
+    await this._ioredisService.removeResetPasswordToken({ userAuthId: sub as string });
+    const { accessToken } = JWTGenerator.accessToken({ userAuthId: sub as string, role: UserAuthRoleEnum.CUSTOMER });
+    const { refreshToken, jti: jtiRefreshToken } = JWTGenerator.refreshToken({ userAuthId: sub as string });
+    await this._ioredisService.saveRefreshTokenWhitelist({ userAuthId: sub as string, jti: jtiRefreshToken });
+
+    return { accessToken, refreshToken };
   }
 }
