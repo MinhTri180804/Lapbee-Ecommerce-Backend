@@ -24,6 +24,7 @@ import { ResetPasswordTokenAccountPendingError } from '../errors/ResetPasswordTo
 import { NotMatchAccountUpdatePasswordError } from '../errors/NotMatchAccountUpdatePassword.error.js';
 import { ResetPasswordTokenNotFoundError } from '../errors/ResetPasswordTokenNotFound.error.js';
 import { EmailNotExistError } from '../errors/EmailNotExist.error.js';
+import { AuthorizationHeaderMissingError } from '../errors/AuthorizationHeaderMissing.error.js';
 
 type ErrorHandler<T extends AppError<unknown> | Error> = (response: Response, error: T) => void;
 
@@ -50,6 +51,7 @@ type MappingHandler = {
   [ErrorInstance.NOT_MATCH_ACCOUNT_UPDATE_PASSWORD]: ErrorHandler<NotMatchAccountUpdatePasswordError>;
   [ErrorInstance.RESET_PASSWORD_TOKEN_NOT_FOUND]: ErrorHandler<ResetPasswordTokenNotFoundError>;
   [ErrorInstance.EMAIL_NOT_EXIST]: ErrorHandler<EmailNotExistError>;
+  [ErrorInstance.AUTHORIZATION_HEADER_MISSING]: ErrorHandler<AuthorizationHeaderMissingError>;
 };
 
 class _ErrorMiddlewareHandler {
@@ -76,7 +78,8 @@ class _ErrorMiddlewareHandler {
     [ErrorInstance.RESET_PASSWORD_TOKEN_ACCOUNT_PENDING]: this._resetPasswordTokenAccountPendingErrorHandler,
     [ErrorInstance.NOT_MATCH_ACCOUNT_UPDATE_PASSWORD]: this._notMatchAccountUpdatePasswordErrorHandler,
     [ErrorInstance.RESET_PASSWORD_TOKEN_NOT_FOUND]: this._resetPasswordTokenNotFoundErrorHandler,
-    [ErrorInstance.EMAIL_NOT_EXIST]: this._emailNotExistErrorHandler
+    [ErrorInstance.EMAIL_NOT_EXIST]: this._emailNotExistErrorHandler,
+    [ErrorInstance.AUTHORIZATION_HEADER_MISSING]: this._authorizationHeaderMissingErrorHandler
   };
 
   private constructor() {}
@@ -238,6 +241,13 @@ class _ErrorMiddlewareHandler {
   }
 
   private _emailNotExistErrorHandler(response: Response, error: EmailNotExistError) {
+    sendErrorResponse({
+      response,
+      content: error
+    });
+  }
+
+  private _authorizationHeaderMissingErrorHandler(response: Response, error: AuthorizationHeaderMissingError) {
     sendErrorResponse({
       response,
       content: error

@@ -29,5 +29,6 @@ export const ErrorMessages: ErrorMessagesType = {
     'ResetPasswordToken was already sent and is awaiting confirmation',
   [ErrorInstance.NOT_MATCH_ACCOUNT_UPDATE_PASSWORD]: 'Not match account update password',
   [ErrorInstance.RESET_PASSWORD_TOKEN_NOT_FOUND]: 'No reset password request found for this email or it has expired.',
-  [ErrorInstance.EMAIL_NOT_EXIST]: 'Email not exist'
+  [ErrorInstance.EMAIL_NOT_EXIST]: 'Email not exist',
+  [ErrorInstance.AUTHORIZATION_HEADER_MISSING]: 'Authorization missing'
 };
