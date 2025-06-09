@@ -22,6 +22,7 @@ import { InvalidCredentialsError } from 'src/errors/InvalidCredentials.error.js'
 import { ResetPasswordTokenRequestTooSoonError } from '../errors/ResetPasswordTokenTooSoon.error.js';
 import { ResetPasswordTokenAccountPendingError } from '../errors/ResetPasswordTokenAccountPending.error.js';
 import { NotMatchAccountUpdatePasswordError } from '../errors/NotMatchAccountUpdatePassword.error.js';
+import { ResetPasswordTokenNotFoundError } from '../errors/ResetPasswordTokenNotFound.error.js';
 
 type ErrorHandler<T extends AppError<unknown> | Error> = (response: Response, error: T) => void;
 
@@ -46,6 +47,7 @@ type MappingHandler = {
   [ErrorInstance.RESET_PASSWORD_TOKEN_REQUEST_TOO_SOON]: ErrorHandler<ResetPasswordTokenRequestTooSoonError>;
   [ErrorInstance.RESET_PASSWORD_TOKEN_ACCOUNT_PENDING]: ErrorHandler<ResetPasswordTokenAccountPendingError>;
   [ErrorInstance.NOT_MATCH_ACCOUNT_UPDATE_PASSWORD]: ErrorHandler<NotMatchAccountUpdatePasswordError>;
+  [ErrorInstance.RESET_PASSWORD_TOKEN_NOT_FOUND]: ErrorHandler<ResetPasswordTokenNotFoundError>;
 };
 
 class _ErrorMiddlewareHandler {
@@ -70,7 +72,8 @@ class _ErrorMiddlewareHandler {
     [ErrorInstance.INVALID_CREDENTIALS]: this._invalidCredentialsErrorHandler,
     [ErrorInstance.RESET_PASSWORD_TOKEN_REQUEST_TOO_SOON]: this._resetPasswordTokenRequestTooSoonErrorHandler,
     [ErrorInstance.RESET_PASSWORD_TOKEN_ACCOUNT_PENDING]: this._resetPasswordTokenAccountPendingErrorHandler,
-    [ErrorInstance.NOT_MATCH_ACCOUNT_UPDATE_PASSWORD]: this._notMatchAccountUpdatePasswordErrorHandler
+    [ErrorInstance.NOT_MATCH_ACCOUNT_UPDATE_PASSWORD]: this._notMatchAccountUpdatePasswordErrorHandler,
+    [ErrorInstance.RESET_PASSWORD_TOKEN_NOT_FOUND]: this._resetPasswordTokenNotFoundErrorHandler
   };
 
   private constructor() {}
@@ -224,6 +227,10 @@ class _ErrorMiddlewareHandler {
   }
 
   private _notMatchAccountUpdatePasswordErrorHandler(response: Response, error: NotMatchAccountUpdatePasswordError) {
+    sendErrorResponse({ response, content: error });
+  }
+
+  private _resetPasswordTokenNotFoundErrorHandler(response: Response, error: ResetPasswordTokenNotFoundError) {
     sendErrorResponse({ response, content: error });
   }
 
