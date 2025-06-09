@@ -20,6 +20,7 @@ import { NotFoundEmailSetPasswordError } from 'src/errors/NotFoundEmailSetPasswo
 import { AccountLockedError } from 'src/errors/AccountLocked.error.js';
 import { InvalidCredentialsError } from 'src/errors/InvalidCredentials.error.js';
 import { ResetPasswordTokenRequestTooSoonError } from '../errors/ResetPasswordTokenTooSoon.error.js';
+import { ResetPasswordTokenAccountPendingError } from '../errors/ResetPasswordTokenAccountPending.erorr.js';
 
 type ErrorHandler<T extends AppError<unknown> | Error> = (response: Response, error: T) => void;
 
@@ -42,6 +43,7 @@ type MappingHandler = {
   [ErrorInstance.ACCOUNT_LOCKED]: ErrorHandler<AccountLockedError>;
   [ErrorInstance.INVALID_CREDENTIALS]: ErrorHandler<InvalidCredentialsError>;
   [ErrorInstance.RESET_PASSWORD_TOKEN_REQUEST_TOO_SOON]: ErrorHandler<ResetPasswordTokenRequestTooSoonError>;
+  [ErrorInstance.RESET_PASSWORD_TOKEN_ACCOUNT_PENDING]: ErrorHandler<ResetPasswordTokenAccountPendingError>;
 };
 
 class _ErrorMiddlewareHandler {
@@ -64,7 +66,8 @@ class _ErrorMiddlewareHandler {
     [ErrorInstance.NOTFOUND_EMAIL_SET_PASSWORD_TOKEN]: this._notFoundEmailSetPasswordTokenErrorHandler,
     [ErrorInstance.ACCOUNT_LOCKED]: this._accountLockedErrorHandler,
     [ErrorInstance.INVALID_CREDENTIALS]: this._invalidCredentialsErrorHandler,
-    [ErrorInstance.RESET_PASSWORD_TOKEN_REQUEST_TOO_SOON]: this._resetPasswordTokenRequestTooSoonErrorHandler
+    [ErrorInstance.RESET_PASSWORD_TOKEN_REQUEST_TOO_SOON]: this._resetPasswordTokenRequestTooSoonErrorHandler,
+    [ErrorInstance.RESET_PASSWORD_TOKEN_ACCOUNT_PENDING]: this._resetPasswordTokenAccountPendingErrorHandler
   };
 
   private constructor() {}
@@ -202,6 +205,16 @@ class _ErrorMiddlewareHandler {
     error: ResetPasswordTokenRequestTooSoonError
   ) {
     sendErrorResponse<ResetPasswordTokenRequestTooSoonError['details']>({
+      response,
+      content: error
+    });
+  }
+
+  private _resetPasswordTokenAccountPendingErrorHandler(
+    response: Response,
+    error: ResetPasswordTokenAccountPendingError
+  ) {
+    sendErrorResponse({
       response,
       content: error
     });

@@ -24,5 +24,7 @@ export const ErrorMessages: ErrorMessagesType = {
   [ErrorInstance.NOTFOUND_EMAIL_SET_PASSWORD_TOKEN]: 'Email address does not exist in case setPassword.',
   [ErrorInstance.ACCOUNT_LOCKED]: 'Your account has been locked. Please contact support.',
   [ErrorInstance.INVALID_CREDENTIALS]: 'Email or password is incorrect.',
-  [ErrorInstance.RESET_PASSWORD_TOKEN_REQUEST_TOO_SOON]: 'Please wait before requesting a new resetPasswordToken.'
+  [ErrorInstance.RESET_PASSWORD_TOKEN_REQUEST_TOO_SOON]: 'Please wait before requesting a new resetPasswordToken.',
+  [ErrorInstance.RESET_PASSWORD_TOKEN_ACCOUNT_PENDING]:
+    'ResetPasswordToken was already sent and is awaiting confirmation'
 };

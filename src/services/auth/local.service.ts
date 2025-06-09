@@ -31,6 +31,7 @@ import { InvalidCredentialsError } from '../../errors/InvalidCredentials.error.j
 import { comparePassword } from '../../utils/password.util.js';
 import { AccountLockedError } from '../../errors/AccountLocked.error.js';
 import { ResetPasswordTokenRequestTooSoonError } from 'src/errors/ResetPasswordTokenTooSoon.error.js';
+import { ResetPasswordTokenAccountPendingError } from 'src/errors/ResetPasswordTokenAccountPending.erorr.js';
 
 type RegisterParams = {
   email: string;
@@ -300,7 +301,7 @@ export class AuthLocalService implements IAuthLocalService {
         const remainingMS = isResendAvailable
           ? 0
           : createdAt + this._resetPasswordTokenCoolDownTimeSecond - currentTime;
-        throw new ResetPasswordTokenRequestTooSoonError({
+        throw new ResetPasswordTokenAccountPendingError({
           errorDetails: {
             resendAvailable: isResendAvailable,
             sentAt: createdAt,
