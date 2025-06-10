@@ -26,7 +26,8 @@ export const ErrorCodes: ErrorCodes = {
   [ErrorInstance.RESET_PASSWORD_TOKEN_ACCOUNT_PENDING]: 1005,
   [ErrorInstance.NOT_MATCH_ACCOUNT_UPDATE_PASSWORD]: 4004,
   [ErrorInstance.RESET_PASSWORD_TOKEN_NOT_FOUND]: 4004,
-  [ErrorInstance.EMAIL_NOT_EXIST]: 4004
+  [ErrorInstance.EMAIL_NOT_EXIST]: 4004,
+  [ErrorInstance.AUTHORIZATION_HEADER_MISSING]: 4001
 } as const;
 
 export type ErrorCodesKeys = keyof typeof ErrorCodes;

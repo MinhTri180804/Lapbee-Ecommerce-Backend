@@ -45,6 +45,9 @@ export const ValidationMessages = {
           resendResetPasswordToken: {
             EMAIL_INVALID: 'Email invalid',
             EMAIL_REQUIRED: 'Email is required'
+          },
+          refreshToken: {
+            REFRESH_TOKEN_REQUIRED: 'RefreshToken is required'
           }
         }
       }

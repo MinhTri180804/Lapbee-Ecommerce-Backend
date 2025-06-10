@@ -40,6 +40,8 @@ const {
   EMAIL_REQUIRED: EMAIL_REQUIRED_RESEND_RESET_PASSWORD_TOKEN
 } = ValidationMessages.api.request.auth.local.resendResetPasswordToken;
 
+const { REFRESH_TOKEN_REQUIRED } = ValidationMessages.api.request.auth.local.refreshToken;
+
 export const registerLocalRequestBodySchema = z.object({
   email: z
     .string({
@@ -118,6 +120,10 @@ export const resendResetPasswordTokenRequestBodySchema = z.object({
     .email(EMAIL_INVALID_RESEND_RESET_PASSWORD_TOKEN)
 });
 
+export const refreshTokenRequestBodySchema = z.object({
+  refreshToken: z.string({ required_error: REFRESH_TOKEN_REQUIRED })
+});
+
 export type RegisterLocalRequestBody = z.infer<typeof registerLocalRequestBodySchema>;
 export type VerifyEmailRegisterRequestBody = z.infer<typeof verifyEmailRegisterRequestBodySchema>;
 export type SetPasswordRequestBody = z.infer<typeof setPasswordRequestBodySchema>;
@@ -127,3 +133,4 @@ export type LoginRequestBody = z.infer<typeof loginRequestBodySchema>;
 export type ForgotPasswordRequestBody = z.infer<typeof forgotPasswordRequestBodySchema>;
 export type ResetPasswordRequestBody = z.infer<typeof resetPasswordRequestBodySchema>;
 export type ResendResetPasswordTokenRequestBody = z.infer<typeof resendResetPasswordTokenRequestBodySchema>;
+export type RefreshTokenRequestBody = z.infer<typeof refreshTokenRequestBodySchema>;
