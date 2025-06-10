@@ -9,6 +9,7 @@ import {
   passwordSchema,
   providerSchema,
   roleSchema,
+  userProfileIdSchema,
   zaloIdSchema
 } from './fields.schema.js';
 
@@ -16,6 +17,7 @@ export const userAuthZodSchema = z.object({
   email: emailSchema.optional(),
   password: passwordSchema.optional(),
   passwordConfirm: passwordConfirmSchema.optional(),
+  userProfileId: userProfileIdSchema.optional().nullable(),
   role: roleSchema,
   provider: providerSchema,
   isVerify: isVerifySchema,

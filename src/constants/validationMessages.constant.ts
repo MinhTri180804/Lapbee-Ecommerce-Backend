@@ -66,6 +66,7 @@ export const ValidationMessages = {
     PASSWORD_REQUIRED: 'Password is required for local provider',
     PASSWORD_CONFIRM_REQUIRED: 'Password confirm is required for local provider',
     ZALO_ID_REQUIRED: 'Zalo ID is required for zalo provider',
-    BLOCKED_STATUS_MESSAGE_REQUIRED: 'Account lock content is required'
+    BLOCKED_STATUS_MESSAGE_REQUIRED: 'Account lock content is required',
+    USER_PROFILE_ID_REQUIRED: 'UserProfileId is required'
   }
 };

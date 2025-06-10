@@ -4,8 +4,8 @@ import { UserAuthRoleEnum } from '../enums/userAuthRole.enum.js';
 import { UserAuthSchemaType } from '../schema/zod/userAuth/index.schema.js';
 import { hashPassword } from '../utils/password.util.js';
 
-const DOCUMENT_NAME = 'users_auth';
-const COLLECTION_NAME = 'user_auth';
+const DOCUMENT_NAME = 'user_auth';
+const COLLECTION_NAME = 'users_auth';
 
 export interface IUserAuthDocument extends UserAuthSchemaType, Document {
   isSetPassword: boolean;
@@ -33,6 +33,11 @@ const userAuthSchema = new Schema<IUserAuthDocument>(
     provider: {
       type: String,
       enum: Object.values(UserAuthProviderEnum)
+    },
+    userProfileId: {
+      type: Schema.Types.ObjectId,
+      ref: 'user_profile',
+      default: null
     },
     isVerify: {
       type: Boolean,
