@@ -29,7 +29,8 @@ export const ErrorCodes: ErrorCodes = {
   [ErrorInstance.EMAIL_NOT_EXIST]: 4004,
   [ErrorInstance.AUTHORIZATION_HEADER_MISSING]: 4001,
   [ErrorInstance.USER_PROFILE_CREATED]: 4004,
-  [ErrorInstance.USER_NOT_EXIST]: 4004
+  [ErrorInstance.USER_NOT_EXIST]: 4004,
+  [ErrorInstance.USER_PROFILE_NOT_EXIST]: 4004
 } as const;
 
 export type ErrorCodesKeys = keyof typeof ErrorCodes;

@@ -1,17 +1,17 @@
 import { Router } from 'express';
-import { UserProfileController } from '../controllers/userProfile.controller';
+import { UserProfileController } from '../controllers/userProfile.controller.js';
 import { validateRequestBody } from '../middleware/validateRequestBody.middleware.js';
 import {
   CreateUserProfileRequestBody,
   createUserProfileRequestBodySchema
-} from '../schema/zod/api/requests/userProfile.schema';
+} from '../schema/zod/api/requests/userProfile.schema.js';
 import { verifyAccessTokenMiddleware } from '../middleware/verifyAccessToken.middleware.js';
 
 export const router = Router();
 
-const validateRequestBodyCreate = validateRequestBody<CreateUserProfileRequestBody>(createUserProfileRequestBodySchema);
-
 const userProfileController = new UserProfileController();
+
+const validateRequestBodyCreate = validateRequestBody<CreateUserProfileRequestBody>(createUserProfileRequestBodySchema);
 
 router.post(
   '/',
@@ -19,3 +19,5 @@ router.post(
   validateRequestBodyCreate,
   userProfileController.create.bind(userProfileController)
 );
+
+router.get('/', verifyAccessTokenMiddleware, userProfileController.getMe.bind(userProfileController));

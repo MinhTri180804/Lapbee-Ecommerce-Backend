@@ -27,6 +27,7 @@ import { EmailNotExistError } from '../errors/EmailNotExist.error.js';
 import { AuthorizationHeaderMissingError } from '../errors/AuthorizationHeaderMissing.error.js';
 import { UserProfileCreatedError } from '../errors/UserProfileCreated.error.js';
 import { UserNotExistError } from '../errors/UserNotExist.error.js';
+import { UserProfileNotExistError } from '../errors/UserProfileNotExist.error.js';
 
 type ErrorHandler<T extends AppError<unknown> | Error> = (response: Response, error: T) => void;
 
@@ -56,6 +57,7 @@ type MappingHandler = {
   [ErrorInstance.AUTHORIZATION_HEADER_MISSING]: ErrorHandler<AuthorizationHeaderMissingError>;
   [ErrorInstance.USER_PROFILE_CREATED]: ErrorHandler<UserProfileCreatedError>;
   [ErrorInstance.USER_NOT_EXIST]: ErrorHandler<UserNotExistError>;
+  [ErrorInstance.USER_PROFILE_NOT_EXIST]: ErrorHandler<UserProfileNotExistError>;
 };
 
 class _ErrorMiddlewareHandler {
@@ -85,7 +87,8 @@ class _ErrorMiddlewareHandler {
     [ErrorInstance.EMAIL_NOT_EXIST]: this._emailNotExistErrorHandler,
     [ErrorInstance.AUTHORIZATION_HEADER_MISSING]: this._authorizationHeaderMissingErrorHandler,
     [ErrorInstance.USER_PROFILE_CREATED]: this._userProfileCreatedErrorHandler,
-    [ErrorInstance.USER_NOT_EXIST]: this._userNotExistErrorHandler
+    [ErrorInstance.USER_NOT_EXIST]: this._userNotExistErrorHandler,
+    [ErrorInstance.USER_PROFILE_NOT_EXIST]: this._userProfileNotExistErrorHandler
   };
 
   private constructor() {}
@@ -268,6 +271,13 @@ class _ErrorMiddlewareHandler {
   }
 
   private _userNotExistErrorHandler(response: Response, error: UserNotExistError) {
+    sendErrorResponse({
+      response,
+      content: error
+    });
+  }
+
+  private _userProfileNotExistErrorHandler(response: Response, error: UserProfileNotExistError) {
     sendErrorResponse({
       response,
       content: error
