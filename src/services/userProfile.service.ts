@@ -5,13 +5,19 @@ import { decode, JwtPayload } from 'jsonwebtoken';
 import { UserAuthRepository } from '../repositories/UserAuth.repository.js';
 import { UserProfileCreatedError } from '../errors/UserProfileCreated.error.js';
 import { UserNotExistError } from '../errors/UserNotExist.error.js';
+import { UserProfileNotExistError } from '../errors/UserProfileNotExist.error.js';
 
 type CreateParams = CreateUserProfileRequestBody & {
   accessToken: string;
 };
 
+type GetMeParams = {
+  accessToken: string;
+};
+
 interface IUserProfileService {
   create: (params: CreateParams) => Promise<IUserProfileDocument>;
+  getMe: (params: GetMeParams) => Promise<IUserProfileDocument>;
 }
 
 export class UserProfileService implements IUserProfileService {
@@ -50,6 +56,16 @@ export class UserProfileService implements IUserProfileService {
       userAuth,
       userProfileId: userProfile.id
     });
+
+    return userProfile;
+  }
+
+  public async getMe({ accessToken }: GetMeParams): Promise<IUserProfileDocument> {
+    const { sub } = decode(accessToken) as JwtPayload;
+    const userProfile = await this._userProfileRepository.findByUserAuthId({ userAuthId: sub as string });
+    if (!userProfile) {
+      throw new UserProfileNotExistError({});
+    }
 
     return userProfile;
   }

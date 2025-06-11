@@ -32,5 +32,6 @@ export const ErrorMessages: ErrorMessagesType = {
   [ErrorInstance.EMAIL_NOT_EXIST]: 'Email not exist',
   [ErrorInstance.AUTHORIZATION_HEADER_MISSING]: 'Authorization missing',
   [ErrorInstance.USER_PROFILE_CREATED]: 'User profile has already been created',
-  [ErrorInstance.USER_NOT_EXIST]: 'User not exist'
+  [ErrorInstance.USER_NOT_EXIST]: 'User not exist',
+  [ErrorInstance.USER_PROFILE_NOT_EXIST]: 'User profile not exist'
 };
