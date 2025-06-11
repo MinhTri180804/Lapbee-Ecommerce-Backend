@@ -68,5 +68,12 @@ export const ValidationMessages = {
     ZALO_ID_REQUIRED: 'Zalo ID is required for zalo provider',
     BLOCKED_STATUS_MESSAGE_REQUIRED: 'Account lock content is required',
     USER_PROFILE_ID_REQUIRED: 'UserProfileId is required'
+  },
+
+  userProfile: {
+    USER_AUTH_ID_REQUIRED: 'UserAuthId is required',
+    FIRST_NAME_REQUIRED: 'First name is required',
+    LAST_NAME_REQUIRED: 'Last name is required',
+    PHONE_REQUIRED: 'Phone is required'
   }
 };
