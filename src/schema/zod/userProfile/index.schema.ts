@@ -5,7 +5,7 @@ export const userProfileZodSchema = z.object({
   userAuthId: userAuthIdSchema,
   firstName: firstNameSchema,
   lastName: lastNameSchema,
-  avatarUrl: avatarUrlSchema.optional(),
+  avatarUrl: avatarUrlSchema.nullable(),
   phone: phoneSchema
 });
 
