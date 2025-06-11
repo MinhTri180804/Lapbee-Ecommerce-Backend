@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { IoredisManager } from 'src/configs/ioredisManager.config.js';
 import { UserAuthRepository } from 'src/repositories/UserAuth.repository.js';
-import { IoredisService } from 'src/services/Ioredis.service.js';
+import { IoredisService } from 'src/services/external/Ioredis.service.js';
 import {
   ForgotPasswordRequestBody,
   LoginRequestBody,

@@ -1,6 +1,6 @@
 import { Redis } from 'ioredis';
-import { RedisKeyGenerator } from '../utils/RedisKeyGenerator.util.js';
-import { env } from '../configs/env.config.js';
+import { RedisKeyGenerator } from '../../utils/RedisKeyGenerator.util.js';
+import { env } from '../../configs/env.config.js';
 
 type SavePinCodeVerifyEmailParams = {
   email: string;

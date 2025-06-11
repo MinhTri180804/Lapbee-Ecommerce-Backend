@@ -73,7 +73,10 @@ export const ValidationMessages = {
   userProfile: {
     USER_AUTH_ID_REQUIRED: 'UserAuthId is required',
     FIRST_NAME_REQUIRED: 'First name is required',
+    FIRST_NAME_MIN_LENGTH: 'First name must be length equal or greater than 3',
+    LAST_NAME_MIN_LENGTH: 'Last name must be length equal or greater than 3',
     LAST_NAME_REQUIRED: 'Last name is required',
-    PHONE_REQUIRED: 'Phone is required'
+    PHONE_REQUIRED: 'Phone is required',
+    PHONE_INVALID: 'Number phone invalid'
   }
 };

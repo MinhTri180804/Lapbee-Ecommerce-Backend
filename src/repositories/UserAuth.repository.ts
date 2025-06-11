@@ -40,7 +40,7 @@ type DoesUserProfileExistParams = {
 };
 
 type UpdateUserProfileIdParams = {
-  userAuthId: string;
+  userAuth: IUserAuthDocument;
   userProfileId: string;
 };
 
@@ -52,7 +52,7 @@ interface IUserAuthRepository {
   updateJtiSetPassword: (params: UpdateJtiSetPasswordParams) => Promise<IUserAuthDocument>;
   updatePassword: (params: UpdatePasswordParams) => Promise<boolean>;
   doesUserProfileExist: (params: DoesUserProfileExistParams) => Promise<boolean>;
-  updateUserProfileId: (params: UpdateUserProfileIdParams) => Promise<boolean>;
+  updateUserProfileId: (params: UpdateUserProfileIdParams) => Promise<IUserAuthDocument>;
 }
 
 export class UserAuthRepository implements IUserAuthRepository {
@@ -134,16 +134,9 @@ export class UserAuthRepository implements IUserAuthRepository {
     return true;
   }
 
-  public async updateUserProfileId({ userAuthId, userProfileId }: UpdateUserProfileIdParams): Promise<boolean> {
-    const result = await this._userAuthModel.updateOne(
-      {
-        _id: userAuthId
-      },
-      {
-        userProfileId
-      }
-    );
-
-    return result.matchedCount > 0;
+  public async updateUserProfileId({ userAuth, userProfileId }: UpdateUserProfileIdParams): Promise<IUserAuthDocument> {
+    userAuth.userProfileId = userProfileId;
+    const userAuthData = await userAuth.save();
+    return userAuthData;
   }
 }

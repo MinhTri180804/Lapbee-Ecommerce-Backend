@@ -1,5 +1,5 @@
 import { JobsSendEmail, JobsSendEmailValues } from '../../constants/jobs.constant.js';
-import { SendEmailService } from '../../services/SendEmail.service.js';
+import { SendEmailService } from '../../services/external/SendEmail.service.js';
 import {
   ResendResetPasswordTokenJobType,
   ResendSetPasswordTokenJobType,

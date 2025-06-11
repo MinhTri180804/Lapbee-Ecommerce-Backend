@@ -31,5 +31,6 @@ export const ErrorMessages: ErrorMessagesType = {
   [ErrorInstance.RESET_PASSWORD_TOKEN_NOT_FOUND]: 'No reset password request found for this email or it has expired.',
   [ErrorInstance.EMAIL_NOT_EXIST]: 'Email not exist',
   [ErrorInstance.AUTHORIZATION_HEADER_MISSING]: 'Authorization missing',
-  [ErrorInstance.USER_PROFILE_CREATED]: 'User profile has already been created'
+  [ErrorInstance.USER_PROFILE_CREATED]: 'User profile has already been created',
+  [ErrorInstance.USER_NOT_EXIST]: 'User not exist'
 };

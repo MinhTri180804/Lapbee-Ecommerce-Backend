@@ -35,7 +35,7 @@ import { JWTGenerator } from '../../utils/JwtGenerator.util.js';
 import { comparePassword, hashPassword } from '../../utils/password.util.js';
 import { PinCodeVerifyEmail } from '../../utils/pinCode/core/PinCodeVerifyEmail.js';
 import { SubjectSendEmail } from '../../utils/subjectSendEmail.util.js';
-import { IoredisService } from '../Ioredis.service.js';
+import { IoredisService } from '../external/Ioredis.service.js';
 import { EmailNotExistError } from 'src/errors/EmailNotExist.error.js';
 import { ResetPasswordTokenNotFoundError } from 'src/errors/ResetPasswordTokenNotFound.error.js';
 import { ResetPasswordTokenRequestTooSoonError } from 'src/errors/ResetPasswordTokenTooSoon.error.js';
