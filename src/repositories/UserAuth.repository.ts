@@ -35,6 +35,15 @@ type UpdatePasswordParams = {
   newPassword: string;
 };
 
+type DoesUserProfileExistParams = {
+  userAuthId: string;
+};
+
+type UpdateUserProfileIdParams = {
+  userAuth: IUserAuthDocument;
+  userProfileId: string;
+};
+
 interface IUserAuthRepository {
   findByEmail: (params: FindByEmailParams) => Promise<IUserAuthDocument | null>;
   verifyEmailRegister: (params: VerifyEmailRegisterParams) => Promise<boolean>;
@@ -42,6 +51,8 @@ interface IUserAuthRepository {
   createPassword: (params: CreatePasswordParams) => Promise<IUserAuthDocument>;
   updateJtiSetPassword: (params: UpdateJtiSetPasswordParams) => Promise<IUserAuthDocument>;
   updatePassword: (params: UpdatePasswordParams) => Promise<boolean>;
+  doesUserProfileExist: (params: DoesUserProfileExistParams) => Promise<boolean>;
+  updateUserProfileId: (params: UpdateUserProfileIdParams) => Promise<IUserAuthDocument>;
 }
 
 export class UserAuthRepository implements IUserAuthRepository {
@@ -110,5 +121,22 @@ export class UserAuthRepository implements IUserAuthRepository {
     );
 
     return result.matchedCount > 0;
+  }
+
+  public async doesUserProfileExist({ userAuthId }: DoesUserProfileExistParams): Promise<boolean> {
+    const result = await this._userAuthModel.exists({
+      _id: userAuthId,
+      userProfileId: { $ne: null }
+    });
+
+    if (result === null) return false;
+
+    return true;
+  }
+
+  public async updateUserProfileId({ userAuth, userProfileId }: UpdateUserProfileIdParams): Promise<IUserAuthDocument> {
+    userAuth.userProfileId = userProfileId;
+    const userAuthData = await userAuth.save();
+    return userAuthData;
   }
 }

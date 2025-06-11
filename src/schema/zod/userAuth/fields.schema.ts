@@ -15,7 +15,8 @@ const {
   ZALO_ID_REQUIRED,
   MAX_LENGTH_PASSWORD_CONFIRM,
   MIN_LENGTH_PASSWORD_CONFIRM,
-  BLOCKED_STATUS_MESSAGE_REQUIRED
+  BLOCKED_STATUS_MESSAGE_REQUIRED,
+  USER_PROFILE_ID_REQUIRED
 } = ValidationMessages.userAuth;
 
 const REGEX_CHECK_PASSWORD = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
@@ -32,6 +33,8 @@ export const passwordConfirmSchema = z
   .min(8, MIN_LENGTH_PASSWORD_CONFIRM)
   .max(16, MAX_LENGTH_PASSWORD_CONFIRM)
   .regex(REGEX_CHECK_PASSWORD, WEAK_PASSWORD_CONFIRM);
+
+export const userProfileIdSchema = z.string({ required_error: USER_PROFILE_ID_REQUIRED });
 
 export const roleSchema = z.nativeEnum(UserAuthRoleEnum);
 export const providerSchema = z.nativeEnum(UserAuthProviderEnum);

@@ -1,14 +1,14 @@
-import { env } from '../configs/env.config.js';
-import { SubjectSendEmail } from '../constants/subjectSendEmail.constant.js';
+import { env } from '../../configs/env.config.js';
+import { SubjectSendEmail } from '../../constants/subjectSendEmail.constant.js';
 import {
   ResendResetPasswordTokenJobType,
   ResendSetPasswordTokenJobType,
   ResetPasswordTokenJobType,
   VerificationEmailSuccessJobType,
   VerifyEmailJobType
-} from '../queues/jobs/SendEmail.job.js';
-import { NodemailerManager } from '../configs/NodemailerManager.config.js';
-import { formatTime } from '../utils/formatTime.util.js';
+} from '../../queues/jobs/SendEmail.job.js';
+import { NodemailerManager } from '../../configs/NodemailerManager.config.js';
+import { formatTime } from '../../utils/formatTime.util.js';
 import { Transporter } from 'nodemailer';
 
 type VerifyEmailParams = Pick<VerifyEmailJobType, 'data'>;

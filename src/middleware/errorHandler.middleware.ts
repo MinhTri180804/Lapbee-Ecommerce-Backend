@@ -25,6 +25,8 @@ import { NotMatchAccountUpdatePasswordError } from '../errors/NotMatchAccountUpd
 import { ResetPasswordTokenNotFoundError } from '../errors/ResetPasswordTokenNotFound.error.js';
 import { EmailNotExistError } from '../errors/EmailNotExist.error.js';
 import { AuthorizationHeaderMissingError } from '../errors/AuthorizationHeaderMissing.error.js';
+import { UserProfileCreatedError } from '../errors/UserProfileCreated.error.js';
+import { UserNotExistError } from '../errors/UserNotExist.error.js';
 
 type ErrorHandler<T extends AppError<unknown> | Error> = (response: Response, error: T) => void;
 
@@ -52,6 +54,8 @@ type MappingHandler = {
   [ErrorInstance.RESET_PASSWORD_TOKEN_NOT_FOUND]: ErrorHandler<ResetPasswordTokenNotFoundError>;
   [ErrorInstance.EMAIL_NOT_EXIST]: ErrorHandler<EmailNotExistError>;
   [ErrorInstance.AUTHORIZATION_HEADER_MISSING]: ErrorHandler<AuthorizationHeaderMissingError>;
+  [ErrorInstance.USER_PROFILE_CREATED]: ErrorHandler<UserProfileCreatedError>;
+  [ErrorInstance.USER_NOT_EXIST]: ErrorHandler<UserNotExistError>;
 };
 
 class _ErrorMiddlewareHandler {
@@ -79,7 +83,9 @@ class _ErrorMiddlewareHandler {
     [ErrorInstance.NOT_MATCH_ACCOUNT_UPDATE_PASSWORD]: this._notMatchAccountUpdatePasswordErrorHandler,
     [ErrorInstance.RESET_PASSWORD_TOKEN_NOT_FOUND]: this._resetPasswordTokenNotFoundErrorHandler,
     [ErrorInstance.EMAIL_NOT_EXIST]: this._emailNotExistErrorHandler,
-    [ErrorInstance.AUTHORIZATION_HEADER_MISSING]: this._authorizationHeaderMissingErrorHandler
+    [ErrorInstance.AUTHORIZATION_HEADER_MISSING]: this._authorizationHeaderMissingErrorHandler,
+    [ErrorInstance.USER_PROFILE_CREATED]: this._userProfileCreatedErrorHandler,
+    [ErrorInstance.USER_NOT_EXIST]: this._userNotExistErrorHandler
   };
 
   private constructor() {}
@@ -248,6 +254,20 @@ class _ErrorMiddlewareHandler {
   }
 
   private _authorizationHeaderMissingErrorHandler(response: Response, error: AuthorizationHeaderMissingError) {
+    sendErrorResponse({
+      response,
+      content: error
+    });
+  }
+
+  private _userProfileCreatedErrorHandler(response: Response, error: UserProfileCreatedError) {
+    sendErrorResponse({
+      response,
+      content: error
+    });
+  }
+
+  private _userNotExistErrorHandler(response: Response, error: UserNotExistError) {
     sendErrorResponse({
       response,
       content: error
