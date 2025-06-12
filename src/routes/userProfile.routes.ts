@@ -32,3 +32,4 @@ router.post(
   uploadMulterMiddleware.singleUpload.bind(uploadMulterMiddleware),
   userProfileController.updateAvatar.bind(userProfileController)
 );
+router.delete('/avatar', verifyAccessTokenMiddleware, userProfileController.deleteAvatar.bind(userProfileController));

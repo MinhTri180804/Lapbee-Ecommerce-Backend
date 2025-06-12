@@ -50,6 +50,11 @@ export const ValidationMessages = {
             REFRESH_TOKEN_REQUIRED: 'RefreshToken is required'
           }
         }
+      },
+      userProfile: {
+        deleteAvatar: {
+          PUBLIC_ID_REQUIRED: 'PublicId is required'
+        }
       }
     }
   },

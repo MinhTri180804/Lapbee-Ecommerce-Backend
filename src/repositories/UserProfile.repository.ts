@@ -12,10 +12,15 @@ type UpdateAvatarParams = {
   publicId: string;
 };
 
+type DeleteAvatarParams = {
+  userProfile: IUserProfileDocument;
+};
+
 interface IUserProfileRepository {
   create: (params: CreateParams) => Promise<IUserProfileDocument>;
   findByUserAuthId: (params: FindByUserAuthIdParams) => Promise<IUserProfileDocument | null>;
   updateAvatar: (params: UpdateAvatarParams) => Promise<IUserProfileDocument>;
+  deleteAvatar: (params: DeleteAvatarParams) => Promise<IUserProfileDocument>;
 }
 
 export class UserProfileRepository implements IUserProfileRepository {
@@ -37,6 +42,12 @@ export class UserProfileRepository implements IUserProfileRepository {
       publicId,
       url
     };
+    await userProfile.save();
+    return userProfile;
+  }
+
+  public async deleteAvatar({ userProfile }: DeleteAvatarParams): Promise<IUserProfileDocument> {
+    userProfile.avatar = null;
     await userProfile.save();
     return userProfile;
   }
