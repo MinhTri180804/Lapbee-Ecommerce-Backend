@@ -67,5 +67,10 @@ export const env = {
       SET_PASSWORD: process.env.URL_CALLBACK_SET_PASSWORD,
       RESET_PASSWORD: process.env.URL_CALLBACK_RESET_PASSWORD
     }
+  },
+  cloudinary: {
+    NAME: process.env.CLOUDINARY_NAME,
+    KEY: process.env.CLOUDINARY_KEY,
+    SECRET: process.env.CLOUDINARY_SECRET
   }
 };

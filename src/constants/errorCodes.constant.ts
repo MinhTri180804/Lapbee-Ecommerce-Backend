@@ -30,7 +30,15 @@ export const ErrorCodes: ErrorCodes = {
   [ErrorInstance.AUTHORIZATION_HEADER_MISSING]: 4001,
   [ErrorInstance.USER_PROFILE_CREATED]: 4004,
   [ErrorInstance.USER_NOT_EXIST]: 4004,
-  [ErrorInstance.USER_PROFILE_NOT_EXIST]: 4004
+  [ErrorInstance.USER_PROFILE_NOT_EXIST]: 4004,
+  [ErrorInstance.CLOUDINARY_UPLOAD]: 5002,
+  [ErrorInstance.MULTER_LIMIT_FIELD_COUNT]: 4000,
+  [ErrorInstance.MULTER_LIMIT_FIELD_KEY]: 4000,
+  [ErrorInstance.MULTER_LIMIT_FIELD_VALUE]: 4000,
+  [ErrorInstance.MULTER_LIMIT_FILE_COUNT]: 4000,
+  [ErrorInstance.MULTER_LIMIT_FILE_SIZE]: 4000,
+  [ErrorInstance.MULTER_LIMIT_PART_COUNT]: 4000,
+  [ErrorInstance.MULTER_LIMIT_UNEXPECTED_FILE]: 4000
 } as const;
 
 export type ErrorCodesKeys = keyof typeof ErrorCodes;
