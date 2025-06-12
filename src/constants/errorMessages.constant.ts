@@ -41,5 +41,6 @@ export const ErrorMessages: ErrorMessagesType = {
   [ErrorInstance.MULTER_LIMIT_FILE_COUNT]: 'Too many files uploaded.',
   [ErrorInstance.MULTER_LIMIT_FILE_SIZE]: 'File too large.',
   [ErrorInstance.MULTER_LIMIT_PART_COUNT]: 'Too many parts in the request.',
-  [ErrorInstance.MULTER_LIMIT_UNEXPECTED_FILE]: 'Unexpected file field.'
+  [ErrorInstance.MULTER_LIMIT_UNEXPECTED_FILE]: 'Unexpected file field.',
+  [ErrorInstance.NO_FILE_PROVIDER]: 'No file provided'
 };

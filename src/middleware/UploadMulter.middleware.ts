@@ -7,6 +7,7 @@ import { MulterLimitFileCountError } from '../errors/multer/MulterLimitFileCount
 import { MulterLimitFileSizeError } from '../errors/multer/MulterLimitFileSize.error.js';
 import { MulterLimitPartCountError } from '../errors/multer/MulterLimitPartCount.error.js';
 import { MulterLimitUnexpectedFileError } from '../errors/multer/MulterLimitUnexpectedFile.error.js';
+import { NoFileProviderError } from 'src/errors/multer/NoFileProvider.error.js';
 
 type ConstructorParams = {
   sizeMB?: number;
@@ -78,18 +79,31 @@ export class UploadMulterMiddleware {
     return;
   }
 
-  private _handleError(error: multer.MulterError, next: NextFunction) {
-    this._mappingMulterErrorCode[error.code](next);
+  private _handleError(error: multer.MulterError) {
+    return this._mappingMulterErrorCode[error.code];
   }
 
   public singleUpload(request: Request, response: Response, next: NextFunction) {
     this._uploadMulter.single(this._fieldName)(request, response, (error) => {
       if (error) {
         if (error instanceof multer.MulterError) {
-          this._handleError(error, next);
+          const handler = this._handleError(error);
+          if (!handler) {
+            next(error);
+            return;
+          }
+
+          handler(next);
+          return;
         }
 
         next(error);
+        return;
+      }
+
+      if (!request.file) {
+        next(new NoFileProviderError({}));
+        return;
       }
 
       next();

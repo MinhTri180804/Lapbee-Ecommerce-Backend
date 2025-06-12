@@ -1,11 +1,11 @@
 import { z } from 'zod';
-import { avatarUrlSchema, firstNameSchema, lastNameSchema, phoneSchema, userAuthIdSchema } from './fields.schema.js';
+import { avatarSchema, firstNameSchema, lastNameSchema, phoneSchema, userAuthIdSchema } from './fields.schema.js';
 
 export const userProfileZodSchema = z.object({
   userAuthId: userAuthIdSchema,
   firstName: firstNameSchema,
   lastName: lastNameSchema,
-  avatarUrl: avatarUrlSchema.nullable(),
+  avatar: avatarSchema.nullable(),
   phone: phoneSchema
 });
 
