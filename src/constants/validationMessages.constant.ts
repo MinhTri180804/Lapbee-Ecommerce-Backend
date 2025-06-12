@@ -77,6 +77,8 @@ export const ValidationMessages = {
     LAST_NAME_MIN_LENGTH: 'Last name must be length equal or greater than 3',
     LAST_NAME_REQUIRED: 'Last name is required',
     PHONE_REQUIRED: 'Phone is required',
-    PHONE_INVALID: 'Number phone invalid'
+    PHONE_INVALID: 'Number phone invalid',
+    AVATAR_PUBLIC_ID_REQUIRED: 'PublicId avatar is required',
+    AVATAR_URL_REQUIRED: 'Avatar url is required'
   }
 };

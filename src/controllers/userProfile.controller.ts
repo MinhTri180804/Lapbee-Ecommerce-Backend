@@ -7,10 +7,12 @@ import { sendSuccessResponse } from '../utils/responses.util.js';
 
 type CreateRequestType = Request<unknown, unknown, CreateUserProfileRequestBody>;
 type GetMeRequestType = Request;
+type UpdateAvatarRequestType = Request;
 
 interface IUserProfileController {
   create: (request: CreateRequestType, response: Response, next: NextFunction) => Promise<void>;
   getMe: (request: GetMeRequestType, response: Response, next: NextFunction) => Promise<void>;
+  updateAvatar: (request: UpdateAvatarRequestType, response: Response, next: NextFunction) => Promise<void>;
 }
 
 export class UserProfileController implements IUserProfileController {
@@ -42,6 +44,29 @@ export class UserProfileController implements IUserProfileController {
         statusCode: StatusCodes.OK,
         message: 'Get me profile success',
         data: userProfileData
+      }
+    });
+  }
+
+  public async updateAvatar(request: UpdateAvatarRequestType, response: Response): Promise<void> {
+    const accessToken = request.headers['authorization']!.split(' ')[1];
+    const file = request.file as Express.Multer.File;
+
+    const { publicId, url } = await this._userProfileService.updateAvatar({
+      accessToken,
+      fileBuffer: file.buffer,
+      originalFileName: file.originalname
+    });
+
+    sendSuccessResponse<{ publicId: string; url: string }>({
+      response,
+      content: {
+        statusCode: StatusCodes.OK,
+        message: 'Update avatar success',
+        data: {
+          publicId,
+          url
+        }
       }
     });
   }

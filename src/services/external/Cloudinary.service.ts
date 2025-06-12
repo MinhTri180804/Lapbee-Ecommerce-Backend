@@ -1,4 +1,4 @@
-import { v2 as cloudinary, UploadApiResponse, UploadApiErrorResponse } from 'cloudinary';
+import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import path from 'path';
 import streamifier from 'streamifier';
 import { v4 as uuidV4 } from 'uuid';

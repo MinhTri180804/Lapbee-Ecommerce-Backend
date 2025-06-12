@@ -6,6 +6,18 @@ const COLLECTION_NAME = 'users_profile';
 
 export interface IUserProfileDocument extends UserProfileSchemaType, Document {}
 
+const avatarSchema = new Schema<IUserProfileDocument['avatar']>(
+  {
+    publicId: {
+      type: String
+    },
+    url: {
+      type: String
+    }
+  },
+  { _id: false }
+);
+
 const userProfileSchema = new Schema<IUserProfileDocument>(
   {
     userAuthId: {
@@ -17,9 +29,9 @@ const userProfileSchema = new Schema<IUserProfileDocument>(
     lastName: {
       type: String
     },
-    avatarUrl: {
-      type: String,
-      default: ''
+    avatar: {
+      type: avatarSchema,
+      default: null
     },
     phone: {
       Type: String

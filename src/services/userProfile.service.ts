@@ -6,6 +6,8 @@ import { UserAuthRepository } from '../repositories/UserAuth.repository.js';
 import { UserProfileCreatedError } from '../errors/UserProfileCreated.error.js';
 import { UserNotExistError } from '../errors/UserNotExist.error.js';
 import { UserProfileNotExistError } from '../errors/UserProfileNotExist.error.js';
+import { CloudinaryService } from './external/Cloudinary.service.js';
+import { CloudinaryFolder } from 'src/enums/cloudinaryFolder.enum.js';
 
 type CreateParams = CreateUserProfileRequestBody & {
   accessToken: string;
@@ -15,9 +17,19 @@ type GetMeParams = {
   accessToken: string;
 };
 
+type UpdateAvatarParams = {
+  accessToken: string;
+  fileBuffer: Buffer;
+  originalFileName: string;
+};
+
 interface IUserProfileService {
   create: (params: CreateParams) => Promise<IUserProfileDocument>;
   getMe: (params: GetMeParams) => Promise<IUserProfileDocument>;
+  updateAvatar: (params: UpdateAvatarParams) => Promise<{
+    publicId: string;
+    url: string;
+  }>;
 }
 
 export class UserProfileService implements IUserProfileService {
@@ -30,7 +42,7 @@ export class UserProfileService implements IUserProfileService {
     phone,
     firstName,
     lastName,
-    avatarUrl = null,
+    avatar = null,
     accessToken
   }: CreateParams): Promise<IUserProfileDocument> {
     const { sub } = decode(accessToken) as JwtPayload;
@@ -48,7 +60,7 @@ export class UserProfileService implements IUserProfileService {
       userAuthId: userAuth.id,
       firstName,
       lastName,
-      avatarUrl,
+      avatar,
       phone
     });
 
@@ -68,5 +80,30 @@ export class UserProfileService implements IUserProfileService {
     }
 
     return userProfile;
+  }
+
+  public async updateAvatar({ accessToken, fileBuffer, originalFileName }: UpdateAvatarParams): Promise<{
+    publicId: string;
+    url: string;
+  }> {
+    const { sub } = decode(accessToken) as JwtPayload;
+    const profile = await this._userProfileRepository.findByUserAuthId({ userAuthId: sub as string });
+    if (!profile) {
+      throw new UserProfileNotExistError({});
+    }
+    const cloudinaryService = new CloudinaryService(CloudinaryFolder.USER_AVATAR);
+
+    if (profile.avatar) {
+      await cloudinaryService.delete({ publicId: profile.avatar.publicId });
+    }
+
+    const { public_id, url } = await cloudinaryService.uploadStream(fileBuffer, originalFileName);
+    await this._userProfileRepository.updateAvatar({
+      userProfile: profile,
+      url,
+      publicId: public_id
+    });
+
+    return { publicId: public_id, url };
   }
 }
