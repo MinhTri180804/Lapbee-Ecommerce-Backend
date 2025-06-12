@@ -28,6 +28,14 @@ import { AuthorizationHeaderMissingError } from '../errors/AuthorizationHeaderMi
 import { UserProfileCreatedError } from '../errors/UserProfileCreated.error.js';
 import { UserNotExistError } from '../errors/UserNotExist.error.js';
 import { UserProfileNotExistError } from '../errors/UserProfileNotExist.error.js';
+import { CloudinaryUploadError } from '../errors/CloudinaryUpload.error.js';
+import { MulterLimitFieldCountError } from '../errors/multer/MulterLimitFieldCount.error.js';
+import { MulterLimitFieldKeyError } from '../errors/multer/MulterLimitFieldKey.error.js';
+import { MulterLimitFieldValueError } from '../errors/multer/MulterLimitFieldValue.error.js';
+import { MulterLimitFileCountError } from '../errors/multer/MulterLimitFileCount.error.js';
+import { MulterLimitFileSizeError } from '../errors/multer/MulterLimitFileSize.error.js';
+import { MulterLimitPartCountError } from '../errors/multer/MulterLimitPartCount.error.js';
+import { MulterLimitUnexpectedFileError } from '../errors/multer/MulterLimitUnexpectedFile.error.js';
 
 type ErrorHandler<T extends AppError<unknown> | Error> = (response: Response, error: T) => void;
 
@@ -58,6 +66,14 @@ type MappingHandler = {
   [ErrorInstance.USER_PROFILE_CREATED]: ErrorHandler<UserProfileCreatedError>;
   [ErrorInstance.USER_NOT_EXIST]: ErrorHandler<UserNotExistError>;
   [ErrorInstance.USER_PROFILE_NOT_EXIST]: ErrorHandler<UserProfileNotExistError>;
+  [ErrorInstance.CLOUDINARY_UPLOAD]: ErrorHandler<CloudinaryUploadError>;
+  [ErrorInstance.MULTER_LIMIT_FIELD_COUNT]: ErrorHandler<MulterLimitFieldCountError>;
+  [ErrorInstance.MULTER_LIMIT_FIELD_KEY]: ErrorHandler<MulterLimitFieldKeyError>;
+  [ErrorInstance.MULTER_LIMIT_FIELD_VALUE]: ErrorHandler<MulterLimitFieldValueError>;
+  [ErrorInstance.MULTER_LIMIT_FILE_COUNT]: ErrorHandler<MulterLimitFileCountError>;
+  [ErrorInstance.MULTER_LIMIT_FILE_SIZE]: ErrorHandler<MulterLimitFileSizeError>;
+  [ErrorInstance.MULTER_LIMIT_PART_COUNT]: ErrorHandler<MulterLimitPartCountError>;
+  [ErrorInstance.MULTER_LIMIT_UNEXPECTED_FILE]: ErrorHandler<MulterLimitUnexpectedFileError>;
 };
 
 class _ErrorMiddlewareHandler {
@@ -88,7 +104,15 @@ class _ErrorMiddlewareHandler {
     [ErrorInstance.AUTHORIZATION_HEADER_MISSING]: this._authorizationHeaderMissingErrorHandler,
     [ErrorInstance.USER_PROFILE_CREATED]: this._userProfileCreatedErrorHandler,
     [ErrorInstance.USER_NOT_EXIST]: this._userNotExistErrorHandler,
-    [ErrorInstance.USER_PROFILE_NOT_EXIST]: this._userProfileNotExistErrorHandler
+    [ErrorInstance.USER_PROFILE_NOT_EXIST]: this._userProfileNotExistErrorHandler,
+    [ErrorInstance.CLOUDINARY_UPLOAD]: this._cloudinaryUploadErrorHandler,
+    [ErrorInstance.MULTER_LIMIT_FIELD_COUNT]: this._multerLimitFieldCountErrorHandler,
+    [ErrorInstance.MULTER_LIMIT_FIELD_KEY]: this._multerLimitFieldKeyErrorHandler,
+    [ErrorInstance.MULTER_LIMIT_FIELD_VALUE]: this._multerLimitFieldValueErrorHandler,
+    [ErrorInstance.MULTER_LIMIT_FILE_COUNT]: this._multerLimitFileCountErrorHandler,
+    [ErrorInstance.MULTER_LIMIT_FILE_SIZE]: this._multerLimitFileSizeErrorHandler,
+    [ErrorInstance.MULTER_LIMIT_PART_COUNT]: this._multerLimitPartCountErrorHandler,
+    [ErrorInstance.MULTER_LIMIT_UNEXPECTED_FILE]: this._multerLimitUnexpectedFileErrorHandler
   };
 
   private constructor() {}
@@ -278,6 +302,62 @@ class _ErrorMiddlewareHandler {
   }
 
   private _userProfileNotExistErrorHandler(response: Response, error: UserProfileNotExistError) {
+    sendErrorResponse({
+      response,
+      content: error
+    });
+  }
+
+  private _cloudinaryUploadErrorHandler(response: Response, error: CloudinaryUploadError) {
+    sendErrorResponse({
+      response,
+      content: error
+    });
+  }
+
+  private _multerLimitPartCountErrorHandler(response: Response, error: MulterLimitPartCountError) {
+    sendErrorResponse({
+      response,
+      content: error
+    });
+  }
+
+  private _multerLimitFileSizeErrorHandler(response: Response, error: MulterLimitFileSizeError) {
+    sendErrorResponse({
+      response,
+      content: error
+    });
+  }
+
+  private _multerLimitFileCountErrorHandler(response: Response, error: MulterLimitFileCountError) {
+    sendErrorResponse({
+      response,
+      content: error
+    });
+  }
+
+  private _multerLimitFieldKeyErrorHandler(response: Response, error: MulterLimitFieldKeyError) {
+    sendErrorResponse({
+      response,
+      content: error
+    });
+  }
+
+  private _multerLimitFieldValueErrorHandler(response: Response, error: MulterLimitFieldValueError) {
+    sendErrorResponse({
+      response,
+      content: error
+    });
+  }
+
+  private _multerLimitFieldCountErrorHandler(response: Response, error: MulterLimitFieldCountError) {
+    sendErrorResponse({
+      response,
+      content: error
+    });
+  }
+
+  private _multerLimitUnexpectedFileErrorHandler(response: Response, error: MulterLimitUnexpectedFileError) {
     sendErrorResponse({
       response,
       content: error

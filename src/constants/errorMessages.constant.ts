@@ -33,5 +33,13 @@ export const ErrorMessages: ErrorMessagesType = {
   [ErrorInstance.AUTHORIZATION_HEADER_MISSING]: 'Authorization missing',
   [ErrorInstance.USER_PROFILE_CREATED]: 'User profile has already been created',
   [ErrorInstance.USER_NOT_EXIST]: 'User not exist',
-  [ErrorInstance.USER_PROFILE_NOT_EXIST]: 'User profile not exist'
+  [ErrorInstance.USER_PROFILE_NOT_EXIST]: 'User profile not exist',
+  [ErrorInstance.CLOUDINARY_UPLOAD]: 'Cloudinary upload error',
+  [ErrorInstance.MULTER_LIMIT_FIELD_COUNT]: 'Too many fields.',
+  [ErrorInstance.MULTER_LIMIT_FIELD_KEY]: 'Field name is too long.',
+  [ErrorInstance.MULTER_LIMIT_FIELD_VALUE]: 'Field value is too long.',
+  [ErrorInstance.MULTER_LIMIT_FILE_COUNT]: 'Too many files uploaded.',
+  [ErrorInstance.MULTER_LIMIT_FILE_SIZE]: 'File too large.',
+  [ErrorInstance.MULTER_LIMIT_PART_COUNT]: 'Too many parts in the request.',
+  [ErrorInstance.MULTER_LIMIT_UNEXPECTED_FILE]: 'Unexpected file field.'
 };
