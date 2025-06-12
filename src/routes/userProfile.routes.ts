@@ -26,8 +26,8 @@ router.post(
 );
 
 router.get('/', verifyAccessTokenMiddleware, userProfileController.getMe.bind(userProfileController));
-router.post(
-  '/update-avatar',
+router.patch(
+  '/avatar',
   verifyAccessTokenMiddleware,
   uploadMulterMiddleware.singleUpload.bind(uploadMulterMiddleware),
   userProfileController.updateAvatar.bind(userProfileController)
