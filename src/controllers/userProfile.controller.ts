@@ -8,11 +8,13 @@ import { sendSuccessResponse } from '../utils/responses.util.js';
 type CreateRequestType = Request<unknown, unknown, CreateUserProfileRequestBody>;
 type GetMeRequestType = Request;
 type UpdateAvatarRequestType = Request;
+type DeleteAvatarRequestType = Request;
 
 interface IUserProfileController {
   create: (request: CreateRequestType, response: Response, next: NextFunction) => Promise<void>;
   getMe: (request: GetMeRequestType, response: Response, next: NextFunction) => Promise<void>;
   updateAvatar: (request: UpdateAvatarRequestType, response: Response, next: NextFunction) => Promise<void>;
+  deleteAvatar: (request: DeleteAvatarRequestType, response: Response, next: NextFunction) => Promise<void>;
 }
 
 export class UserProfileController implements IUserProfileController {
@@ -67,6 +69,19 @@ export class UserProfileController implements IUserProfileController {
           publicId,
           url
         }
+      }
+    });
+  }
+
+  public async deleteAvatar(request: DeleteAvatarRequestType, response: Response): Promise<void> {
+    const accessToken = request.headers['authorization']!.split(' ')[1];
+
+    await this._userProfileService.deleteAvatar({ accessToken });
+    sendSuccessResponse({
+      response,
+      content: {
+        statusCode: StatusCodes.OK,
+        message: 'Delete avatar success'
       }
     });
   }

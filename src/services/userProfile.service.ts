@@ -1,13 +1,14 @@
-import { CreateUserProfileRequestBody } from '../schema/zod/api/requests/userProfile.schema.js';
-import { UserProfileRepository } from '../repositories/UserProfile.repository.js';
-import { IUserProfileDocument } from '../models/userProfile.model.js';
 import { decode, JwtPayload } from 'jsonwebtoken';
-import { UserAuthRepository } from '../repositories/UserAuth.repository.js';
-import { UserProfileCreatedError } from '../errors/UserProfileCreated.error.js';
-import { UserNotExistError } from '../errors/UserNotExist.error.js';
-import { UserProfileNotExistError } from '../errors/UserProfileNotExist.error.js';
-import { CloudinaryService } from './external/Cloudinary.service.js';
 import { CloudinaryFolder } from 'src/enums/cloudinaryFolder.enum.js';
+import { UserAvatarMissingError } from '../errors/UserAvatarMissing.error.js';
+import { UserNotExistError } from '../errors/UserNotExist.error.js';
+import { UserProfileCreatedError } from '../errors/UserProfileCreated.error.js';
+import { UserProfileNotExistError } from '../errors/UserProfileNotExist.error.js';
+import { IUserProfileDocument } from '../models/userProfile.model.js';
+import { UserAuthRepository } from '../repositories/UserAuth.repository.js';
+import { UserProfileRepository } from '../repositories/UserProfile.repository.js';
+import { CreateUserProfileRequestBody } from '../schema/zod/api/requests/userProfile.schema.js';
+import { CloudinaryService } from './external/Cloudinary.service.js';
 
 type CreateParams = CreateUserProfileRequestBody & {
   accessToken: string;
@@ -23,6 +24,10 @@ type UpdateAvatarParams = {
   originalFileName: string;
 };
 
+type DeleteAvatarParams = {
+  accessToken: string;
+};
+
 interface IUserProfileService {
   create: (params: CreateParams) => Promise<IUserProfileDocument>;
   getMe: (params: GetMeParams) => Promise<IUserProfileDocument>;
@@ -30,6 +35,7 @@ interface IUserProfileService {
     publicId: string;
     url: string;
   }>;
+  deleteAvatar: (params: DeleteAvatarParams) => Promise<void>;
 }
 
 export class UserProfileService implements IUserProfileService {
@@ -105,5 +111,22 @@ export class UserProfileService implements IUserProfileService {
     });
 
     return { publicId: public_id, url };
+  }
+
+  public async deleteAvatar({ accessToken }: DeleteAvatarParams): Promise<void> {
+    const { sub } = decode(accessToken) as JwtPayload;
+    const profile = await this._userProfileRepository.findByUserAuthId({ userAuthId: sub as string });
+    if (!profile) {
+      throw new UserProfileNotExistError({});
+    }
+
+    if (!profile.avatar) {
+      throw new UserAvatarMissingError({});
+    }
+
+    const cloudinaryService = new CloudinaryService(CloudinaryFolder.USER_AVATAR);
+    await cloudinaryService.delete({ publicId: profile.avatar.publicId });
+    await this._userProfileRepository.deleteAvatar({ userProfile: profile });
+    return;
   }
 }

@@ -37,6 +37,7 @@ import { MulterLimitFileSizeError } from '../errors/multer/MulterLimitFileSize.e
 import { MulterLimitPartCountError } from '../errors/multer/MulterLimitPartCount.error.js';
 import { MulterLimitUnexpectedFileError } from '../errors/multer/MulterLimitUnexpectedFile.error.js';
 import { NoFileProviderError } from '../errors/multer/NoFileProvider.error.js';
+import { UserAvatarMissingError } from '../errors/UserAvatarMissing.error.js';
 
 type ErrorHandler<T extends AppError<unknown> | Error> = (response: Response, error: T) => void;
 
@@ -76,6 +77,7 @@ type MappingHandler = {
   [ErrorInstance.MULTER_LIMIT_PART_COUNT]: ErrorHandler<MulterLimitPartCountError>;
   [ErrorInstance.MULTER_LIMIT_UNEXPECTED_FILE]: ErrorHandler<MulterLimitUnexpectedFileError>;
   [ErrorInstance.NO_FILE_PROVIDER]: ErrorHandler<NoFileProviderError>;
+  [ErrorInstance.USER_AVATAR_MISSING]: ErrorHandler<UserAvatarMissingError>;
 };
 
 class _ErrorMiddlewareHandler {
@@ -115,7 +117,8 @@ class _ErrorMiddlewareHandler {
     [ErrorInstance.MULTER_LIMIT_FILE_SIZE]: this._multerLimitFileSizeErrorHandler,
     [ErrorInstance.MULTER_LIMIT_PART_COUNT]: this._multerLimitPartCountErrorHandler,
     [ErrorInstance.MULTER_LIMIT_UNEXPECTED_FILE]: this._multerLimitUnexpectedFileErrorHandler,
-    [ErrorInstance.NO_FILE_PROVIDER]: this._noFileProviderErrorHandler
+    [ErrorInstance.NO_FILE_PROVIDER]: this._noFileProviderErrorHandler,
+    [ErrorInstance.USER_AVATAR_MISSING]: this._userAvatarMissingErrorHandler
   };
 
   private constructor() {}
@@ -368,6 +371,13 @@ class _ErrorMiddlewareHandler {
   }
 
   private _noFileProviderErrorHandler(response: Response, error: NoFileProviderError) {
+    sendErrorResponse({
+      response,
+      content: error
+    });
+  }
+
+  private _userAvatarMissingErrorHandler(response: Response, error: UserAvatarMissingError) {
     sendErrorResponse({
       response,
       content: error
