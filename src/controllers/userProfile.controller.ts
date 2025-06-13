@@ -1,7 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { UserProfileRepository } from '../repositories/UserProfile.repository.js';
-import { CreateUserProfileRequestBody } from '../schema/zod/api/requests/userProfile.schema.js';
+import {
+  CreateUserProfileRequestBody,
+  UpdateUserProfileRequestBody,
+  updateUserProfileRequestBodySchema
+} from '../schema/zod/api/requests/userProfile.schema.js';
 import { UserProfileService } from '../services/userProfile.service.js';
 import { sendSuccessResponse } from '../utils/responses.util.js';
 
@@ -9,12 +13,14 @@ type CreateRequestType = Request<unknown, unknown, CreateUserProfileRequestBody>
 type GetMeRequestType = Request;
 type UpdateAvatarRequestType = Request;
 type DeleteAvatarRequestType = Request;
+type UpdateRequestType = Request<unknown, unknown, UpdateUserProfileRequestBody>;
 
 interface IUserProfileController {
   create: (request: CreateRequestType, response: Response, next: NextFunction) => Promise<void>;
   getMe: (request: GetMeRequestType, response: Response, next: NextFunction) => Promise<void>;
   updateAvatar: (request: UpdateAvatarRequestType, response: Response, next: NextFunction) => Promise<void>;
   deleteAvatar: (request: DeleteAvatarRequestType, response: Response, next: NextFunction) => Promise<void>;
+  update: (request: UpdateRequestType, response: Response, next: NextFunction) => Promise<void>;
 }
 
 export class UserProfileController implements IUserProfileController {
@@ -82,6 +88,20 @@ export class UserProfileController implements IUserProfileController {
       content: {
         statusCode: StatusCodes.OK,
         message: 'Delete avatar success'
+      }
+    });
+  }
+
+  public async update(request: UpdateRequestType, response: Response): Promise<void> {
+    const accessToken = request.headers['authorization']!.split(' ')[1];
+    const updateData = updateUserProfileRequestBodySchema.parse(request.body);
+    const userProfile = await this._userProfileService.update({ accessToken, updateData });
+    sendSuccessResponse<typeof userProfile>({
+      response,
+      content: {
+        statusCode: StatusCodes.OK,
+        message: 'Update user profile success',
+        data: userProfile
       }
     });
   }

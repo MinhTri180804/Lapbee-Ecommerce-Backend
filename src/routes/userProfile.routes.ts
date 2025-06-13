@@ -3,7 +3,9 @@ import { UserProfileController } from '../controllers/userProfile.controller.js'
 import { validateRequestBody } from '../middleware/validateRequestBody.middleware.js';
 import {
   CreateUserProfileRequestBody,
-  createUserProfileRequestBodySchema
+  createUserProfileRequestBodySchema,
+  UpdateUserProfileRequestBody,
+  updateUserProfileRequestBodySchema
 } from '../schema/zod/api/requests/userProfile.schema.js';
 import { verifyAccessTokenMiddleware } from '../middleware/verifyAccessToken.middleware.js';
 import { UploadMulterMiddleware } from '../middleware/UploadMulter.middleware.js';
@@ -14,6 +16,7 @@ const userProfileController = new UserProfileController();
 
 // Validate middleware
 const validateRequestBodyCreate = validateRequestBody<CreateUserProfileRequestBody>(createUserProfileRequestBodySchema);
+const validateRequestBodyUpdate = validateRequestBody<UpdateUserProfileRequestBody>(updateUserProfileRequestBodySchema);
 
 // Upload multer middleware
 const uploadMulterMiddleware = new UploadMulterMiddleware({ fieldName: 'avatar' });
@@ -33,3 +36,9 @@ router.patch(
   userProfileController.updateAvatar.bind(userProfileController)
 );
 router.delete('/avatar', verifyAccessTokenMiddleware, userProfileController.deleteAvatar.bind(userProfileController));
+router.patch(
+  '/',
+  verifyAccessTokenMiddleware,
+  validateRequestBodyUpdate,
+  userProfileController.update.bind(userProfileController)
+);

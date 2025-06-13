@@ -7,7 +7,10 @@ import { UserProfileNotExistError } from '../errors/UserProfileNotExist.error.js
 import { IUserProfileDocument } from '../models/userProfile.model.js';
 import { UserAuthRepository } from '../repositories/UserAuth.repository.js';
 import { UserProfileRepository } from '../repositories/UserProfile.repository.js';
-import { CreateUserProfileRequestBody } from '../schema/zod/api/requests/userProfile.schema.js';
+import {
+  CreateUserProfileRequestBody,
+  UpdateUserProfileRequestBody
+} from '../schema/zod/api/requests/userProfile.schema.js';
 import { CloudinaryService } from './external/Cloudinary.service.js';
 
 type CreateParams = CreateUserProfileRequestBody & {
@@ -28,6 +31,11 @@ type DeleteAvatarParams = {
   accessToken: string;
 };
 
+type UpdateParams = {
+  accessToken: string;
+  updateData: UpdateUserProfileRequestBody;
+};
+
 interface IUserProfileService {
   create: (params: CreateParams) => Promise<IUserProfileDocument>;
   getMe: (params: GetMeParams) => Promise<IUserProfileDocument>;
@@ -36,6 +44,7 @@ interface IUserProfileService {
     url: string;
   }>;
   deleteAvatar: (params: DeleteAvatarParams) => Promise<void>;
+  update: (params: UpdateParams) => Promise<IUserProfileDocument>;
 }
 
 export class UserProfileService implements IUserProfileService {
@@ -128,5 +137,24 @@ export class UserProfileService implements IUserProfileService {
     await cloudinaryService.delete({ publicId: profile.avatar.publicId });
     await this._userProfileRepository.deleteAvatar({ userProfile: profile });
     return;
+  }
+
+  public async update({ accessToken, updateData }: UpdateParams) {
+    const { sub: userAuthId } = decode(accessToken) as JwtPayload;
+    const userProfile = await this._userProfileRepository.findByUserAuthId({ userAuthId: userAuthId as string });
+    if (!userProfile) {
+      throw new UserProfileNotExistError({});
+    }
+
+    const userProfileUpdate = await this._userProfileRepository.update({
+      userProfileId: userProfile.id,
+      updateData
+    });
+
+    if (!userProfileUpdate) {
+      throw new UserProfileNotExistError({});
+    }
+
+    return userProfileUpdate;
   }
 }

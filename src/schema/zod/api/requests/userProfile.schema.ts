@@ -8,4 +8,11 @@ export const createUserProfileRequestBodySchema = z.object({
   phone: phoneSchema
 });
 
+export const updateUserProfileRequestBodySchema = z.object({
+  firstName: firstNameSchema.optional(),
+  lastName: lastNameSchema.optional(),
+  phone: phoneSchema.optional()
+});
+
 export type CreateUserProfileRequestBody = z.infer<typeof createUserProfileRequestBodySchema>;
+export type UpdateUserProfileRequestBody = z.infer<typeof updateUserProfileRequestBodySchema>;
