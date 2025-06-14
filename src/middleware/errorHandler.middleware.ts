@@ -38,6 +38,7 @@ import { MulterLimitPartCountError } from '../errors/multer/MulterLimitPartCount
 import { MulterLimitUnexpectedFileError } from '../errors/multer/MulterLimitUnexpectedFile.error.js';
 import { NoFileProviderError } from '../errors/multer/NoFileProvider.error.js';
 import { UserAvatarMissingError } from '../errors/UserAvatarMissing.error.js';
+import { NotFoundError } from '../errors/NotFound.error.js';
 
 type ErrorHandler<T extends AppError<unknown> | Error> = (response: Response, error: T) => void;
 
@@ -78,6 +79,7 @@ type MappingHandler = {
   [ErrorInstance.MULTER_LIMIT_UNEXPECTED_FILE]: ErrorHandler<MulterLimitUnexpectedFileError>;
   [ErrorInstance.NO_FILE_PROVIDER]: ErrorHandler<NoFileProviderError>;
   [ErrorInstance.USER_AVATAR_MISSING]: ErrorHandler<UserAvatarMissingError>;
+  [ErrorInstance.NOT_FOUND]: ErrorHandler<NotFoundError>;
 };
 
 class _ErrorMiddlewareHandler {
@@ -118,7 +120,8 @@ class _ErrorMiddlewareHandler {
     [ErrorInstance.MULTER_LIMIT_PART_COUNT]: this._multerLimitPartCountErrorHandler,
     [ErrorInstance.MULTER_LIMIT_UNEXPECTED_FILE]: this._multerLimitUnexpectedFileErrorHandler,
     [ErrorInstance.NO_FILE_PROVIDER]: this._noFileProviderErrorHandler,
-    [ErrorInstance.USER_AVATAR_MISSING]: this._userAvatarMissingErrorHandler
+    [ErrorInstance.USER_AVATAR_MISSING]: this._userAvatarMissingErrorHandler,
+    [ErrorInstance.NOT_FOUND]: this._notFoundErrorHandler
   };
 
   private constructor() {}
@@ -382,6 +385,10 @@ class _ErrorMiddlewareHandler {
       response,
       content: error
     });
+  }
+
+  private _notFoundErrorHandler(response: Response, error: NotFoundError) {
+    sendErrorResponse({ response, content: error });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

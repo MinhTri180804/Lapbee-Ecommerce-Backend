@@ -43,5 +43,6 @@ export const ErrorMessages: ErrorMessagesType = {
   [ErrorInstance.MULTER_LIMIT_PART_COUNT]: 'Too many parts in the request.',
   [ErrorInstance.MULTER_LIMIT_UNEXPECTED_FILE]: 'Unexpected file field.',
   [ErrorInstance.NO_FILE_PROVIDER]: 'No file provided',
-  [ErrorInstance.USER_AVATAR_MISSING]: 'Avatar not found for this user.'
+  [ErrorInstance.USER_AVATAR_MISSING]: 'Avatar not found for this user.',
+  [ErrorInstance.NOT_FOUND]: 'Notfound'
 };
