@@ -85,5 +85,13 @@ export const ValidationMessages = {
     PHONE_INVALID: 'Number phone invalid',
     AVATAR_PUBLIC_ID_REQUIRED: 'PublicId avatar is required',
     AVATAR_URL_REQUIRED: 'Avatar url is required'
+  },
+
+  brand: {
+    NAME_REQUIRED: 'Name brand is required',
+    PUBLIC_ID_BANNERS_REQUIRED: 'PublicId of banners is required',
+    URL_BANNERS_REQUIRED: 'Url of banners is required',
+    PUBLIC_ID_LOGO_REQUIRED: 'PublicId logo is required',
+    URL_LOGO_REQUIRED: 'Url of logo is required'
   }
 };
