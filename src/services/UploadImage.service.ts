@@ -11,6 +11,10 @@ type UploadBannerBrandParams = {
   originalFileName: string;
 };
 
+type DeleteBannerBrandParams = {
+  publicId: string;
+};
+
 type DeleteLogoBrandParams = {
   publicId: string;
 };
@@ -27,6 +31,8 @@ interface IUploadImageService {
     publicId: string;
     url: string;
   }>;
+
+  deleteBannerBrand: (params: DeleteBannerBrandParams) => Promise<void>;
 }
 
 export class UploadImageService implements IUploadImageService {
@@ -47,7 +53,7 @@ export class UploadImageService implements IUploadImageService {
 
   public async deleteLogoBrand({ publicId }: DeleteLogoBrandParams): Promise<void> {
     const cloudinaryService = new CloudinaryService(CloudinaryFolder.LOGOS_BRAND);
-    await cloudinaryService.delete({ publicId });
+    await cloudinaryService.delete({ publicId: `${CloudinaryFolder.BANNERS_BRAND}/${publicId}` });
 
     return;
   }
@@ -63,5 +69,11 @@ export class UploadImageService implements IUploadImageService {
       publicId: public_id,
       url
     };
+  }
+
+  public async deleteBannerBrand({ publicId }: DeleteBannerBrandParams): Promise<void> {
+    const cloudinaryService = new CloudinaryService(CloudinaryFolder.BANNERS_BRAND);
+    await cloudinaryService.delete({ publicId: `${CloudinaryFolder.BANNERS_BRAND}/${publicId}` });
+    return;
   }
 }
