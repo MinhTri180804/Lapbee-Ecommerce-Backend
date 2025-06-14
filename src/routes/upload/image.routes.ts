@@ -9,6 +9,7 @@ const uploadImageController = new UploadImageController();
 
 // Middleware for multer upload
 const uploadImageLogoBrandMulterMiddleware = new UploadMulterMiddleware({ fieldName: 'logo' });
+const uploadImageBannerBrandMulterMiddleware = new UploadMulterMiddleware({ fieldName: 'banner' });
 
 router.post(
   '/brand/logo',
@@ -18,3 +19,10 @@ router.post(
 );
 
 router.delete('/brand/logo/:public_id', uploadImageController.deleteLogoBrand.bind(uploadImageController));
+
+router.post(
+  '/brand/banner',
+  verifyAccessTokenMiddleware,
+  uploadImageBannerBrandMulterMiddleware.singleUpload.bind(uploadImageBannerBrandMulterMiddleware),
+  uploadImageController.uploadBannerBrand.bind(uploadImageController)
+);

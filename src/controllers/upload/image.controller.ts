@@ -9,6 +9,7 @@ type DeleteLogoBrandRequestType = Request<{ public_id: string }, unknown, unknow
 interface IUploadImageController {
   uploadLogoBrand: (request: Request, response: Response, next: NextFunction) => Promise<void>;
   deleteLogoBrand: (request: DeleteLogoBrandRequestType, response: Response, next: NextFunction) => Promise<void>;
+  uploadBannerBrand: (request: Request, response: Response, next: NextFunction) => Promise<void>;
 }
 
 export class UploadImageController implements IUploadImageController {
@@ -39,7 +40,7 @@ export class UploadImageController implements IUploadImageController {
 
   public async deleteLogoBrand(request: DeleteLogoBrandRequestType, response: Response): Promise<void> {
     const { public_id } = request.params;
-    await this._uploadImageService.deleteLogoBrand({ publicId: `${CloudinaryFolder.LOGO_BRAND}/${public_id}` });
+    await this._uploadImageService.deleteLogoBrand({ publicId: `${CloudinaryFolder.LOGOS_BRAND}/${public_id}` });
 
     sendSuccessResponse<{ publicId: string }>({
       response,
@@ -47,7 +48,31 @@ export class UploadImageController implements IUploadImageController {
         statusCode: StatusCodes.OK,
         message: 'Delete logo brand success',
         data: {
-          publicId: `${CloudinaryFolder.LOGO_BRAND}/${public_id}`
+          publicId: `${CloudinaryFolder.LOGOS_BRAND}/${public_id}`
+        }
+      }
+    });
+  }
+
+  public async uploadBannerBrand(request: Request, response: Response): Promise<void> {
+    const file = request.file as Express.Multer.File;
+
+    const { publicId, url } = await this._uploadImageService.uploadBannerBrand({
+      fileBuffer: file.buffer,
+      originalFileName: file.originalname
+    });
+
+    sendSuccessResponse<{
+      publicId: string;
+      url: string;
+    }>({
+      response,
+      content: {
+        statusCode: StatusCodes.OK,
+        message: 'Upload image banner brand success',
+        data: {
+          publicId,
+          url
         }
       }
     });

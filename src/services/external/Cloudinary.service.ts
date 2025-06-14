@@ -33,7 +33,7 @@ export class CloudinaryService {
   public async uploadStream(fileBuffer: Buffer, originalFileName: string): Promise<{ public_id: string; url: string }> {
     return new Promise((resolve, reject) => {
       const fileExt = path.extname(originalFileName);
-      const fileName = path.basename(originalFileName, fileExt);
+      const fileName = path.basename(originalFileName, fileExt).replaceAll(' ', '_');
       const suffix = this._generateSuffix();
       const stream = cloudinary.uploader.upload_stream(
         {
