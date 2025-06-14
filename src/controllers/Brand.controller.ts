@@ -5,9 +5,11 @@ import { sendSuccessResponse } from '../utils/responses.util.js';
 import { StatusCodes } from 'http-status-codes';
 
 type CreateRequestType = Request<unknown, unknown, CreateBrandRequestBodySchema>;
+type DeleteRequestType = Request<{ id: string }>;
 
 interface IBrandController {
   create: (request: CreateRequestType, response: Response, next: NextFunction) => Promise<void>;
+  delete: (request: DeleteRequestType, response: Response, next: NextFunction) => Promise<void>;
 }
 
 export class BrandController implements IBrandController {
@@ -24,6 +26,19 @@ export class BrandController implements IBrandController {
         statusCode: StatusCodes.CREATED,
         message: 'Create brand success',
         data: brandData
+      }
+    });
+  }
+
+  public async delete(request: DeleteRequestType, response: Response) {
+    const { id } = request.params;
+    await this._brandService.delete({ brandId: id });
+
+    sendSuccessResponse({
+      response,
+      content: {
+        statusCode: StatusCodes.OK,
+        message: 'Delete brand success'
       }
     });
   }

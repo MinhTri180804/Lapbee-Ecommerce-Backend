@@ -17,3 +17,5 @@ router.post(
   validateCreateBrandRequestBody,
   brandController.create.bind(brandController)
 );
+
+router.delete('/:id', verifyAccessTokenMiddleware, brandController.delete.bind(brandController));
