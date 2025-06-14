@@ -18,11 +18,21 @@ router.post(
   uploadImageController.uploadLogoBrand.bind(uploadImageController)
 );
 
-router.delete('/brand/logo/:public_id', uploadImageController.deleteLogoBrand.bind(uploadImageController));
+router.delete(
+  '/brand/logo/:public_id',
+  verifyAccessTokenMiddleware,
+  uploadImageController.deleteLogoBrand.bind(uploadImageController)
+);
 
 router.post(
   '/brand/banner',
   verifyAccessTokenMiddleware,
   uploadImageBannerBrandMulterMiddleware.singleUpload.bind(uploadImageBannerBrandMulterMiddleware),
   uploadImageController.uploadBannerBrand.bind(uploadImageController)
+);
+
+router.delete(
+  '/brand/banner/:public_id',
+  verifyAccessTokenMiddleware,
+  uploadImageController.deleteBannerBrand.bind(uploadImageController)
 );

@@ -5,11 +5,13 @@ import { sendSuccessResponse } from '../../utils/responses.util.js';
 import { CloudinaryFolder } from 'src/enums/cloudinaryFolder.enum.js';
 
 type DeleteLogoBrandRequestType = Request<{ public_id: string }, unknown, unknown>;
+type DeleteBannerBrandRequestType = Request<{ public_id: string }>;
 
 interface IUploadImageController {
   uploadLogoBrand: (request: Request, response: Response, next: NextFunction) => Promise<void>;
   deleteLogoBrand: (request: DeleteLogoBrandRequestType, response: Response, next: NextFunction) => Promise<void>;
   uploadBannerBrand: (request: Request, response: Response, next: NextFunction) => Promise<void>;
+  deleteBannerBrand: (request: DeleteBannerBrandRequestType, response: Response, next: NextFunction) => Promise<void>;
 }
 
 export class UploadImageController implements IUploadImageController {
@@ -40,7 +42,7 @@ export class UploadImageController implements IUploadImageController {
 
   public async deleteLogoBrand(request: DeleteLogoBrandRequestType, response: Response): Promise<void> {
     const { public_id } = request.params;
-    await this._uploadImageService.deleteLogoBrand({ publicId: `${CloudinaryFolder.LOGOS_BRAND}/${public_id}` });
+    await this._uploadImageService.deleteLogoBrand({ publicId: public_id });
 
     sendSuccessResponse<{ publicId: string }>({
       response,
@@ -73,6 +75,22 @@ export class UploadImageController implements IUploadImageController {
         data: {
           publicId,
           url
+        }
+      }
+    });
+  }
+
+  public async deleteBannerBrand(request: DeleteBannerBrandRequestType, response: Response): Promise<void> {
+    const { public_id } = request.params;
+    await this._uploadImageService.deleteBannerBrand({ publicId: public_id });
+
+    sendSuccessResponse<{ publicId: string }>({
+      response,
+      content: {
+        statusCode: StatusCodes.OK,
+        message: 'Delete image banner brand success',
+        data: {
+          publicId: `${CloudinaryFolder.BANNERS_BRAND}/${public_id}`
         }
       }
     });
