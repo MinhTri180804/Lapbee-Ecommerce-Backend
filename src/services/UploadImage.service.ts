@@ -1,22 +1,28 @@
 import { CloudinaryFolder } from '../enums/cloudinaryFolder.enum.js';
 import { CloudinaryService } from './external/Cloudinary.service.js';
 
-type LogoBrandParams = {
+type UploadLogoBrandParams = {
   fileBuffer: Buffer;
   originalFileName: string;
 };
 
+type DeleteLogoBrandParams = {
+  publicId: string;
+};
+
 interface IUploadImageService {
-  logoBrand: (params: LogoBrandParams) => Promise<{
+  uploadLogoBrand: (params: UploadLogoBrandParams) => Promise<{
     publicId: string;
     url: string;
   }>;
+
+  deleteLogoBrand: (params: DeleteLogoBrandParams) => Promise<void>;
 }
 
 export class UploadImageService implements IUploadImageService {
   constructor() {}
 
-  public async logoBrand({ fileBuffer, originalFileName }: LogoBrandParams): Promise<{
+  public async uploadLogoBrand({ fileBuffer, originalFileName }: UploadLogoBrandParams): Promise<{
     publicId: string;
     url: string;
   }> {
@@ -27,5 +33,12 @@ export class UploadImageService implements IUploadImageService {
       url,
       publicId: public_id
     };
+  }
+
+  public async deleteLogoBrand({ publicId }: DeleteLogoBrandParams): Promise<void> {
+    const cloudinaryService = new CloudinaryService(CloudinaryFolder.LOGO_BRAND);
+    await cloudinaryService.delete({ publicId });
+
+    return;
   }
 }
