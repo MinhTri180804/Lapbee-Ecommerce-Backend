@@ -1,15 +1,22 @@
 import { NextFunction, Request, Response } from 'express';
-import { createBrandRequestBodySchema, CreateBrandRequestBodySchema } from '../schema/zod/api/requests/brand.schema.js';
+import {
+  createBrandRequestBodySchema,
+  CreateBrandRequestBodySchema,
+  updateBrandRequestBodySchema,
+  UpdateBrandRequestBodySchema
+} from '../schema/zod/api/requests/brand.schema.js';
 import { BrandService } from '../services/Brand.service.js';
 import { sendSuccessResponse } from '../utils/responses.util.js';
 import { StatusCodes } from 'http-status-codes';
 
 type CreateRequestType = Request<unknown, unknown, CreateBrandRequestBodySchema>;
 type DeleteRequestType = Request<{ id: string }>;
+type UpdateRequestType = Request<{ id: string }, unknown, UpdateBrandRequestBodySchema>;
 
 interface IBrandController {
   create: (request: CreateRequestType, response: Response, next: NextFunction) => Promise<void>;
   delete: (request: DeleteRequestType, response: Response, next: NextFunction) => Promise<void>;
+  update: (request: UpdateRequestType, response: Response, next: NextFunction) => Promise<void>;
 }
 
 export class BrandController implements IBrandController {
@@ -39,6 +46,21 @@ export class BrandController implements IBrandController {
       content: {
         statusCode: StatusCodes.OK,
         message: 'Delete brand success'
+      }
+    });
+  }
+
+  public async update(request: UpdateRequestType, response: Response) {
+    const { id } = request.params;
+    const requestBody = request.body;
+    const updateData = updateBrandRequestBodySchema.parse(requestBody);
+    const brandUpdated = await this._brandService.update({ brandId: id, updateData });
+    sendSuccessResponse<typeof brandUpdated>({
+      response,
+      content: {
+        statusCode: StatusCodes.OK,
+        message: 'Update brand success',
+        data: brandUpdated
       }
     });
   }
