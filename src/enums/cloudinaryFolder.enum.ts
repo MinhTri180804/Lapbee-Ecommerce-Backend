@@ -1,4 +1,5 @@
 export enum CloudinaryFolder {
-  USER_AVATAR = 'user_avatar',
-  LOGO_BRAND = 'logo_brand'
+  USERS_AVATAR = 'users_avatar',
+  LOGOS_BRAND = 'logos_brand',
+  BANNERS_BRAND = 'banners-brand'
 }

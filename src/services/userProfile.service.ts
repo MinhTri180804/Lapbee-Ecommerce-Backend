@@ -106,7 +106,7 @@ export class UserProfileService implements IUserProfileService {
     if (!profile) {
       throw new UserProfileNotExistError({});
     }
-    const cloudinaryService = new CloudinaryService(CloudinaryFolder.USER_AVATAR);
+    const cloudinaryService = new CloudinaryService(CloudinaryFolder.USERS_AVATAR);
 
     if (profile.avatar) {
       await cloudinaryService.delete({ publicId: profile.avatar.publicId });
@@ -133,7 +133,7 @@ export class UserProfileService implements IUserProfileService {
       throw new UserAvatarMissingError({});
     }
 
-    const cloudinaryService = new CloudinaryService(CloudinaryFolder.USER_AVATAR);
+    const cloudinaryService = new CloudinaryService(CloudinaryFolder.USERS_AVATAR);
     await cloudinaryService.delete({ publicId: profile.avatar.publicId });
     await this._userProfileRepository.deleteAvatar({ userProfile: profile });
     return;
