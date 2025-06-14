@@ -4,6 +4,7 @@ import { ErrorMiddlewareHandler } from './middleware/errorHandler.middleware.js'
 import { router as authRouter } from './routes/auth/index.route.js';
 import { router as userProfileRouter } from './routes/userProfile.routes.js';
 import { router as uploadRouter } from './routes/upload/index.routes.js';
+import { router as brandRouter } from './routes/brand.routes.js';
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use(morgan('dev'));
 app.use('/auth', authRouter);
 app.use('/profile', userProfileRouter);
 app.use('/upload', uploadRouter);
+app.use('/brands', brandRouter);
 
 app.use(ErrorMiddlewareHandler.handler.bind(ErrorMiddlewareHandler));
 
