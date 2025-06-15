@@ -27,6 +27,9 @@ type GetAllReturns = {
     limit: number;
   };
 };
+type GetDetailsParams = {
+  brandId: string;
+};
 
 interface IBrandService {
   create: (params: CreateParams) => Promise<IBrandDocument>;
@@ -61,6 +64,15 @@ export class BrandService implements IBrandService {
     }
 
     return brandUpdated;
+  }
+
+  public async getDetails({ brandId }: GetDetailsParams): Promise<IBrandDocument> {
+    const brand = await this._brandRepository.getById({ id: brandId });
+    if (!brand) {
+      throw new NotFoundError({ message: 'Brand not found' });
+    }
+
+    return brand;
   }
 
   public async getAll({ page, limit }: GetAllParams): Promise<GetAllReturns> {

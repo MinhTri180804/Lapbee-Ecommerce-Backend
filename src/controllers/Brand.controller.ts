@@ -12,6 +12,7 @@ import { StatusCodes } from 'http-status-codes';
 type CreateRequestType = Request<unknown, unknown, CreateBrandRequestBody>;
 type DeleteRequestType = Request<{ id: string }>;
 type UpdateRequestType = Request<{ id: string }, unknown, UpdateBrandRequestBody>;
+type GetDetailsRequestType = Request<{ id: string }>;
 type GetAllRequestType = Request<
   unknown,
   unknown,
@@ -21,12 +22,12 @@ type GetAllRequestType = Request<
     limit?: number;
   }
 >;
-
 interface IBrandController {
   create: (request: CreateRequestType, response: Response, next: NextFunction) => Promise<void>;
   delete: (request: DeleteRequestType, response: Response, next: NextFunction) => Promise<void>;
   update: (request: UpdateRequestType, response: Response, next: NextFunction) => Promise<void>;
   getAll: (params: GetAllRequestType, response: Response, next: NextFunction) => Promise<void>;
+  getDetails: (request: GetDetailsRequestType, response: Response, next: NextFunction) => Promise<void>;
 }
 
 const DEFAULT_PAGE_GET_ALL = 1;
@@ -92,6 +93,19 @@ export class BrandController implements IBrandController {
         message: 'Get all brands success',
         data: data.paginatedResult,
         metadata: data.metadata
+      }
+    });
+  }
+
+  public async getDetails(request: GetDetailsRequestType, response: Response) {
+    const { id } = request.params;
+    const brand = await this._brandService.getDetails({ brandId: id });
+    sendSuccessResponse<typeof brand>({
+      response,
+      content: {
+        statusCode: StatusCodes.OK,
+        message: 'Get details brand success',
+        data: brand
       }
     });
   }

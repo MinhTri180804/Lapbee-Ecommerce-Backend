@@ -19,12 +19,16 @@ type GetAllReturns = {
   paginatedResult: IBrandDocument[];
   totalCount: number;
 };
+type GetByIdParams = {
+  id: string;
+};
 
 interface IBrandRepository {
   create: (params: CreateParams) => Promise<IBrandDocument>;
   delete: (params: DeleteParams) => Promise<IBrandDocument | null>;
   update: (params: UpdateParams) => Promise<IBrandDocument | null>;
   getAll: (params: GetAllParams) => Promise<GetAllReturns>;
+  getById: (params: GetByIdParams) => Promise<IBrandDocument | null>;
 }
 
 export class BrandRepository implements IBrandRepository {
@@ -69,5 +73,9 @@ export class BrandRepository implements IBrandRepository {
       totalCount: result[0].totalCount.length > 0 ? result[0].totalCount[0].count : 0,
       paginatedResult: result[0].paginatedResults
     };
+  }
+
+  public async getById({ id }: GetByIdParams): Promise<IBrandDocument | null> {
+    return await this._brandMode.findById(id);
   }
 }
