@@ -9,5 +9,5 @@ export const updateBrandRequestBodySchema = z.object({
   banners: bannersSchema.optional()
 });
 
-export type CreateBrandRequestBodySchema = z.infer<typeof createBrandRequestBodySchema>;
-export type UpdateBrandRequestBodySchema = z.infer<typeof updateBrandRequestBodySchema>;
+export type CreateBrandRequestBody = z.infer<typeof createBrandRequestBodySchema>;
+export type UpdateBrandRequestBody = z.infer<typeof updateBrandRequestBodySchema>;
