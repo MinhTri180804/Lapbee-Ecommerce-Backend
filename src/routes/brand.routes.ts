@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import { BrandController } from '../controllers/Brand.controller.js';
-import { verifyAccessTokenMiddleware } from '../middleware/verifyAccessToken.middleware.js';
 import { validateRequestBody } from '../middleware/validateRequestBody.middleware.js';
+import { verifyAccessTokenMiddleware } from '../middleware/verifyAccessToken.middleware.js';
 import {
+  CreateBrandRequestBody,
   createBrandRequestBodySchema,
-  CreateBrandRequestBodySchema,
-  updateBrandRequestBodySchema,
-  UpdateBrandRequestBodySchema
+  UpdateBrandRequestBody,
+  updateBrandRequestBodySchema
 } from '../schema/zod/api/requests/brand.schema.js';
 
 export const router = Router();
@@ -14,8 +14,8 @@ export const router = Router();
 const brandController = new BrandController();
 
 // Middleware validate request body
-const validateCreateBrandRequestBody = validateRequestBody<CreateBrandRequestBodySchema>(createBrandRequestBodySchema);
-const validateUpdateBrandRequestBody = validateRequestBody<UpdateBrandRequestBodySchema>(updateBrandRequestBodySchema);
+const validateCreateBrandRequestBody = validateRequestBody<CreateBrandRequestBody>(createBrandRequestBodySchema);
+const validateUpdateBrandRequestBody = validateRequestBody<UpdateBrandRequestBody>(updateBrandRequestBodySchema);
 
 router.post(
   '/',
@@ -32,3 +32,5 @@ router.patch(
   validateUpdateBrandRequestBody,
   brandController.update.bind(brandController)
 );
+
+router.get('/', brandController.getAll.bind(brandController));

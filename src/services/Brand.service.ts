@@ -1,21 +1,38 @@
-import { CreateBrandRequestBodySchema, UpdateBrandRequestBodySchema } from '../schema/zod/api/requests/brand.schema.js';
+import { CreateBrandRequestBody, UpdateBrandRequestBody } from '../schema/zod/api/requests/brand.schema.js';
 import { IBrandDocument } from '../models/brand.model.js';
 import { BrandRepository } from '../repositories/Brand.repository.js';
 import { NotFoundError } from 'src/errors/NotFound.error.js';
 
-type CreateParams = CreateBrandRequestBodySchema;
+type CreateParams = CreateBrandRequestBody;
 type DeleteParams = {
   brandId: string;
 };
 type UpdateParams = {
   brandId: string;
-  updateData: UpdateBrandRequestBodySchema;
+  updateData: UpdateBrandRequestBody;
+};
+type GetAllParams = {
+  page: number;
+  limit: number;
+};
+
+type GetAllReturns = {
+  paginatedResult: IBrandDocument[];
+  metadata: {
+    totalDocument: number;
+    totalPage: number;
+    currentPage: number;
+    nextPage: number | null;
+    previousPage: number | null;
+    limit: number;
+  };
 };
 
 interface IBrandService {
   create: (params: CreateParams) => Promise<IBrandDocument>;
   delete: (params: DeleteParams) => Promise<void>;
   update: (params: UpdateParams) => Promise<IBrandDocument>;
+  getAll: (params: GetAllParams) => Promise<GetAllReturns>;
 }
 
 export class BrandService implements IBrandService {
@@ -44,5 +61,32 @@ export class BrandService implements IBrandService {
     }
 
     return brandUpdated;
+  }
+
+  public async getAll({ page, limit }: GetAllParams): Promise<GetAllReturns> {
+    const skip = (page - 1) * limit;
+    const { paginatedResult, totalCount } = await this._brandRepository.getAll({
+      skip,
+      limit
+    });
+    console.log(skip);
+
+    const totalPage = Math.ceil(totalCount / limit);
+    const currentPage = page;
+    const nextPage = currentPage < totalPage ? page + 1 : null;
+    const previousPage = page - 1 > 0 ? page - 1 : null;
+    const totalDocument = paginatedResult.length;
+
+    return {
+      paginatedResult,
+      metadata: {
+        totalDocument,
+        totalPage,
+        currentPage,
+        nextPage,
+        previousPage,
+        limit
+      }
+    };
   }
 }
