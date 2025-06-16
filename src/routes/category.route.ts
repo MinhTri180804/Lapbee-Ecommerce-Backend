@@ -20,3 +20,5 @@ router.post(
   validateRequestBodyCreate,
   categoryController.create.bind(categoryController)
 );
+
+router.delete('/:id', verifyAccessTokenMiddleware, categoryController.delete.bind(categoryController));
