@@ -3,7 +3,9 @@ import { CategoryController } from '../controllers/Category.controller.js';
 import { validateRequestBody } from '../middleware/validateRequestBody.middleware.js';
 import {
   createCategoryRequestBodySchema,
-  CreateCategoryRequestBody
+  CreateCategoryRequestBody,
+  UpdateCategoryRequestBody,
+  updateCategoryRequestBodySchema
 } from '../schema/zod/api/requests/category.schema.js';
 import { verifyAccessTokenMiddleware } from '../middleware/verifyAccessToken.middleware.js';
 
@@ -13,6 +15,7 @@ const categoryController = new CategoryController();
 
 // Middleware handle request body
 const validateRequestBodyCreate = validateRequestBody<CreateCategoryRequestBody>(createCategoryRequestBodySchema);
+const validateRequestBodyUpdate = validateRequestBody<UpdateCategoryRequestBody>(updateCategoryRequestBodySchema);
 
 router.post(
   '/',
@@ -22,3 +25,9 @@ router.post(
 );
 
 router.delete('/:id', verifyAccessTokenMiddleware, categoryController.delete.bind(categoryController));
+router.patch(
+  '/:id',
+  verifyAccessTokenMiddleware,
+  validateRequestBodyUpdate,
+  categoryController.update.bind(categoryController)
+);

@@ -11,6 +11,14 @@ export const validateRequestBody = <T>(schemaValidate: ZodSchema<T>): RequestHan
       });
     }
 
+    if (!Object.keys(result.data as []).length) {
+      throw new ValidateRequestBodyError({
+        errorDetails: {
+          _errors: ['Request body not empty']
+        }
+      });
+    }
+
     next();
   };
 };

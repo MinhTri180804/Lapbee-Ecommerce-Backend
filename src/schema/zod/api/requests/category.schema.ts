@@ -7,4 +7,11 @@ export const createCategoryRequestBodySchema = z.object({
   slug: slugSchema
 });
 
+export const updateCategoryRequestBodySchema = z.object({
+  name: nameSchema.optional(),
+  parentId: parentIdSchema.optional(),
+  slug: slugSchema.optional()
+});
+
 export type CreateCategoryRequestBody = z.infer<typeof createCategoryRequestBodySchema>;
+export type UpdateCategoryRequestBody = z.infer<typeof updateCategoryRequestBodySchema>;

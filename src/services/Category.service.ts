@@ -1,4 +1,4 @@
-import { CreateCategoryRequestBody } from '../schema/zod/api/requests/category.schema.js';
+import { CreateCategoryRequestBody, UpdateCategoryRequestBody } from '../schema/zod/api/requests/category.schema.js';
 import { ICategoryDocument } from '../models/category.model.js';
 import { CategoryRepository } from '../repositories/Category.repository.js';
 import { NotFoundError } from 'src/errors/NotFound.error.js';
@@ -7,10 +7,15 @@ type CreateParams = CreateCategoryRequestBody;
 type DeleteParams = {
   categoryId: string;
 };
+type UpdateParams = {
+  categoryId: string;
+  updateData: UpdateCategoryRequestBody;
+};
 
 interface ICategoryService {
   create: (params: CreateParams) => Promise<ICategoryDocument>;
   delete: (params: DeleteParams) => Promise<void>;
+  update: (params: UpdateParams) => Promise<ICategoryDocument>;
 }
 
 export class CategoryService implements ICategoryService {
@@ -29,5 +34,14 @@ export class CategoryService implements ICategoryService {
     }
 
     return;
+  }
+
+  public async update({ updateData, categoryId }: UpdateParams): Promise<ICategoryDocument> {
+    const categoryUpdated = await this._categoryRepository.update({ id: categoryId, updateData });
+    if (!categoryUpdated) {
+      throw new NotFoundError({ message: 'Not found category' });
+    }
+
+    return categoryUpdated;
   }
 }
