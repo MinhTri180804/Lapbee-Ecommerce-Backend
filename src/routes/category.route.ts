@@ -5,7 +5,9 @@ import {
   createCategoryRequestBodySchema,
   CreateCategoryRequestBody,
   UpdateCategoryRequestBody,
-  updateCategoryRequestBodySchema
+  updateCategoryRequestBodySchema,
+  ChangeParentIdRequestBody,
+  changeParentIdRequestBodySchema
 } from '../schema/zod/api/requests/category.schema.js';
 import { verifyAccessTokenMiddleware } from '../middleware/verifyAccessToken.middleware.js';
 
@@ -16,6 +18,9 @@ const categoryController = new CategoryController();
 // Middleware handle request body
 const validateRequestBodyCreate = validateRequestBody<CreateCategoryRequestBody>(createCategoryRequestBodySchema);
 const validateRequestBodyUpdate = validateRequestBody<UpdateCategoryRequestBody>(updateCategoryRequestBodySchema);
+const validateRequestBodyChangeParentId = validateRequestBody<ChangeParentIdRequestBody>(
+  changeParentIdRequestBodySchema
+);
 
 router.post(
   '/',
@@ -34,3 +39,9 @@ router.patch(
 
 router.get('/:id', categoryController.getDetails.bind(categoryController));
 router.get('/', categoryController.getAll.bind(categoryController));
+router.patch(
+  '/:id/change-parent',
+  verifyAccessTokenMiddleware,
+  validateRequestBodyChangeParentId,
+  categoryController.changeParentId.bind(categoryController)
+);

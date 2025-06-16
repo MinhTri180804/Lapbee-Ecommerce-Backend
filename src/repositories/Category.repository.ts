@@ -17,6 +17,13 @@ type FindParams = {
   limit: number;
   skip: number;
 };
+type ChangeParentIdParams = {
+  newParentId: string;
+  id: string;
+};
+type checkExistParams = {
+  id: string;
+};
 
 interface ICategoryRepository {
   create: (params: CreateParams) => Promise<ICategoryDocument>;
@@ -27,6 +34,8 @@ interface ICategoryRepository {
     paginatedResult: ICategoryDocument[];
     totalCount: number;
   }>;
+  changeParentId: (params: ChangeParentIdParams) => Promise<ICategoryDocument | null>;
+  checkExist: (params: checkExistParams) => Promise<boolean>;
 }
 
 export class CategoryRepository implements ICategoryRepository {
@@ -74,5 +83,24 @@ export class CategoryRepository implements ICategoryRepository {
       paginatedResult: result[0].paginatedResult,
       totalCount: result[0].totalCount.length > 0 ? result[0].totalCount[0].count : 0
     };
+  }
+
+  public async changeParentId({ newParentId, id }: ChangeParentIdParams): Promise<ICategoryDocument | null> {
+    return await this._categoryModel.findByIdAndUpdate(
+      id,
+      {
+        parentId: newParentId
+      },
+      {
+        new: true
+      }
+    );
+  }
+
+  public async checkExist({ id }: checkExistParams): Promise<boolean> {
+    const category = await this._categoryModel.exists({ _id: id });
+    if (!category) return false;
+
+    return true;
   }
 }

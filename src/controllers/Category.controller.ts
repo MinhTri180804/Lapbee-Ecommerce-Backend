@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import {
+  ChangeParentIdRequestBody,
   CreateCategoryRequestBody,
   UpdateCategoryRequestBody,
   updateCategoryRequestBodySchema
@@ -21,6 +22,7 @@ type GetAllRequestType = Request<
     limit?: string;
   }
 >;
+type ChangeParentIdRequestType = Request<{ id: string }, unknown, ChangeParentIdRequestBody>;
 
 interface ICategoryController {
   create: (request: CreateRequestType, response: Response, next: NextFunction) => Promise<void>;
@@ -28,6 +30,7 @@ interface ICategoryController {
   update: (request: UpdateRequestType, response: Response, next: NextFunction) => Promise<void>;
   getDetails: (request: GetDetailsRequestType, response: Response, next: NextFunction) => Promise<void>;
   getAll: (request: GetAllRequestType, response: Response, next: NextFunction) => Promise<void>;
+  changeParentId: (request: ChangeParentIdRequestType, response: Response, next: NextFunction) => Promise<void>;
 }
 
 const DEFAULT_PAGE_GET_ALL = 1;
@@ -111,6 +114,20 @@ export class CategoryController implements ICategoryController {
         message: 'Get all categories success',
         data: categoriesData,
         metadata: metadata
+      }
+    });
+  }
+
+  public async changeParentId(request: ChangeParentIdRequestType, response: Response): Promise<void> {
+    const { newParentId } = request.body;
+    const { id } = request.params;
+
+    await this._categoryService.changeParentId({ categoryId: id, newParentId });
+    sendSuccessResponse({
+      response,
+      content: {
+        statusCode: StatusCodes.NO_CONTENT,
+        message: 'Update new parent for category success'
       }
     });
   }
