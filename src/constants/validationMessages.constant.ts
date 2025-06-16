@@ -93,5 +93,10 @@ export const ValidationMessages = {
     URL_BANNERS_REQUIRED: 'Url of banners is required',
     PUBLIC_ID_LOGO_REQUIRED: 'PublicId logo is required',
     URL_LOGO_REQUIRED: 'Url of logo is required'
+  },
+
+  category: {
+    NAME_REQUIRED: 'Name category is required',
+    SLUG_REQUIRED: 'Slug category is required'
   }
 };
