@@ -13,12 +13,20 @@ type UpdateParams = {
 type FindByIdParams = {
   id: string;
 };
+type FindParams = {
+  limit: number;
+  skip: number;
+};
 
 interface ICategoryRepository {
   create: (params: CreateParams) => Promise<ICategoryDocument>;
   delete: (params: DeleteParams) => Promise<ICategoryDocument | null>;
   update: (params: UpdateParams) => Promise<ICategoryDocument | null>;
   findById: (params: FindByIdParams) => Promise<ICategoryDocument | null>;
+  find: (params: FindParams) => Promise<{
+    paginatedResult: ICategoryDocument[];
+    totalCount: number;
+  }>;
 }
 
 export class CategoryRepository implements ICategoryRepository {
@@ -42,5 +50,29 @@ export class CategoryRepository implements ICategoryRepository {
 
   public async findById({ id }: FindByIdParams): Promise<ICategoryDocument | null> {
     return await this._categoryModel.findById(id);
+  }
+
+  public async find({ skip, limit }: FindParams): Promise<{
+    paginatedResult: ICategoryDocument[];
+    totalCount: number;
+  }> {
+    const result = await this._categoryModel
+      .aggregate<{
+        paginatedResult: ICategoryDocument[];
+        totalCount: { count: number }[];
+      }>([
+        {
+          $facet: {
+            paginatedResult: [{ $skip: skip }, { $limit: limit }],
+            totalCount: [{ $count: 'count' }]
+          }
+        }
+      ])
+      .exec();
+
+    return {
+      paginatedResult: result[0].paginatedResult,
+      totalCount: result[0].totalCount.length > 0 ? result[0].totalCount[0].count : 0
+    };
   }
 }

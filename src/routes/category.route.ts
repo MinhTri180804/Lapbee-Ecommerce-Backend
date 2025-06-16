@@ -33,3 +33,4 @@ router.patch(
 );
 
 router.get('/:id', categoryController.getDetails.bind(categoryController));
+router.get('/', categoryController.getAll.bind(categoryController));
