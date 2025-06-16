@@ -10,11 +10,15 @@ type UpdateParams = {
   updateData: UpdateCategoryRequestBody;
   id: string;
 };
+type FindByIdParams = {
+  id: string;
+};
 
 interface ICategoryRepository {
   create: (params: CreateParams) => Promise<ICategoryDocument>;
   delete: (params: DeleteParams) => Promise<ICategoryDocument | null>;
   update: (params: UpdateParams) => Promise<ICategoryDocument | null>;
+  findById: (params: FindByIdParams) => Promise<ICategoryDocument | null>;
 }
 
 export class CategoryRepository implements ICategoryRepository {
@@ -34,5 +38,9 @@ export class CategoryRepository implements ICategoryRepository {
     return await this._categoryModel.findByIdAndUpdate(id, updateData, {
       new: true
     });
+  }
+
+  public async findById({ id }: FindByIdParams): Promise<ICategoryDocument | null> {
+    return await this._categoryModel.findById(id);
   }
 }

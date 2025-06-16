@@ -31,3 +31,5 @@ router.patch(
   validateRequestBodyUpdate,
   categoryController.update.bind(categoryController)
 );
+
+router.get('/:id', categoryController.getDetails.bind(categoryController));

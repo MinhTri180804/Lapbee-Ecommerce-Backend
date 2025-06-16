@@ -11,11 +11,15 @@ type UpdateParams = {
   categoryId: string;
   updateData: UpdateCategoryRequestBody;
 };
+type GetDetailsParams = {
+  categoryId: string;
+};
 
 interface ICategoryService {
   create: (params: CreateParams) => Promise<ICategoryDocument>;
   delete: (params: DeleteParams) => Promise<void>;
   update: (params: UpdateParams) => Promise<ICategoryDocument>;
+  getDetails: (params: GetDetailsParams) => Promise<ICategoryDocument>;
 }
 
 export class CategoryService implements ICategoryService {
@@ -43,5 +47,14 @@ export class CategoryService implements ICategoryService {
     }
 
     return categoryUpdated;
+  }
+
+  public async getDetails({ categoryId }: GetDetailsParams): Promise<ICategoryDocument> {
+    const category = await this._categoryRepository.findById({ id: categoryId });
+    if (!category) {
+      throw new NotFoundError({ message: 'Category not found' });
+    }
+
+    return category;
   }
 }
