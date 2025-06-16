@@ -55,6 +55,11 @@ export const ValidationMessages = {
         deleteAvatar: {
           PUBLIC_ID_REQUIRED: 'PublicId is required'
         }
+      },
+      category: {
+        changeParentId: {
+          PARENT_ID_REQUIRED: 'ParentId is required'
+        }
       }
     }
   },

@@ -1,7 +1,12 @@
-import { CreateCategoryRequestBody, UpdateCategoryRequestBody } from '../schema/zod/api/requests/category.schema.js';
+import {
+  ChangeParentIdRequestBody,
+  CreateCategoryRequestBody,
+  UpdateCategoryRequestBody
+} from '../schema/zod/api/requests/category.schema.js';
 import { ICategoryDocument } from '../models/category.model.js';
 import { CategoryRepository } from '../repositories/Category.repository.js';
 import { NotFoundError } from 'src/errors/NotFound.error.js';
+import { CategoryNotExistError } from '../errors/CategoryNotExist.error.js';
 
 type CreateParams = CreateCategoryRequestBody;
 type DeleteParams = {
@@ -18,6 +23,10 @@ type GetAllParams = {
   page: number;
   limit: number;
 };
+
+type ChangeParentIdParams = {
+  categoryId: string;
+} & ChangeParentIdRequestBody;
 
 type GetAllReturns = {
   categoriesData: ICategoryDocument[];
@@ -37,6 +46,7 @@ interface ICategoryService {
   update: (params: UpdateParams) => Promise<ICategoryDocument>;
   getDetails: (params: GetDetailsParams) => Promise<ICategoryDocument>;
   getAll: (params: GetAllParams) => Promise<GetAllReturns>;
+  changeParentId: (params: ChangeParentIdParams) => Promise<ICategoryDocument>;
 }
 
 export class CategoryService implements ICategoryService {
@@ -92,5 +102,18 @@ export class CategoryService implements ICategoryService {
         limit: limit
       }
     };
+  }
+
+  public async changeParentId({ categoryId, newParentId }: ChangeParentIdParams): Promise<ICategoryDocument> {
+    const newParentIdIsExist = await this._categoryRepository.checkExist({ id: newParentId });
+    if (!newParentIdIsExist) {
+      throw new CategoryNotExistError({ message: 'ParentId of category is not exist' });
+    }
+    const category = await this._categoryRepository.changeParentId({ id: categoryId, newParentId });
+    if (!category) {
+      throw new NotFoundError({ message: 'Category not found' });
+    }
+
+    return category;
   }
 }
