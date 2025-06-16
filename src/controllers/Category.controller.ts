@@ -5,9 +5,11 @@ import { sendSuccessResponse } from '../utils/responses.util.js';
 import { StatusCodes } from 'http-status-codes';
 
 type CreateRequestType = Request<unknown, unknown, CreateCategoryRequestBody>;
+type DeleteRequestType = Request<{ id: string }>;
 
 interface ICategoryController {
   create: (request: CreateRequestType, response: Response, next: NextFunction) => Promise<void>;
+  delete: (request: DeleteRequestType, response: Response, next: NextFunction) => Promise<void>;
 }
 
 export class CategoryController implements ICategoryController {
@@ -25,6 +27,19 @@ export class CategoryController implements ICategoryController {
         statusCode: StatusCodes.CREATED,
         message: 'Create category success',
         data: categoryData
+      }
+    });
+  }
+
+  public async delete(request: DeleteRequestType, response: Response): Promise<void> {
+    const { id } = request.params;
+
+    await this._categoryService.delete({ categoryId: id });
+    sendSuccessResponse({
+      response,
+      content: {
+        statusCode: StatusCodes.OK,
+        message: 'Delete category success'
       }
     });
   }
