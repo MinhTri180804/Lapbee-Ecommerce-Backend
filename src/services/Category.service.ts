@@ -14,12 +14,29 @@ type UpdateParams = {
 type GetDetailsParams = {
   categoryId: string;
 };
+type GetAllParams = {
+  page: number;
+  limit: number;
+};
+
+type GetAllReturns = {
+  categoriesData: ICategoryDocument[];
+  metadata: {
+    currentPage: number;
+    nextPage: number | null;
+    previousPage: number | null;
+    totalPage: number;
+    totalDocument: number;
+    limit: number;
+  };
+};
 
 interface ICategoryService {
   create: (params: CreateParams) => Promise<ICategoryDocument>;
   delete: (params: DeleteParams) => Promise<void>;
   update: (params: UpdateParams) => Promise<ICategoryDocument>;
   getDetails: (params: GetDetailsParams) => Promise<ICategoryDocument>;
+  getAll: (params: GetAllParams) => Promise<GetAllReturns>;
 }
 
 export class CategoryService implements ICategoryService {
@@ -56,5 +73,24 @@ export class CategoryService implements ICategoryService {
     }
 
     return category;
+  }
+
+  public async getAll({ page, limit }: GetAllParams): Promise<GetAllReturns> {
+    const skip = (page - 1) * limit;
+    const { totalCount, paginatedResult } = await this._categoryRepository.find({ skip, limit });
+
+    const totalPage = Math.ceil(totalCount / limit);
+
+    return {
+      categoriesData: paginatedResult,
+      metadata: {
+        totalDocument: totalCount,
+        totalPage: totalPage,
+        currentPage: page,
+        nextPage: page < totalPage ? page + 1 : null,
+        previousPage: page - 1 > 0 ? page - 1 : null,
+        limit: limit
+      }
+    };
   }
 }

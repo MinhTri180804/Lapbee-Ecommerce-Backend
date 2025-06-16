@@ -12,13 +12,26 @@ type CreateRequestType = Request<unknown, unknown, CreateCategoryRequestBody>;
 type DeleteRequestType = Request<{ id: string }>;
 type UpdateRequestType = Request<{ id: string }, unknown, UpdateCategoryRequestBody>;
 type GetDetailsRequestType = Request<{ id: string }>;
+type GetAllRequestType = Request<
+  unknown,
+  unknown,
+  unknown,
+  {
+    page?: string;
+    limit?: string;
+  }
+>;
 
 interface ICategoryController {
   create: (request: CreateRequestType, response: Response, next: NextFunction) => Promise<void>;
   delete: (request: DeleteRequestType, response: Response, next: NextFunction) => Promise<void>;
   update: (request: UpdateRequestType, response: Response, next: NextFunction) => Promise<void>;
   getDetails: (request: GetDetailsRequestType, response: Response, next: NextFunction) => Promise<void>;
+  getAll: (request: GetAllRequestType, response: Response, next: NextFunction) => Promise<void>;
 }
+
+const DEFAULT_PAGE_GET_ALL = 1;
+const DEFAULT_LIMIT_GET_ALL = 10;
 
 export class CategoryController implements ICategoryController {
   private _categoryService: CategoryService = new CategoryService();
@@ -79,6 +92,25 @@ export class CategoryController implements ICategoryController {
         statusCode: StatusCodes.OK,
         message: 'Get details category success',
         data: category
+      }
+    });
+  }
+
+  public async getAll(request: GetAllRequestType, response: Response): Promise<void> {
+    const { page = DEFAULT_PAGE_GET_ALL, limit = DEFAULT_LIMIT_GET_ALL } = request.query;
+
+    const { categoriesData, metadata } = await this._categoryService.getAll({
+      page: Number(page),
+      limit: Number(limit)
+    });
+
+    sendSuccessResponse<typeof categoriesData, typeof metadata>({
+      response,
+      content: {
+        statusCode: StatusCodes.OK,
+        message: 'Get all categories success',
+        data: categoriesData,
+        metadata: metadata
       }
     });
   }
