@@ -41,7 +41,8 @@ export const ErrorCodes: ErrorCodes = {
   [ErrorInstance.MULTER_LIMIT_UNEXPECTED_FILE]: 4000,
   [ErrorInstance.NO_FILE_PROVIDER]: 4000,
   [ErrorInstance.USER_AVATAR_MISSING]: 4000,
-  [ErrorInstance.NOT_FOUND]: 4004
+  [ErrorInstance.NOT_FOUND]: 4004,
+  [ErrorInstance.CATEGORY_NOT_EXIST]: 4000
 } as const;
 
 export type ErrorCodesKeys = keyof typeof ErrorCodes;
