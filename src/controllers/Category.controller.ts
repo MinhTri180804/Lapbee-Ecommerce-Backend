@@ -11,11 +11,13 @@ import { StatusCodes } from 'http-status-codes';
 type CreateRequestType = Request<unknown, unknown, CreateCategoryRequestBody>;
 type DeleteRequestType = Request<{ id: string }>;
 type UpdateRequestType = Request<{ id: string }, unknown, UpdateCategoryRequestBody>;
+type GetDetailsRequestType = Request<{ id: string }>;
 
 interface ICategoryController {
   create: (request: CreateRequestType, response: Response, next: NextFunction) => Promise<void>;
   delete: (request: DeleteRequestType, response: Response, next: NextFunction) => Promise<void>;
   update: (request: UpdateRequestType, response: Response, next: NextFunction) => Promise<void>;
+  getDetails: (request: GetDetailsRequestType, response: Response, next: NextFunction) => Promise<void>;
 }
 
 export class CategoryController implements ICategoryController {
@@ -62,6 +64,21 @@ export class CategoryController implements ICategoryController {
         statusCode: StatusCodes.OK,
         message: 'Updated category success',
         data: categoryUpdated
+      }
+    });
+  }
+
+  public async getDetails(request: GetDetailsRequestType, response: Response): Promise<void> {
+    const { id } = request.params;
+
+    const category = await this._categoryService.getDetails({ categoryId: id });
+
+    sendSuccessResponse<typeof category>({
+      response,
+      content: {
+        statusCode: StatusCodes.OK,
+        message: 'Get details category success',
+        data: category
       }
     });
   }
