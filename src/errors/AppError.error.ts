@@ -6,7 +6,7 @@ import { ErrorMessages } from '../constants/errorMessages.constant.js';
 type AppErrorConstructor<T> = {
   statusCode: StatusCodes;
   errorInstanceKey: ErrorInstanceKeys;
-  details: T;
+  details: T | null;
   message?: string | null;
 };
 
