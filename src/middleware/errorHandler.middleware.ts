@@ -40,6 +40,7 @@ import { NoFileProviderError } from '../errors/multer/NoFileProvider.error.js';
 import { UserAvatarMissingError } from '../errors/UserAvatarMissing.error.js';
 import { NotFoundError } from '../errors/NotFound.error.js';
 import { CategoryNotExistError } from '../errors/CategoryNotExist.error.js';
+import { BadRequestError } from '../errors/BadRequest.error.js';
 
 type ErrorHandler<T extends AppError<unknown> | Error> = (response: Response, error: T) => void;
 
@@ -82,6 +83,7 @@ type MappingHandler = {
   [ErrorInstance.USER_AVATAR_MISSING]: ErrorHandler<UserAvatarMissingError>;
   [ErrorInstance.NOT_FOUND]: ErrorHandler<NotFoundError>;
   [ErrorInstance.CATEGORY_NOT_EXIST]: ErrorHandler<CategoryNotExistError>;
+  [ErrorInstance.BAD_REQUEST]: ErrorHandler<BadRequestError>;
 };
 
 class _ErrorMiddlewareHandler {
@@ -124,7 +126,8 @@ class _ErrorMiddlewareHandler {
     [ErrorInstance.NO_FILE_PROVIDER]: this._noFileProviderErrorHandler,
     [ErrorInstance.USER_AVATAR_MISSING]: this._userAvatarMissingErrorHandler,
     [ErrorInstance.NOT_FOUND]: this._notFoundErrorHandler,
-    [ErrorInstance.CATEGORY_NOT_EXIST]: this._categoryNotExistErrorHandler
+    [ErrorInstance.CATEGORY_NOT_EXIST]: this._categoryNotExistErrorHandler,
+    [ErrorInstance.BAD_REQUEST]: this._badRequestErrorHandler
   };
 
   private constructor() {}
@@ -395,6 +398,13 @@ class _ErrorMiddlewareHandler {
   }
 
   private _categoryNotExistErrorHandler(response: Response, error: CategoryNotExistError) {
+    sendErrorResponse({
+      response,
+      content: error
+    });
+  }
+
+  private _badRequestErrorHandler(response: Response, error: BadRequestError) {
     sendErrorResponse({
       response,
       content: error
