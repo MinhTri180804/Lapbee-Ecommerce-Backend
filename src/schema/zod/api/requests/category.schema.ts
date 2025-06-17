@@ -17,7 +17,7 @@ export const updateCategoryRequestBodySchema = z.object({
 });
 
 export const changeParentIdRequestBodySchema = z.object({
-  newParentId: z.string({ required_error: PARENT_ID_REQUIRED })
+  newParentId: z.string({ required_error: PARENT_ID_REQUIRED }).nullable()
 });
 
 export type CreateCategoryRequestBody = z.infer<typeof createCategoryRequestBodySchema>;

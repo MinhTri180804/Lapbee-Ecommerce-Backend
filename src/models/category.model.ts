@@ -19,6 +19,10 @@ const categorySchema = new Schema<ICategoryDocument>(
     slug: {
       type: String,
       required: true
+    },
+    hasChildren: {
+      type: Boolean,
+      default: false
     }
   },
   {
