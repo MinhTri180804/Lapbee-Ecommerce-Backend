@@ -7,10 +7,12 @@ import { ICategoryDocument } from '../models/category.model.js';
 import { CategoryRepository } from '../repositories/Category.repository.js';
 import { NotFoundError } from 'src/errors/NotFound.error.js';
 import { CategoryNotExistError } from '../errors/CategoryNotExist.error.js';
+import { BadRequestError } from 'src/errors/BadRequest.error.js';
 
 type CreateParams = CreateCategoryRequestBody;
 type DeleteParams = {
   categoryId: string;
+  isForce: boolean;
 };
 type UpdateParams = {
   categoryId: string;
@@ -57,12 +59,26 @@ export class CategoryService implements ICategoryService {
     return await this._categoryRepository.create(data);
   }
 
-  public async delete({ categoryId }: DeleteParams): Promise<void> {
-    const resultDocument = await this._categoryRepository.delete({ id: categoryId });
+  public async delete({ categoryId, isForce }: DeleteParams): Promise<void> {
+    const category = await this._categoryRepository.findById({ id: categoryId });
 
-    if (!resultDocument) {
+    if (!category) {
       throw new NotFoundError({ message: 'Category not found' });
     }
+
+    const isExistChildCategories = await this._categoryRepository.checkHasChildCategories({ parentId: categoryId });
+
+    if (isExistChildCategories && !isForce) {
+      throw new BadRequestError<null>({
+        message: 'This category has child categories. Please reassign or remove them before deleting.'
+      });
+    }
+
+    if (isExistChildCategories && isForce) {
+      await this._categoryRepository.updateManyParentId({ parentId: categoryId, newParentId: null });
+    }
+
+    await this._categoryRepository.deleteByDoc({ categoryDoc: category });
 
     return;
   }

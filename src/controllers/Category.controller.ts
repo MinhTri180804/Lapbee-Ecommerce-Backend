@@ -10,7 +10,14 @@ import { sendSuccessResponse } from '../utils/responses.util.js';
 import { StatusCodes } from 'http-status-codes';
 
 type CreateRequestType = Request<unknown, unknown, CreateCategoryRequestBody>;
-type DeleteRequestType = Request<{ id: string }>;
+type DeleteRequestType = Request<
+  { id: string },
+  unknown,
+  unknown,
+  {
+    force?: boolean;
+  }
+>;
 type UpdateRequestType = Request<{ id: string }, unknown, UpdateCategoryRequestBody>;
 type GetDetailsRequestType = Request<{ id: string }>;
 type GetAllRequestType = Request<
@@ -57,8 +64,9 @@ export class CategoryController implements ICategoryController {
 
   public async delete(request: DeleteRequestType, response: Response): Promise<void> {
     const { id } = request.params;
+    const { force = false } = request.query;
 
-    await this._categoryService.delete({ categoryId: id });
+    await this._categoryService.delete({ categoryId: id, isForce: Boolean(force) });
     sendSuccessResponse({
       response,
       content: {

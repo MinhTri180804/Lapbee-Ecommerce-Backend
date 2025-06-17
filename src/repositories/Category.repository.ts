@@ -21,13 +21,23 @@ type ChangeParentIdParams = {
   newParentId: string;
   id: string;
 };
-type checkExistParams = {
+type CheckExistParams = {
   id: string;
+};
+type DeleteByDocParams = {
+  categoryDoc: ICategoryDocument;
+};
+type CheckHasChildCategories = {
+  parentId: string;
+};
+type UpdateManyParentIdParams = {
+  parentId: string;
+  newParentId: string | null;
 };
 
 interface ICategoryRepository {
   create: (params: CreateParams) => Promise<ICategoryDocument>;
-  delete: (params: DeleteParams) => Promise<ICategoryDocument | null>;
+  deleteById: (params: DeleteParams) => Promise<ICategoryDocument | null>;
   update: (params: UpdateParams) => Promise<ICategoryDocument | null>;
   findById: (params: FindByIdParams) => Promise<ICategoryDocument | null>;
   find: (params: FindParams) => Promise<{
@@ -35,7 +45,10 @@ interface ICategoryRepository {
     totalCount: number;
   }>;
   changeParentId: (params: ChangeParentIdParams) => Promise<ICategoryDocument | null>;
-  checkExist: (params: checkExistParams) => Promise<boolean>;
+  checkExist: (params: CheckExistParams) => Promise<boolean>;
+  deleteByDoc: (params: DeleteByDocParams) => Promise<void>;
+  checkHasChildCategories: (params: CheckHasChildCategories) => Promise<boolean>;
+  updateManyParentId: (params: UpdateManyParentIdParams) => Promise<void>;
 }
 
 export class CategoryRepository implements ICategoryRepository {
@@ -46,7 +59,7 @@ export class CategoryRepository implements ICategoryRepository {
     return await this._categoryModel.create(data);
   }
 
-  public async delete({ id }: DeleteParams): Promise<ICategoryDocument | null> {
+  public async deleteById({ id }: DeleteParams): Promise<ICategoryDocument | null> {
     const category = await this._categoryModel.findByIdAndDelete(id);
     return category;
   }
@@ -97,10 +110,24 @@ export class CategoryRepository implements ICategoryRepository {
     );
   }
 
-  public async checkExist({ id }: checkExistParams): Promise<boolean> {
+  public async checkExist({ id }: CheckExistParams): Promise<boolean> {
     const category = await this._categoryModel.exists({ _id: id });
     if (!category) return false;
 
     return true;
+  }
+
+  public async deleteByDoc({ categoryDoc }: DeleteByDocParams): Promise<void> {
+    return await categoryDoc.deleteOne();
+  }
+
+  public async checkHasChildCategories({ parentId }: CheckHasChildCategories): Promise<boolean> {
+    const result = await this._categoryModel.exists({ parentId });
+    if (!result) return false;
+    return true;
+  }
+
+  public async updateManyParentId({ parentId, newParentId }: UpdateManyParentIdParams): Promise<void> {
+    await this._categoryModel.updateMany({ parentId }, { parentId: newParentId });
   }
 }
