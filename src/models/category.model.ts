@@ -1,4 +1,4 @@
-import { Document, model, Schema } from 'mongoose';
+import { Document, model, Schema, Types } from 'mongoose';
 import { CategorySchemaType } from '../schema/zod/category/index.schema.js';
 
 const DOCUMENT_NAME = 'category';
@@ -13,11 +13,20 @@ const categorySchema = new Schema<ICategoryDocument>(
       required: true
     },
     parentId: {
-      type: String,
+      type: Types.ObjectId,
+      ref: DOCUMENT_NAME,
       default: null
     },
     slug: {
       type: String,
+      required: true
+    },
+    hasChildren: {
+      type: Boolean,
+      default: false
+    },
+    order: {
+      type: Number,
       required: true
     }
   },

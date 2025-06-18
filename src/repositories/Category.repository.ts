@@ -1,21 +1,20 @@
 import { CategorySchemaType } from '../schema/zod/category/index.schema.js';
 import { ICategoryDocument, Category } from '../models/category.model.js';
-import { UpdateCategoryRequestBody } from 'src/schema/zod/api/requests/category.schema.js';
+import { UpdateQuery } from 'mongoose';
 
 type CreateParams = CategorySchemaType;
 type DeleteParams = {
   id: string;
 };
 type UpdateParams = {
-  updateData: UpdateCategoryRequestBody;
+  updateData: UpdateQuery<ICategoryDocument>;
   id: string;
 };
 type FindByIdParams = {
   id: string;
 };
 type FindParams = {
-  limit: number;
-  skip: number;
+  parentId: string | null;
 };
 type ChangeParentIdParams = {
   newParentId: string;
@@ -34,21 +33,26 @@ type UpdateManyParentIdParams = {
   parentId: string;
   newParentId: string | null;
 };
+type UpdateByDocParams = {
+  categoryDoc: ICategoryDocument;
+  updateData: UpdateQuery<ICategoryDocument>;
+};
+
+type GetAllTreeReturns = ICategoryDocument[];
 
 interface ICategoryRepository {
   create: (params: CreateParams) => Promise<ICategoryDocument>;
   deleteById: (params: DeleteParams) => Promise<ICategoryDocument | null>;
   update: (params: UpdateParams) => Promise<ICategoryDocument | null>;
   findById: (params: FindByIdParams) => Promise<ICategoryDocument | null>;
-  find: (params: FindParams) => Promise<{
-    paginatedResult: ICategoryDocument[];
-    totalCount: number;
-  }>;
+  find: (params: FindParams) => Promise<ICategoryDocument[]>;
   changeParentId: (params: ChangeParentIdParams) => Promise<ICategoryDocument | null>;
   checkExist: (params: CheckExistParams) => Promise<boolean>;
   deleteByDoc: (params: DeleteByDocParams) => Promise<void>;
   checkHasChildCategories: (params: CheckHasChildCategories) => Promise<boolean>;
   updateManyParentId: (params: UpdateManyParentIdParams) => Promise<void>;
+  updateByDoc: (params: UpdateByDocParams) => Promise<ICategoryDocument>;
+  getAllTree: () => Promise<GetAllTreeReturns>;
 }
 
 export class CategoryRepository implements ICategoryRepository {
@@ -74,28 +78,8 @@ export class CategoryRepository implements ICategoryRepository {
     return await this._categoryModel.findById(id);
   }
 
-  public async find({ skip, limit }: FindParams): Promise<{
-    paginatedResult: ICategoryDocument[];
-    totalCount: number;
-  }> {
-    const result = await this._categoryModel
-      .aggregate<{
-        paginatedResult: ICategoryDocument[];
-        totalCount: { count: number }[];
-      }>([
-        {
-          $facet: {
-            paginatedResult: [{ $skip: skip }, { $limit: limit }],
-            totalCount: [{ $count: 'count' }]
-          }
-        }
-      ])
-      .exec();
-
-    return {
-      paginatedResult: result[0].paginatedResult,
-      totalCount: result[0].totalCount.length > 0 ? result[0].totalCount[0].count : 0
-    };
+  public async find({ parentId }: FindParams): Promise<ICategoryDocument[]> {
+    return await this._categoryModel.find({ parentId }).exec();
   }
 
   public async changeParentId({ newParentId, id }: ChangeParentIdParams): Promise<ICategoryDocument | null> {
@@ -129,5 +113,15 @@ export class CategoryRepository implements ICategoryRepository {
 
   public async updateManyParentId({ parentId, newParentId }: UpdateManyParentIdParams): Promise<void> {
     await this._categoryModel.updateMany({ parentId }, { parentId: newParentId });
+  }
+
+  public async updateByDoc({ categoryDoc, updateData }: UpdateByDocParams): Promise<ICategoryDocument> {
+    return await categoryDoc.updateOne(updateData, {
+      new: true
+    });
+  }
+
+  async getAllTree(): Promise<GetAllTreeReturns> {
+    return await this._categoryModel.find().lean();
   }
 }

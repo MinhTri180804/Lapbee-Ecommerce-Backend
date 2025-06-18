@@ -102,6 +102,7 @@ export const ValidationMessages = {
 
   category: {
     NAME_REQUIRED: 'Name category is required',
-    SLUG_REQUIRED: 'Slug category is required'
+    SLUG_REQUIRED: 'Slug category is required',
+    ORDER_REQUIRED: 'Order category is required'
   }
 };

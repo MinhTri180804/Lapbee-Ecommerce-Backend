@@ -37,6 +37,7 @@ router.patch(
   categoryController.update.bind(categoryController)
 );
 
+router.get('/tree', categoryController.getAllTree.bind(categoryController));
 router.get('/:id', categoryController.getDetails.bind(categoryController));
 router.get('/', categoryController.getAll.bind(categoryController));
 router.patch(

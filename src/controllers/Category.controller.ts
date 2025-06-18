@@ -25,8 +25,7 @@ type GetAllRequestType = Request<
   unknown,
   unknown,
   {
-    page?: string;
-    limit?: string;
+    parentId?: string;
   }
 >;
 type ChangeParentIdRequestType = Request<{ id: string }, unknown, ChangeParentIdRequestBody>;
@@ -38,10 +37,10 @@ interface ICategoryController {
   getDetails: (request: GetDetailsRequestType, response: Response, next: NextFunction) => Promise<void>;
   getAll: (request: GetAllRequestType, response: Response, next: NextFunction) => Promise<void>;
   changeParentId: (request: ChangeParentIdRequestType, response: Response, next: NextFunction) => Promise<void>;
+  getAllTree: (request: Request, response: Response, next: NextFunction) => Promise<void>;
 }
 
-const DEFAULT_PAGE_GET_ALL = 1;
-const DEFAULT_LIMIT_GET_ALL = 10;
+const DEFAULT_PARENT_ID_GET_ALL = null;
 
 export class CategoryController implements ICategoryController {
   private _categoryService: CategoryService = new CategoryService();
@@ -108,20 +107,18 @@ export class CategoryController implements ICategoryController {
   }
 
   public async getAll(request: GetAllRequestType, response: Response): Promise<void> {
-    const { page = DEFAULT_PAGE_GET_ALL, limit = DEFAULT_LIMIT_GET_ALL } = request.query;
+    const { parentId = DEFAULT_PARENT_ID_GET_ALL } = request.query;
 
-    const { categoriesData, metadata } = await this._categoryService.getAll({
-      page: Number(page),
-      limit: Number(limit)
+    const categoriesData = await this._categoryService.getAll({
+      parentId
     });
 
-    sendSuccessResponse<typeof categoriesData, typeof metadata>({
+    sendSuccessResponse<typeof categoriesData>({
       response,
       content: {
         statusCode: StatusCodes.OK,
         message: 'Get all categories success',
-        data: categoriesData,
-        metadata: metadata
+        data: categoriesData
       }
     });
   }
@@ -136,6 +133,18 @@ export class CategoryController implements ICategoryController {
       content: {
         statusCode: StatusCodes.NO_CONTENT,
         message: 'Update new parent for category success'
+      }
+    });
+  }
+
+  public async getAllTree(_: Request, response: Response): Promise<void> {
+    const data = await this._categoryService.getAllTree();
+    sendSuccessResponse<typeof data>({
+      response,
+      content: {
+        statusCode: StatusCodes.OK,
+        message: 'Get all categories tree success',
+        data: data
       }
     });
   }
