@@ -55,6 +55,15 @@ export const ValidationMessages = {
         deleteAvatar: {
           PUBLIC_ID_REQUIRED: 'PublicId is required'
         }
+      },
+      category: {
+        changeParentId: {
+          PARENT_ID_REQUIRED: 'ParentId is required'
+        },
+        changeOrder: {
+          NEW_ORDER_REQUIRED: 'New order is required',
+          OLD_ORDER_REQUIRED: 'Old order is required'
+        }
       }
     }
   },
@@ -93,5 +102,11 @@ export const ValidationMessages = {
     URL_BANNERS_REQUIRED: 'Url of banners is required',
     PUBLIC_ID_LOGO_REQUIRED: 'PublicId logo is required',
     URL_LOGO_REQUIRED: 'Url of logo is required'
+  },
+
+  category: {
+    NAME_REQUIRED: 'Name category is required',
+    SLUG_REQUIRED: 'Slug category is required',
+    ORDER_REQUIRED: 'Order category is required'
   }
 };

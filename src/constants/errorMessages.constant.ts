@@ -44,5 +44,7 @@ export const ErrorMessages: ErrorMessagesType = {
   [ErrorInstance.MULTER_LIMIT_UNEXPECTED_FILE]: 'Unexpected file field.',
   [ErrorInstance.NO_FILE_PROVIDER]: 'No file provided',
   [ErrorInstance.USER_AVATAR_MISSING]: 'Avatar not found for this user.',
-  [ErrorInstance.NOT_FOUND]: 'Notfound'
+  [ErrorInstance.NOT_FOUND]: 'Notfound',
+  [ErrorInstance.CATEGORY_NOT_EXIST]: 'Category not exist',
+  [ErrorInstance.BAD_REQUEST]: 'Bad request'
 };
