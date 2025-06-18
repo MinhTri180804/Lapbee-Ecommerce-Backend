@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { nameSchema, parentIdSchema, slugSchema } from '../../category/field.schema.js';
+import { nameSchema, orderSchema, parentIdSchema, slugSchema } from '../../category/field.schema.js';
 import { ValidationMessages } from 'src/constants/validationMessages.constant.js';
 
 const { PARENT_ID_REQUIRED } = ValidationMessages.api.request.category.changeParentId;
@@ -7,13 +7,15 @@ const { PARENT_ID_REQUIRED } = ValidationMessages.api.request.category.changePar
 export const createCategoryRequestBodySchema = z.object({
   name: nameSchema,
   parentId: parentIdSchema.nullable(),
-  slug: slugSchema
+  slug: slugSchema,
+  order: orderSchema
 });
 
 export const updateCategoryRequestBodySchema = z.object({
   name: nameSchema.optional(),
   parentId: parentIdSchema.optional(),
-  slug: slugSchema.optional()
+  slug: slugSchema.optional(),
+  order: orderSchema.optional()
 });
 
 export const changeParentIdRequestBodySchema = z.object({

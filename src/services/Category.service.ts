@@ -8,7 +8,7 @@ import { CategoryRepository } from '../repositories/Category.repository.js';
 import { NotFoundError } from 'src/errors/NotFound.error.js';
 import { CategoryNotExistError } from '../errors/CategoryNotExist.error.js';
 import { BadRequestError } from 'src/errors/BadRequest.error.js';
-import { parentIdSchema } from 'src/schema/zod/category/field.schema.js';
+import { BuildTree } from '../utils/buildTree.util.js';
 
 type CreateParams = CreateCategoryRequestBody;
 type DeleteParams = {
@@ -30,6 +30,10 @@ type ChangeParentIdParams = {
   categoryId: string;
 } & ChangeParentIdRequestBody;
 
+type CategoryTreeNode = ICategoryDocument & {
+  children: CategoryTreeNode[];
+};
+
 interface ICategoryService {
   create: (params: CreateParams) => Promise<ICategoryDocument>;
   delete: (params: DeleteParams) => Promise<void>;
@@ -37,6 +41,7 @@ interface ICategoryService {
   getDetails: (params: GetDetailsParams) => Promise<ICategoryDocument>;
   getAll: (params: GetAllParams) => Promise<ICategoryDocument[]>;
   changeParentId: (params: ChangeParentIdParams) => Promise<ICategoryDocument>;
+  getAllTree: () => Promise<any>;
 }
 
 export class CategoryService implements ICategoryService {
@@ -188,5 +193,12 @@ export class CategoryService implements ICategoryService {
     }
 
     return category;
+  }
+
+  public async getAllTree() {
+    const data = await this._categoryRepository.getAllTree();
+    const buildTreeUtil = new BuildTree<ICategoryDocument>(data, '_id', 'parentId');
+    const categoryTree = buildTreeUtil.getTree();
+    return buildTreeUtil.sortTree(categoryTree, 'order');
   }
 }

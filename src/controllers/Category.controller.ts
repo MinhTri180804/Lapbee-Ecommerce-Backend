@@ -37,6 +37,7 @@ interface ICategoryController {
   getDetails: (request: GetDetailsRequestType, response: Response, next: NextFunction) => Promise<void>;
   getAll: (request: GetAllRequestType, response: Response, next: NextFunction) => Promise<void>;
   changeParentId: (request: ChangeParentIdRequestType, response: Response, next: NextFunction) => Promise<void>;
+  getAllTree: (request: Request, response: Response, next: NextFunction) => Promise<void>;
 }
 
 const DEFAULT_PARENT_ID_GET_ALL = null;
@@ -132,6 +133,18 @@ export class CategoryController implements ICategoryController {
       content: {
         statusCode: StatusCodes.NO_CONTENT,
         message: 'Update new parent for category success'
+      }
+    });
+  }
+
+  public async getAllTree(_: Request, response: Response): Promise<void> {
+    const data = await this._categoryService.getAllTree();
+    sendSuccessResponse<typeof data>({
+      response,
+      content: {
+        statusCode: StatusCodes.OK,
+        message: 'Get all categories tree success',
+        data: data
       }
     });
   }

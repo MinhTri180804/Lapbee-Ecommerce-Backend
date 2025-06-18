@@ -38,6 +38,8 @@ type UpdateByDocParams = {
   updateData: UpdateQuery<ICategoryDocument>;
 };
 
+type GetAllTreeReturns = ICategoryDocument[];
+
 interface ICategoryRepository {
   create: (params: CreateParams) => Promise<ICategoryDocument>;
   deleteById: (params: DeleteParams) => Promise<ICategoryDocument | null>;
@@ -50,6 +52,7 @@ interface ICategoryRepository {
   checkHasChildCategories: (params: CheckHasChildCategories) => Promise<boolean>;
   updateManyParentId: (params: UpdateManyParentIdParams) => Promise<void>;
   updateByDoc: (params: UpdateByDocParams) => Promise<ICategoryDocument>;
+  getAllTree: () => Promise<GetAllTreeReturns>;
 }
 
 export class CategoryRepository implements ICategoryRepository {
@@ -116,5 +119,9 @@ export class CategoryRepository implements ICategoryRepository {
     return await categoryDoc.updateOne(updateData, {
       new: true
     });
+  }
+
+  async getAllTree(): Promise<GetAllTreeReturns> {
+    return await this._categoryModel.find().lean();
   }
 }
