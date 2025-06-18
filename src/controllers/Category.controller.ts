@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import {
+  ChangeOrderCategoryRequestBody,
   ChangeParentIdRequestBody,
   CreateCategoryRequestBody,
   UpdateCategoryRequestBody,
@@ -29,6 +30,7 @@ type GetAllRequestType = Request<
   }
 >;
 type ChangeParentIdRequestType = Request<{ id: string }, unknown, ChangeParentIdRequestBody>;
+type ChangeOrderRequestType = Request<{ id: string }, unknown, ChangeOrderCategoryRequestBody>;
 
 interface ICategoryController {
   create: (request: CreateRequestType, response: Response, next: NextFunction) => Promise<void>;
@@ -38,6 +40,7 @@ interface ICategoryController {
   getAll: (request: GetAllRequestType, response: Response, next: NextFunction) => Promise<void>;
   changeParentId: (request: ChangeParentIdRequestType, response: Response, next: NextFunction) => Promise<void>;
   getAllTree: (request: Request, response: Response, next: NextFunction) => Promise<void>;
+  changeOrder: (request: ChangeOrderRequestType, response: Response, next: NextFunction) => Promise<void>;
 }
 
 const DEFAULT_PARENT_ID_GET_ALL = null;
@@ -145,6 +148,20 @@ export class CategoryController implements ICategoryController {
         statusCode: StatusCodes.OK,
         message: 'Get all categories tree success',
         data: data
+      }
+    });
+  }
+
+  public async changeOrder(request: ChangeOrderRequestType, response: Response): Promise<void> {
+    const { id } = request.params;
+    const { newOrder, parentId } = request.body;
+    await this._categoryService.changeOrder({ parentId, newOrder, categoryId: id });
+
+    sendSuccessResponse({
+      response,
+      content: {
+        statusCode: StatusCodes.NO_CONTENT,
+        message: 'Change order category success'
       }
     });
   }

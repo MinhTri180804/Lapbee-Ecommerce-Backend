@@ -1,44 +1,64 @@
 import { CategorySchemaType } from '../schema/zod/category/index.schema.js';
 import { ICategoryDocument, Category } from '../models/category.model.js';
-import { UpdateQuery } from 'mongoose';
+import { FilterQuery, UpdateQuery } from 'mongoose';
 
 type CreateParams = CategorySchemaType;
+
 type DeleteParams = {
   id: string;
 };
+
 type UpdateParams = {
   updateData: UpdateQuery<ICategoryDocument>;
   id: string;
 };
+
 type FindByIdParams = {
   id: string;
 };
+
 type FindParams = {
   parentId: string | null;
 };
+
 type ChangeParentIdParams = {
   newParentId: string;
   id: string;
 };
+
 type CheckExistParams = {
   id: string;
 };
+
 type DeleteByDocParams = {
   categoryDoc: ICategoryDocument;
 };
+
 type CheckHasChildCategories = {
   parentId: string;
 };
+
 type UpdateManyParentIdParams = {
   parentId: string;
   newParentId: string | null;
 };
+
 type UpdateByDocParams = {
   categoryDoc: ICategoryDocument;
   updateData: UpdateQuery<ICategoryDocument>;
 };
 
 type GetAllTreeReturns = ICategoryDocument[];
+
+type ChangeOrderParams = {
+  parentId: string | null;
+  newOrder: number;
+  oldOrder: number;
+};
+
+type CountDocumentParams = {
+  filter: FilterQuery<ICategoryDocument>;
+};
 
 interface ICategoryRepository {
   create: (params: CreateParams) => Promise<ICategoryDocument>;
@@ -53,6 +73,8 @@ interface ICategoryRepository {
   updateManyParentId: (params: UpdateManyParentIdParams) => Promise<void>;
   updateByDoc: (params: UpdateByDocParams) => Promise<ICategoryDocument>;
   getAllTree: () => Promise<GetAllTreeReturns>;
+  changeOrder: (params: ChangeOrderParams) => Promise<void>;
+  countDocument: (params: CountDocumentParams) => Promise<number>;
 }
 
 export class CategoryRepository implements ICategoryRepository {
@@ -121,7 +143,39 @@ export class CategoryRepository implements ICategoryRepository {
     });
   }
 
-  async getAllTree(): Promise<GetAllTreeReturns> {
+  public async getAllTree(): Promise<GetAllTreeReturns> {
     return await this._categoryModel.find().lean();
+  }
+
+  public async changeOrder({ parentId, newOrder, oldOrder }: ChangeOrderParams): Promise<void> {
+    if (newOrder < oldOrder) {
+      await this._categoryModel.updateMany(
+        {
+          parentId,
+          order: { $gte: newOrder, $lt: oldOrder }
+        },
+        {
+          $inc: { order: 1 }
+        }
+      );
+      return;
+    }
+
+    if (newOrder > oldOrder) {
+      await this._categoryModel.updateMany(
+        {
+          parentId,
+          order: { $gt: oldOrder, $lte: newOrder }
+        },
+        {
+          $inc: { order: -1 }
+        }
+      );
+      return;
+    }
+  }
+
+  public async countDocument({ filter }: CountDocumentParams): Promise<number> {
+    return await this._categoryModel.countDocuments(filter);
   }
 }

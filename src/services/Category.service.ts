@@ -1,4 +1,5 @@
 import {
+  ChangeOrderCategoryRequestBody,
   ChangeParentIdRequestBody,
   CreateCategoryRequestBody,
   UpdateCategoryRequestBody
@@ -30,8 +31,8 @@ type ChangeParentIdParams = {
   categoryId: string;
 } & ChangeParentIdRequestBody;
 
-type CategoryTreeNode = ICategoryDocument & {
-  children: CategoryTreeNode[];
+type ChangeOrderParams = ChangeOrderCategoryRequestBody & {
+  categoryId: string;
 };
 
 interface ICategoryService {
@@ -41,7 +42,9 @@ interface ICategoryService {
   getDetails: (params: GetDetailsParams) => Promise<ICategoryDocument>;
   getAll: (params: GetAllParams) => Promise<ICategoryDocument[]>;
   changeParentId: (params: ChangeParentIdParams) => Promise<ICategoryDocument>;
+  // eslint-disable-next-line
   getAllTree: () => Promise<any>;
+  changeOrder: (params: ChangeOrderParams) => Promise<ICategoryDocument>;
 }
 
 export class CategoryService implements ICategoryService {
@@ -200,5 +203,28 @@ export class CategoryService implements ICategoryService {
     const buildTreeUtil = new BuildTree<ICategoryDocument>(data, '_id', 'parentId');
     const categoryTree = buildTreeUtil.getTree();
     return buildTreeUtil.sortTree(categoryTree, 'order');
+  }
+
+  public async changeOrder({ newOrder, categoryId }: ChangeOrderParams): Promise<ICategoryDocument> {
+    const category = await this._categoryRepository.findById({ id: categoryId });
+    if (!category) {
+      throw new CategoryNotExistError({ message: 'Category change order not exist' });
+    }
+
+    const siblingCount = await this._categoryRepository.countDocument({ filter: { parentId: category.parentId } });
+
+    if (newOrder < 1 || newOrder > siblingCount) {
+      throw new BadRequestError({ message: `Invalid order: ${newOrder}, must be between 1 and ${siblingCount}` });
+    }
+
+    await this._categoryRepository.changeOrder({ parentId: category.parentId, newOrder, oldOrder: category.order });
+    const categoryChangedOrder = await this._categoryRepository.updateByDoc({
+      categoryDoc: category,
+      updateData: {
+        order: newOrder
+      }
+    });
+
+    return categoryChangedOrder;
   }
 }

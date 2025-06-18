@@ -7,7 +7,9 @@ import {
   UpdateCategoryRequestBody,
   updateCategoryRequestBodySchema,
   ChangeParentIdRequestBody,
-  changeParentIdRequestBodySchema
+  changeParentIdRequestBodySchema,
+  ChangeOrderCategoryRequestBody,
+  changeOrderCategoryRequestBodySchema
 } from '../schema/zod/api/requests/category.schema.js';
 import { verifyAccessTokenMiddleware } from '../middleware/verifyAccessToken.middleware.js';
 
@@ -20,6 +22,9 @@ const validateRequestBodyCreate = validateRequestBody<CreateCategoryRequestBody>
 const validateRequestBodyUpdate = validateRequestBody<UpdateCategoryRequestBody>(updateCategoryRequestBodySchema);
 const validateRequestBodyChangeParentId = validateRequestBody<ChangeParentIdRequestBody>(
   changeParentIdRequestBodySchema
+);
+const validateRequestBodyChangeOrder = validateRequestBody<ChangeOrderCategoryRequestBody>(
+  changeOrderCategoryRequestBodySchema
 );
 
 router.post(
@@ -45,4 +50,10 @@ router.patch(
   verifyAccessTokenMiddleware,
   validateRequestBodyChangeParentId,
   categoryController.changeParentId.bind(categoryController)
+);
+router.patch(
+  '/:id/change-order',
+  verifyAccessTokenMiddleware,
+  validateRequestBodyChangeOrder,
+  categoryController.changeOrder.bind(categoryController)
 );

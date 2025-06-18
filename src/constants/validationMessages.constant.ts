@@ -59,6 +59,10 @@ export const ValidationMessages = {
       category: {
         changeParentId: {
           PARENT_ID_REQUIRED: 'ParentId is required'
+        },
+        changeOrder: {
+          NEW_ORDER_REQUIRED: 'New order is required',
+          OLD_ORDER_REQUIRED: 'Old order is required'
         }
       }
     }
