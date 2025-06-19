@@ -1,0 +1,38 @@
+import { CreateProductRequestBody } from '../schema/zod/api/requests/product.schema.js';
+import { IProductDocument } from '../models/product.model.js';
+import { ProductRepository } from '../repositories/Product.repository.js';
+import { CategoryRepository } from 'src/repositories/Category.repository.js';
+import { BadRequestError } from 'src/errors/BadRequest.error.js';
+import { BrandRepository } from 'src/repositories/Brand.repository.js';
+
+type CreateParams = CreateProductRequestBody;
+
+interface IProductService {
+  create: (params: CreateParams) => Promise<IProductDocument>;
+}
+
+export class ProductService implements IProductService {
+  private _productRepository: ProductRepository = new ProductRepository();
+  constructor() {}
+
+  public async create(data: CreateParams): Promise<IProductDocument> {
+    const categoryRepository = new CategoryRepository();
+    const brandRepository = new BrandRepository();
+
+    if (data.categoryId) {
+      const categoryIsExist = await categoryRepository.checkExist({ id: data.categoryId });
+      if (!categoryIsExist) {
+        throw new BadRequestError({ message: 'Category is not exist' });
+      }
+    }
+
+    if (data.brandId) {
+      const brandIsExist = await brandRepository.checkExist({ id: data.brandId });
+      if (!brandIsExist) {
+        throw new BadRequestError({ message: 'Brand is not exist' });
+      }
+    }
+
+    return await this._productRepository.create(data);
+  }
+}

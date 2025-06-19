@@ -36,3 +36,5 @@ router.delete(
   verifyAccessTokenMiddleware,
   uploadImageController.deleteBannerBrand.bind(uploadImageController)
 );
+
+router.get('/', uploadImageController.getAllImages.bind(uploadImageController));

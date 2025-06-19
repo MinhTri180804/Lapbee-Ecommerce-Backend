@@ -24,6 +24,10 @@ export class CloudinaryService {
     return uuidV4().slice(0, 6);
   }
 
+  public async getAllImages() {
+    return await cloudinary.api.resources({ resource_type: 'image', type: 'upload' });
+  }
+
   public async upload(filePath: string): Promise<UploadApiResponse> {
     return await cloudinary.uploader.upload(filePath, {
       folder: this._folder
