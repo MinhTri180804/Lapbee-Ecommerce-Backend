@@ -51,6 +51,11 @@ export class UploadImageService implements IUploadImageService {
     };
   }
 
+  public async getAllImages(): Promise<void> {
+    const cloudinaryService = new CloudinaryService(CloudinaryFolder.LOGOS_BRAND);
+    return await cloudinaryService.getAllImages();
+  }
+
   public async deleteLogoBrand({ publicId }: DeleteLogoBrandParams): Promise<void> {
     const cloudinaryService = new CloudinaryService(CloudinaryFolder.LOGOS_BRAND);
     await cloudinaryService.delete({ publicId: `${CloudinaryFolder.BANNERS_BRAND}/${publicId}` });

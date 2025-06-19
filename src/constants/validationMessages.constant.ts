@@ -108,5 +108,17 @@ export const ValidationMessages = {
     NAME_REQUIRED: 'Name category is required',
     SLUG_REQUIRED: 'Slug category is required',
     ORDER_REQUIRED: 'Order category is required'
+  },
+
+  product: {
+    CATEGORY_ID_REQUIRED: 'CategoryId is required',
+    NAME_REQUIRED: 'Name product is required',
+    BRAND_ID_REQUIRED: 'BrandId is required',
+    STATE_REQUIRED: 'State product is required',
+    PHYSICAL_CONDITION_REQUIRED: 'Physical condition product is required',
+    PUBLIC_ID_REQUIRED: 'PublicId is required',
+    URL_REQUIRED: 'Url is required',
+    NAME_ATTRIBUTE_REQUIRED: 'Name attribute is required',
+    VALUE_ATTRIBUTE_REQUIRED: 'Value attribute is required'
   }
 };

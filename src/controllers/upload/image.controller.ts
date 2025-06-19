@@ -6,12 +6,14 @@ import { CloudinaryFolder } from 'src/enums/cloudinaryFolder.enum.js';
 
 type DeleteLogoBrandRequestType = Request<{ public_id: string }, unknown, unknown>;
 type DeleteBannerBrandRequestType = Request<{ public_id: string }>;
+type GetAllImagesRequestType = Request;
 
 interface IUploadImageController {
   uploadLogoBrand: (request: Request, response: Response, next: NextFunction) => Promise<void>;
   deleteLogoBrand: (request: DeleteLogoBrandRequestType, response: Response, next: NextFunction) => Promise<void>;
   uploadBannerBrand: (request: Request, response: Response, next: NextFunction) => Promise<void>;
   deleteBannerBrand: (request: DeleteBannerBrandRequestType, response: Response, next: NextFunction) => Promise<void>;
+  getAllImages: (request: GetAllImagesRequestType, response: Response, next: NextFunction) => Promise<void>;
 }
 
 export class UploadImageController implements IUploadImageController {
@@ -92,6 +94,18 @@ export class UploadImageController implements IUploadImageController {
         data: {
           publicId: `${CloudinaryFolder.BANNERS_BRAND}/${public_id}`
         }
+      }
+    });
+  }
+
+  public async getAllImages(_: GetAllImagesRequestType, response: Response): Promise<void> {
+    const data = await this._uploadImageService.getAllImages();
+    sendSuccessResponse({
+      response,
+      content: {
+        statusCode: StatusCodes.OK,
+        message: 'Get All image success',
+        data: data
       }
     });
   }
