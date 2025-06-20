@@ -1,6 +1,6 @@
 import { z, ZodIssueCode } from 'zod';
 import {
-  attributesSchema,
+  commonSpecsSchema,
   brandIdSchema,
   categoryIdSchema,
   commonImagesSchema,
@@ -16,7 +16,7 @@ export const createProductRequestBodySchema = z
     categoryId: categoryIdSchema.nullable(),
     name: nameSchema,
     commonImages: z.array(commonImagesSchema),
-    attributes: z.array(attributesSchema),
+    commonSpecs: z.array(commonSpecsSchema),
     brandId: brandIdSchema.nullable(),
     state: stateSchema,
     usedInfo: usedInfoSchema.nullable(),

@@ -24,7 +24,7 @@ export const commonImagesSchema = z.object({
   publicId: z.string({ required_error: PUBLIC_ID_REQUIRED }),
   url: z.string({ required_error: URL_REQUIRED })
 });
-export const attributesSchema = z.object({
+export const commonSpecsSchema = z.object({
   name: z.string({ required_error: NAME_ATTRIBUTE_REQUIRED }),
   value: z.string({ required_error: VALUE_ATTRIBUTE_REQUIRED })
 });

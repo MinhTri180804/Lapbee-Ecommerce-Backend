@@ -64,6 +64,9 @@ export const ValidationMessages = {
           NEW_ORDER_REQUIRED: 'New order is required',
           OLD_ORDER_REQUIRED: 'Old order is required'
         }
+      },
+      productVariant: {
+        SKU_REQUIRED: 'Sku product variant is required'
       }
     }
   },
@@ -120,5 +123,35 @@ export const ValidationMessages = {
     URL_REQUIRED: 'Url is required',
     NAME_ATTRIBUTE_REQUIRED: 'Name attribute is required',
     VALUE_ATTRIBUTE_REQUIRED: 'Value attribute is required'
+  },
+
+  productVariant: {
+    NAME_REQUIRED: 'Name product variant is required',
+    NAME_EMPTY: 'Name product variant is not empty',
+    PRODUCT_ID_REQUIRED: 'ProductId is required',
+    SKU_REQUIRED: 'Sku product variant is required',
+    SKU_EMPTY: 'Sku can not empty',
+    ORIGIN_PRICE_REQUIRED: 'Origin price is required',
+    COST_PRICE_REQUIRED: 'Cost price product variant is required',
+    STOCK_REQUIRED: 'Stock product variant is required',
+    SOLD_REQUIRED: 'Sold product variant is required',
+    STATUS_REQUIRED: 'Status product variant is required',
+    spec: {
+      NAME_REQUIRED: 'Name spec is required',
+      VALUE_REQUIRED: 'Value spec is required'
+    },
+    seo: {
+      META_TITLE_REQUIRED: 'Meta title seo product variant is required',
+      META_DESCRIPTION_REQUIRED: 'Meta description seo product variant is required',
+      KEYWORDS_REQUIRED: 'Keywords seo product variant is required',
+      ROBOTS_REQUIRED: 'Robots seo product variant is required',
+      OG_TITLE_REQUIRED: 'OG Title is required',
+      OG_DESCRIPTION_REQUIRED: 'OG Description is required',
+      OG_IMAGE_REQUIRED: 'OG Image is required'
+    },
+    images: {
+      PUBLIC_ID_REQUIRED: 'Public id is required',
+      URL_REQUIRED: 'Url is required'
+    }
   }
 };
