@@ -12,10 +12,16 @@ import { BadRequestError } from 'src/errors/BadRequest.error.js';
 
 type CreateRequestType = Request<{ id: string }, unknown, CreateProductVariantRequestBody>;
 type CreateManyRequestType = Request<{ id: string }, unknown, CreateManyProductsVariantRequestBody>;
+type GetAllProductVariantsByProductRequestType = Request<{ id: string }>;
 
 interface IProductVariantController {
   create: (request: CreateRequestType, response: Response, next: NextFunction) => Promise<void>;
   createMany: (request: CreateManyRequestType, response: Response, next: NextFunction) => Promise<void>;
+  getAllProductVariantsByProduct: (
+    request: GetAllProductVariantsByProductRequestType,
+    response: Response,
+    next: NextFunction
+  ) => Promise<void>;
 }
 
 export class ProductVariantController implements IProductVariantController {
@@ -59,6 +65,22 @@ export class ProductVariantController implements IProductVariantController {
         statusCode: StatusCodes.CREATED,
         message: 'Create many products variant success',
         data: productsVariantCreated
+      }
+    });
+  }
+
+  public async getAllProductVariantsByProduct(
+    request: GetAllProductVariantsByProductRequestType,
+    response: Response
+  ): Promise<void> {
+    const { id } = request.params;
+    const productVariants = await this._productVariantService.getAllProductVariantsByProduct({ productId: id });
+    sendSuccessResponse<typeof productVariants>({
+      response,
+      content: {
+        statusCode: StatusCodes.OK,
+        message: 'Get all product variants of product success',
+        data: productVariants
       }
     });
   }

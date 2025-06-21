@@ -24,6 +24,11 @@ const validateRequestBodyCreateManyProductsVariant = validateRequestBody<CreateM
   createManyProductsVariantRequestBodySchema
 );
 
+router.get(
+  '/:id/product-variants',
+  productVariantController.getAllProductVariantsByProduct.bind(productVariantController)
+);
+
 router.post(
   '/:id/product-variants',
   verifyAccessTokenMiddleware,

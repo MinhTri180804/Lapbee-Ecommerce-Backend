@@ -17,9 +17,14 @@ type CreateManyParams = {
   productId: string;
 } & CreateManyProductsVariantRequestBody;
 
+type GetAllProductVariantsByProductParams = {
+  productId: string;
+};
+
 interface IProductVariantService {
   create: (params: CreateParams) => Promise<IProductVariantDocument>;
   createMany: (params: CreateManyParams) => Promise<IProductVariantDocument[]>;
+  getAllProductVariantsByProduct: (params: GetAllProductVariantsByProductParams) => Promise<IProductVariantDocument[]>;
 }
 
 export class ProductVariantService implements IProductVariantService {
@@ -128,5 +133,11 @@ export class ProductVariantService implements IProductVariantService {
 
     const productsVariantCreated = await this._productVariantRepository.createMany({ data: variantToCreate });
     return productsVariantCreated;
+  }
+
+  public async getAllProductVariantsByProduct({
+    productId
+  }: GetAllProductVariantsByProductParams): Promise<IProductVariantDocument[]> {
+    return await this._productVariantRepository.getAllProductVariantsByProduct({ productId });
   }
 }
