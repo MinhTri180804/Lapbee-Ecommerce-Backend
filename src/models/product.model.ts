@@ -24,14 +24,14 @@ const commonImagesSchema = new Schema<IProductDocument['commonImages'][0]>(
   }
 );
 
-const attributesSchema = new Schema<IProductDocument['attributes'][0]>(
+const commonSpecsSchema = new Schema<IProductDocument['commonSpecs'][0]>(
   {
     name: {
       type: String,
       required: true
     },
     value: {
-      type: String,
+      type: [String],
       required: true
     }
   },
@@ -59,26 +59,75 @@ const usedInfoSchema = new Schema<IProductDocument['usedInfo']>(
   }
 );
 
-const descriptionSchema = new Schema<IProductDocument['description']>({
-  time: {
-    type: Number,
-    required: true
+const descriptionSchema = new Schema<IProductDocument['description']>(
+  {
+    time: {
+      type: Number,
+      required: true
+    },
+    version: {
+      type: String,
+      required: true
+    },
+    blocks: {
+      type: [
+        {
+          type: {
+            type: String
+          },
+          data: {}
+        }
+      ]
+    }
   },
-  version: {
-    type: String,
-    required: true
-  },
-  blocks: {
-    type: [
-      {
-        type: {
-          type: String
-        },
-        data: {}
-      }
-    ]
+  {
+    _id: false
   }
-});
+);
+
+const newInfoSchema = new Schema<IProductDocument['newInfo']>(
+  {
+    typeProduct: {
+      type: String,
+      required: true
+    },
+    productCondition: {
+      type: String,
+      required: true
+    },
+    warrantyLeft: {
+      type: String,
+      required: true
+    },
+    priceInfo: {
+      type: String,
+      required: true
+    }
+  },
+  {
+    _id: false
+  }
+);
+
+const optionsSchema = new Schema<IProductDocument['options'][0]>(
+  {
+    name: {
+      type: String,
+      required: true
+    },
+    values: {
+      type: [String],
+      required: true
+    },
+    isCompareName: {
+      type: Boolean,
+      default: false
+    }
+  },
+  {
+    _id: false
+  }
+);
 
 const productSchema = new Schema<IProductDocument>(
   {
@@ -96,8 +145,8 @@ const productSchema = new Schema<IProductDocument>(
       type: [commonImagesSchema],
       default: []
     },
-    attributes: {
-      type: [attributesSchema],
+    commonSpecs: {
+      type: [commonSpecsSchema],
       default: []
     },
     brandId: {
@@ -114,9 +163,17 @@ const productSchema = new Schema<IProductDocument>(
       type: usedInfoSchema,
       default: null
     },
+    newInfo: {
+      type: newInfoSchema,
+      default: null
+    },
     description: {
       type: descriptionSchema,
       default: null
+    },
+    options: {
+      type: [optionsSchema],
+      required: true
     }
   },
   {
