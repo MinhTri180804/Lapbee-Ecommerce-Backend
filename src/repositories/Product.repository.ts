@@ -5,10 +5,14 @@ type CreateParams = CreateProductRequestBody;
 type CheckExistParams = {
   id: string;
 };
+type FindByIdParams = {
+  id: string;
+};
 
 interface IProductRepository {
   create: (params: CreateParams) => Promise<IProductDocument>;
   checkExist: (params: CheckExistParams) => Promise<boolean>;
+  findById: (params: FindByIdParams) => Promise<IProductDocument | null>;
 }
 
 export class ProductRepository implements IProductRepository {
@@ -23,5 +27,9 @@ export class ProductRepository implements IProductRepository {
     const product = await this._productModel.exists({ _id: id });
     if (!product) return false;
     return true;
+  }
+
+  public async findById({ id }: FindByIdParams): Promise<IProductDocument | null> {
+    return await this._productModel.findById(id);
   }
 }

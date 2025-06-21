@@ -1,16 +1,25 @@
-import { IProductVariantDocument } from '../models/productVariant.model.js';
-import { ProductVariantRepository } from '../repositories/productVariant.repository.js';
-import { CreateProductVariantRequestBody } from '../schema/zod/api/requests/productVariant.schema.js';
-import { ProductRepository } from '../repositories/Product.repository.js';
 import { BadRequestError } from '../errors/BadRequest.error.js';
+import { IProductVariantDocument } from '../models/productVariant.model.js';
+import { ProductRepository } from '../repositories/Product.repository.js';
+import { ProductVariantRepository } from '../repositories/productVariant.repository.js';
+import {
+  CreateManyProductsVariantRequestBody,
+  CreateProductVariantRequestBody
+} from '../schema/zod/api/requests/productVariant.schema.js';
 import { validateObjectIds } from '../utils/validateObjectId.util.js';
+import { ProductVariantZodSchemaType } from './../schema/zod/productVariant/index.schema.js';
 
 type CreateParams = CreateProductVariantRequestBody & {
   productId: string;
 };
 
+type CreateManyParams = {
+  productId: string;
+} & CreateManyProductsVariantRequestBody;
+
 interface IProductVariantService {
   create: (params: CreateParams) => Promise<IProductVariantDocument>;
+  createMany: (params: CreateManyParams) => Promise<IProductVariantDocument[]>;
 }
 
 export class ProductVariantService implements IProductVariantService {
@@ -19,11 +28,35 @@ export class ProductVariantService implements IProductVariantService {
 
   constructor() {}
 
+  private async _validateReference(data: string[], nameFieldReference: string) {
+    const invalidObjectId = validateObjectIds(data);
+    if (invalidObjectId.length > 0) {
+      throw new BadRequestError({
+        message: `${nameFieldReference}: ${invalidObjectId.join('-')} invalid objectId`
+      });
+    }
+
+    const existingIds = await this._productVariantRepository.findExistingIds({
+      ids: data
+    });
+
+    if (existingIds.length === 0) {
+      throw new BadRequestError({
+        message: `${nameFieldReference}: ${data.join('-')} is not existing`
+      });
+    }
+
+    if (existingIds.length !== data.length) {
+      const invalidIds = data.filter((id) => !existingIds.includes(id));
+      throw new BadRequestError({ message: `${nameFieldReference}: ${invalidIds.join('-')} is not existing` });
+    }
+  }
+
   public async create(createData: CreateParams): Promise<IProductVariantDocument> {
-    const productIsExist = await this._productRepository.checkExist({ id: createData.productId });
+    const product = await this._productRepository.findById({ id: createData.productId });
 
     // Validation productId exist
-    if (!productIsExist) {
+    if (!product) {
       throw new BadRequestError({ message: 'ProductId is not exist' });
     }
 
@@ -34,54 +67,66 @@ export class ProductVariantService implements IProductVariantService {
 
     // Validation list related product variant id exist
     if (createData.relatedProductVariantId.length > 0) {
-      const invalidObjectId = validateObjectIds(createData.relatedProductVariantId);
-      if (invalidObjectId.length > 0) {
-        throw new BadRequestError({
-          message: `Related product variant id ${invalidObjectId.join('-')} invalid objectId`
-        });
-      }
-
-      const existingIds = await this._productVariantRepository.findExistingIds({
-        ids: createData.relatedProductVariantId
-      });
-
-      if (existingIds.length === 0) {
-        throw new BadRequestError({
-          message: `Related Product Variant Ids: ${createData.relatedProductVariantId.join('-')} is not existing`
-        });
-      }
-
-      if (existingIds.length !== createData.relatedProductVariantId.length) {
-        const invalidIds = createData.relatedProductVariantId.filter((id) => !existingIds.includes(id));
-        throw new BadRequestError({ message: `Related Product variant Ids: ${invalidIds.join('-')} is not existing` });
-      }
+      await this._validateReference(createData.relatedProductVariantId, 'relatedProductVariantId');
     }
 
     // Validation list suggest product variant id exist
     if (createData.suggestProductVariantId.length > 0) {
-      const invalidObjectId = validateObjectIds(createData.suggestProductVariantId);
-      if (invalidObjectId.length > 0) {
-        throw new BadRequestError({
-          message: `Suggest product variant id ${invalidObjectId.join('-')} invalid objectId`
-        });
-      }
-      const existingIds = await this._productVariantRepository.findExistingIds({
-        ids: createData.suggestProductVariantId
-      });
-
-      if (existingIds.length === 0) {
-        throw new BadRequestError({
-          message: `Suggest product variant ids: ${createData.suggestProductVariantId.join('-')} is not existing`
-        });
-      }
-
-      if (existingIds.length !== createData.suggestProductVariantId.length) {
-        const invalidIds = createData.suggestProductVariantId.filter((id) => !existingIds.includes(id));
-        throw new BadRequestError({ message: `Suggest Product variant Ids: ${invalidIds.join('-')} is not existing` });
-      }
+      await this._validateReference(createData.suggestProductVariantId, 'suggestProductVariantId');
     }
 
-    const productVariant = await this._productVariantRepository.create(createData);
+    const productVariant = await this._productVariantRepository.create({
+      ...createData,
+      brandId: product.brandId,
+      categoryId: product.categoryId,
+      state: product.state
+    });
     return productVariant;
+  }
+
+  public async createMany({
+    productId,
+    productsVariant: createData
+  }: CreateManyParams): Promise<IProductVariantDocument[]> {
+    const product = await this._productRepository.findById({ id: productId });
+    if (!product) {
+      throw new BadRequestError({ message: 'ProductId is not exist' });
+    }
+
+    const suggestProductVariantIdSet = new Set<string>();
+    const relatedProductVariantIdSet = new Set<string>();
+
+    createData.forEach((productVariant) => {
+      if (productVariant.relatedProductVariantId.length > 0) {
+        productVariant.relatedProductVariantId.forEach((relatedProductVariantId) =>
+          relatedProductVariantIdSet.add(relatedProductVariantId)
+        );
+      }
+
+      if (productVariant.suggestProductVariantId.length > 0) {
+        productVariant.suggestProductVariantId.forEach((suggestProductVariantId) =>
+          suggestProductVariantIdSet.add(suggestProductVariantId)
+        );
+      }
+    });
+
+    if (suggestProductVariantIdSet.size > 0) {
+      await this._validateReference([...suggestProductVariantIdSet], 'suggestProductVariantId');
+    }
+
+    if (relatedProductVariantIdSet.size > 0) {
+      await this._validateReference([...relatedProductVariantIdSet], 'relatedProductVariantId');
+    }
+
+    const variantToCreate: ProductVariantZodSchemaType[] = createData.map((data) => ({
+      ...data,
+      categoryId: product.categoryId,
+      brandId: product.brandId,
+      state: product.state,
+      productId: product.id
+    }));
+
+    const productsVariantCreated = await this._productVariantRepository.createMany({ data: variantToCreate });
+    return productsVariantCreated;
   }
 }

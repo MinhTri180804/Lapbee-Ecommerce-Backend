@@ -5,6 +5,8 @@ import { verifyAccessTokenMiddleware } from '../middleware/verifyAccessToken.mid
 import { ProductController } from '../controllers/Product.controller.js';
 import { ProductVariantController } from '../controllers/ProductVariant.controller.js';
 import {
+  CreateManyProductsVariantRequestBody,
+  createManyProductsVariantRequestBodySchema,
   CreateProductVariantRequestBody,
   createProductVariantRequestBodySchema
 } from '../schema/zod/api/requests/productVariant.schema.js';
@@ -18,12 +20,22 @@ const validateRequestBodyCreateProduct = validateRequestBody<CreateProductReques
 const validateRequestBodyCreateProductVariant = validateRequestBody<CreateProductVariantRequestBody>(
   createProductVariantRequestBodySchema
 );
+const validateRequestBodyCreateManyProductsVariant = validateRequestBody<CreateManyProductsVariantRequestBody>(
+  createManyProductsVariantRequestBodySchema
+);
 
 router.post(
-  '/:id/product-variant',
+  '/:id/product-variants',
   verifyAccessTokenMiddleware,
   validateRequestBodyCreateProductVariant,
   productVariantController.create.bind(productVariantController)
+);
+
+router.post(
+  '/:id/product-variants/bulk',
+  verifyAccessTokenMiddleware,
+  validateRequestBodyCreateManyProductsVariant,
+  productVariantController.createMany.bind(productVariantController)
 );
 
 router.post(

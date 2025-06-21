@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ValidationMessages } from '../../../../constants/validationMessages.constant.js';
 import {
   costPriceSchema,
   descriptionSchema,
@@ -6,24 +7,25 @@ import {
   isFeaturedSchema,
   isSaleSchema,
   nameSchema,
+  optionValuesSchema,
   originPriceSchema,
-  productIdSchema,
   relatedBlogIdSchema,
   relatedProductVariantIdSchema,
   salePriceSchema,
   seoSchema,
+  slugSchema,
   soldSchema,
   specsSchema,
   statusSchema,
   stockSchema,
   suggestProductVariantIdSchema
 } from '../../productVariant/field.schema.js';
-import { ValidationMessages } from '../../../../constants/validationMessages.constant.js';
 
 const { SKU_REQUIRED } = ValidationMessages.api.request.productVariant;
 
 export const createProductVariantRequestBodySchema = z.object({
   name: nameSchema,
+  slug: slugSchema,
   specs: z.array(specsSchema),
   sku: z.string({ required_error: SKU_REQUIRED }),
   seo: seoSchema,
@@ -39,7 +41,13 @@ export const createProductVariantRequestBodySchema = z.object({
   suggestProductVariantId: z.array(suggestProductVariantIdSchema),
   relatedProductVariantId: z.array(relatedProductVariantIdSchema),
   status: statusSchema,
-  images: z.array(imagesSchema)
+  images: z.array(imagesSchema),
+  optionValues: z.array(optionValuesSchema)
+});
+
+export const createManyProductsVariantRequestBodySchema = z.object({
+  productsVariant: z.array(createProductVariantRequestBodySchema)
 });
 
 export type CreateProductVariantRequestBody = z.infer<typeof createProductVariantRequestBodySchema>;
+export type CreateManyProductsVariantRequestBody = z.infer<typeof createManyProductsVariantRequestBodySchema>;

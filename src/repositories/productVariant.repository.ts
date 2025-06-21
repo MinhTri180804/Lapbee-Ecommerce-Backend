@@ -1,16 +1,18 @@
-import { CreateProductVariantRequestBody } from '../schema/zod/api/requests/productVariant.schema.js';
 import { IProductVariantDocument, ProductVariant } from '../models/productVariant.model.js';
+import { ProductVariantZodSchemaType } from '../schema/zod/productVariant/index.schema.js';
 
-type CreateParams = CreateProductVariantRequestBody & {
-  productId: string;
-};
+type CreateParams = ProductVariantZodSchemaType;
 type FindExistingIdsParams = {
   ids: IProductVariantDocument['id'][];
+};
+type CreateManyParams = {
+  data: ProductVariantZodSchemaType[];
 };
 
 interface IProductVariantRepository {
   create: (params: CreateParams) => Promise<IProductVariantDocument>;
   findExistingIds: (params: FindExistingIdsParams) => Promise<string[]>;
+  createMany: (params: CreateManyParams) => Promise<IProductVariantDocument[]>;
 }
 
 export class ProductVariantRepository implements IProductVariantRepository {
@@ -25,5 +27,9 @@ export class ProductVariantRepository implements IProductVariantRepository {
   public async findExistingIds({ ids }: FindExistingIdsParams): Promise<string[]> {
     const result = await this._productVariantModel.find({ _id: { $in: ids } }).select('_id');
     return result.map((item) => item._id) as string[];
+  }
+
+  public async createMany({ data }: CreateManyParams): Promise<IProductVariantDocument[]> {
+    return await this._productVariantModel.insertMany(data);
   }
 }

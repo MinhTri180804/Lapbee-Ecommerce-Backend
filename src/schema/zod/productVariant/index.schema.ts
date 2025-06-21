@@ -1,11 +1,14 @@
 import { z, ZodIssueCode } from 'zod';
 import {
+  brandIdSchema,
+  categoryIdSchema,
   costPriceSchema,
   descriptionSchema,
   imagesSchema,
   isFeaturedSchema,
   isSaleSchema,
   nameSchema,
+  optionValuesSchema,
   originPriceSchema,
   productIdSchema,
   relatedBlogIdSchema,
@@ -13,8 +16,10 @@ import {
   salePriceSchema,
   seoSchema,
   skuSchema,
+  slugSchema,
   soldSchema,
   specsSchema,
+  stateSchema,
   statusSchema,
   stockSchema,
   suggestProductVariantIdSchema
@@ -23,6 +28,7 @@ import {
 export const productVariantZodSchema = z
   .object({
     name: nameSchema,
+    slug: slugSchema,
     productId: productIdSchema.nullable(),
     specs: z.array(specsSchema),
     sku: skuSchema,
@@ -39,7 +45,11 @@ export const productVariantZodSchema = z
     suggestProductVariantId: z.array(suggestProductVariantIdSchema),
     relatedProductVariantId: z.array(relatedProductVariantIdSchema),
     status: statusSchema,
-    images: z.array(imagesSchema)
+    images: z.array(imagesSchema),
+    categoryId: categoryIdSchema.nullable(),
+    brandId: brandIdSchema.nullable(),
+    optionValues: z.array(optionValuesSchema),
+    state: stateSchema
   })
   .superRefine(({ isSale, salePrice }, ctx) => {
     if (isSale) {
