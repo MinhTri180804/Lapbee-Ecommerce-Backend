@@ -6,7 +6,9 @@ import { StateProductEnum } from 'src/enums/stateProduct.enum.js';
 const DOCUMENT_NAME = 'product_variant';
 const COLLECTION_NAME = 'products_variant';
 
-export interface IProductVariantDocument extends ProductVariantZodSchemaType, Document {}
+export interface IProductVariantDocument
+  extends Omit<ProductVariantZodSchemaType, '_id'>,
+    Document<Schema.Types.ObjectId> {}
 
 const specsSchema = new Schema<IProductVariantDocument['specs'][0]>(
   {

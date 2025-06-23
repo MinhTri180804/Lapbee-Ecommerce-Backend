@@ -29,6 +29,11 @@ router.get(
   productVariantController.getAllProductVariantsByProduct.bind(productVariantController)
 );
 
+router.get(
+  '/product-variants/:slug',
+  productVariantController.getDetailsProductVariantBySlug.bind(productVariantController)
+);
+
 router.post(
   '/:id/product-variants',
   verifyAccessTokenMiddleware,
