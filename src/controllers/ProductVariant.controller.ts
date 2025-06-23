@@ -1,3 +1,4 @@
+import { ProductVariantResponseDTO } from '../dto/response/productVariant/index.dto.js';
 import { NextFunction, Request, Response } from 'express';
 import { isValidObjectId } from 'mongoose';
 import { ProductVariantService } from '../services/ProductVariant.service.js';
@@ -13,12 +14,18 @@ import { BadRequestError } from 'src/errors/BadRequest.error.js';
 type CreateRequestType = Request<{ id: string }, unknown, CreateProductVariantRequestBody>;
 type CreateManyRequestType = Request<{ id: string }, unknown, CreateManyProductsVariantRequestBody>;
 type GetAllProductVariantsByProductRequestType = Request<{ id: string }>;
+type GetDetailsProductVariantBySlugRequestType = Request<{ slug: string }>;
 
 interface IProductVariantController {
   create: (request: CreateRequestType, response: Response, next: NextFunction) => Promise<void>;
   createMany: (request: CreateManyRequestType, response: Response, next: NextFunction) => Promise<void>;
   getAllProductVariantsByProduct: (
     request: GetAllProductVariantsByProductRequestType,
+    response: Response,
+    next: NextFunction
+  ) => Promise<void>;
+  getDetailsProductVariantBySlug: (
+    request: GetDetailsProductVariantBySlugRequestType,
     response: Response,
     next: NextFunction
   ) => Promise<void>;
@@ -36,12 +43,13 @@ export class ProductVariantController implements IProductVariantController {
     const requestBody = request.body;
     const createData = createProductVariantRequestBodySchema.parse(requestBody);
     const productVariant = await this._productVariantService.create({ ...createData, productId: id });
-    sendSuccessResponse<typeof productVariant>({
+    const createProductVariantResponse = ProductVariantResponseDTO.create(productVariant);
+    sendSuccessResponse({
       response,
       content: {
         statusCode: StatusCodes.CREATED,
         message: 'Created product variant success',
-        data: productVariant
+        data: createProductVariantResponse
       }
     });
   }
@@ -59,12 +67,13 @@ export class ProductVariantController implements IProductVariantController {
       productsVariant: createData
     });
 
-    sendSuccessResponse<typeof productsVariantCreated>({
+    const createManyProductVariantResponse = ProductVariantResponseDTO.createMany(productsVariantCreated);
+    sendSuccessResponse<typeof createManyProductVariantResponse>({
       response,
       content: {
         statusCode: StatusCodes.CREATED,
         message: 'Create many products variant success',
-        data: productsVariantCreated
+        data: createManyProductVariantResponse
       }
     });
   }
@@ -75,12 +84,32 @@ export class ProductVariantController implements IProductVariantController {
   ): Promise<void> {
     const { id } = request.params;
     const productVariants = await this._productVariantService.getAllProductVariantsByProduct({ productId: id });
-    sendSuccessResponse<typeof productVariants>({
+    console.log(productVariants);
+    const productVariantsResponse = ProductVariantResponseDTO.getAllByProduct(productVariants);
+    sendSuccessResponse<typeof productVariantsResponse>({
       response,
       content: {
         statusCode: StatusCodes.OK,
         message: 'Get all product variants of product success',
-        data: productVariants
+        data: productVariantsResponse
+      }
+    });
+  }
+
+  public async getDetailsProductVariantBySlug(
+    request: GetDetailsProductVariantBySlugRequestType,
+    response: Response
+  ): Promise<void> {
+    const { slug } = request.params;
+
+    const productVariant = await this._productVariantService.getDetailsBySlug({ slug });
+    const productVariantResponse = ProductVariantResponseDTO.getDetails(productVariant);
+    sendSuccessResponse<typeof productVariantResponse>({
+      response,
+      content: {
+        statusCode: StatusCodes.OK,
+        message: 'Get details product variant success',
+        data: productVariantResponse
       }
     });
   }

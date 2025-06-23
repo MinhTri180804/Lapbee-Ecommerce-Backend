@@ -1,3 +1,4 @@
+import { ObjectId, isValidObjectId } from 'mongoose';
 import { z } from 'zod';
 
 export const editorJsSchema = z.object({
@@ -12,3 +13,12 @@ export const editorJsSchema = z.object({
     )
     .nonempty({ message: 'Editor content cannot be empty' })
 });
+
+export const objectIdSchema = z.custom<ObjectId>(
+  (value) => {
+    return isValidObjectId(value);
+  },
+  {
+    message: 'Invalid ObjectId'
+  }
+);

@@ -1,3 +1,6 @@
+import { NotFoundError } from 'src/errors/NotFound.error.js';
+import { IBrandDocument } from 'src/models/brand.model.js';
+import { ICategoryDocument } from 'src/models/category.model.js';
 import { BadRequestError } from '../errors/BadRequest.error.js';
 import { IProductVariantDocument } from '../models/productVariant.model.js';
 import { ProductRepository } from '../repositories/Product.repository.js';
@@ -8,6 +11,7 @@ import {
 } from '../schema/zod/api/requests/productVariant.schema.js';
 import { validateObjectIds } from '../utils/validateObjectId.util.js';
 import { ProductVariantZodSchemaType } from './../schema/zod/productVariant/index.schema.js';
+import { IProductDocument } from 'src/models/product.model.js';
 
 type CreateParams = CreateProductVariantRequestBody & {
   productId: string;
@@ -21,10 +25,20 @@ type GetAllProductVariantsByProductParams = {
   productId: string;
 };
 
+type GetDetailsBySlugParams = {
+  slug: string;
+};
+
 interface IProductVariantService {
   create: (params: CreateParams) => Promise<IProductVariantDocument>;
   createMany: (params: CreateManyParams) => Promise<IProductVariantDocument[]>;
-  getAllProductVariantsByProduct: (params: GetAllProductVariantsByProductParams) => Promise<IProductVariantDocument[]>;
+  getAllProductVariantsByProduct: (params: GetAllProductVariantsByProductParams) => Promise<
+    (IProductVariantDocument & {
+      brand: IBrandDocument;
+      category: ICategoryDocument;
+    })[]
+  >;
+  getDetailsBySlug: (params: GetDetailsBySlugParams) => Promise<IProductVariantDocument>;
 }
 
 export class ProductVariantService implements IProductVariantService {
@@ -41,9 +55,11 @@ export class ProductVariantService implements IProductVariantService {
       });
     }
 
-    const existingIds = await this._productVariantRepository.findExistingIds({
-      ids: data
-    });
+    const existingIds = (
+      await this._productVariantRepository.findExistingIds({
+        ids: data
+      })
+    ).map((id) => String(id));
 
     if (existingIds.length === 0) {
       throw new BadRequestError({
@@ -84,6 +100,7 @@ export class ProductVariantService implements IProductVariantService {
       ...createData,
       brandId: product.brandId,
       categoryId: product.categoryId,
+      productId: product.id,
       state: product.state
     });
     return productVariant;
@@ -123,7 +140,7 @@ export class ProductVariantService implements IProductVariantService {
       await this._validateReference([...relatedProductVariantIdSet], 'relatedProductVariantId');
     }
 
-    const variantToCreate: ProductVariantZodSchemaType[] = createData.map((data) => ({
+    const variantToCreate: Omit<ProductVariantZodSchemaType, '_id'>[] = createData.map((data) => ({
       ...data,
       categoryId: product.categoryId,
       brandId: product.brandId,
@@ -135,9 +152,31 @@ export class ProductVariantService implements IProductVariantService {
     return productsVariantCreated;
   }
 
-  public async getAllProductVariantsByProduct({
-    productId
-  }: GetAllProductVariantsByProductParams): Promise<IProductVariantDocument[]> {
+  public async getAllProductVariantsByProduct({ productId }: GetAllProductVariantsByProductParams): Promise<
+    (IProductVariantDocument & {
+      brand: IBrandDocument;
+      category: ICategoryDocument;
+    })[]
+  > {
+    const product = await this._productRepository.checkExist({ id: productId });
+    if (!product) {
+      throw new NotFoundError({ message: 'Product not found' });
+    }
     return await this._productVariantRepository.getAllProductVariantsByProduct({ productId });
+  }
+
+  public async getDetailsBySlug({ slug }: GetDetailsBySlugParams): Promise<
+    IProductVariantDocument & {
+      brandId: IBrandDocument | null;
+      categoryId: ICategoryDocument | null;
+      productId: IProductDocument;
+    }
+  > {
+    const productVariant = await this._productVariantRepository.getDetailsBySlug({ slug });
+    if (!productVariant) {
+      throw new NotFoundError({ message: 'Product variant is not found' });
+    }
+
+    return productVariant;
   }
 }

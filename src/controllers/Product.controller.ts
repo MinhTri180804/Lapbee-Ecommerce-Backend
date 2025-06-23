@@ -1,3 +1,4 @@
+import { ProductResponseDTO } from './../dto/response/product/index.dto.js';
 import { NextFunction, Request, Response } from 'express';
 import { CreateProductRequestBody, createProductRequestBodySchema } from '../schema/zod/api/requests/product.schema.js';
 import { ProductService } from '../services/Product.service.js';
@@ -20,13 +21,13 @@ export class ProductController implements IProductController {
     const dataCreate = createProductRequestBodySchema.parse(requestBody);
 
     const productCreated = await this._productService.create(dataCreate);
-
-    sendSuccessResponse<typeof productCreated>({
+    const createProductResponse = ProductResponseDTO.create(productCreated);
+    sendSuccessResponse<typeof createProductResponse>({
       response,
       content: {
         statusCode: StatusCodes.CREATED,
         message: 'Create product success',
-        data: productCreated
+        data: createProductResponse
       }
     });
   }

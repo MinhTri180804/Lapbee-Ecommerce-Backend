@@ -6,7 +6,7 @@ import { PhysicalConditionProductEnum } from '../enums/physicalConditionProduct.
 const DOCUMENT_NAME = 'product';
 const COLLECTION_NAME = 'products';
 
-export interface IProductDocument extends ProductZodSchemaType, Document {}
+export interface IProductDocument extends Omit<ProductZodSchemaType, '_id'>, Document<Types.ObjectId> {}
 
 const commonImagesSchema = new Schema<IProductDocument['commonImages'][0]>(
   {
@@ -43,8 +43,8 @@ const commonSpecsSchema = new Schema<IProductDocument['commonSpecs'][0]>(
 const usedInfoSchema = new Schema<IProductDocument['usedInfo']>(
   {
     physicalCondition: {
-      type: String,
-      enum: Object.values(PhysicalConditionProductEnum)
+      type: Number,
+      enum: PhysicalConditionProductEnum
     },
     warrantyLeft: {
       type: Number,
