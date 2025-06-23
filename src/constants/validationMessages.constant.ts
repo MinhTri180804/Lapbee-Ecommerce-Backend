@@ -64,6 +64,9 @@ export const ValidationMessages = {
           NEW_ORDER_REQUIRED: 'New order is required',
           OLD_ORDER_REQUIRED: 'Old order is required'
         }
+      },
+      productVariant: {
+        SKU_REQUIRED: 'Sku product variant is required'
       }
     }
   },
@@ -108,5 +111,76 @@ export const ValidationMessages = {
     NAME_REQUIRED: 'Name category is required',
     SLUG_REQUIRED: 'Slug category is required',
     ORDER_REQUIRED: 'Order category is required'
+  },
+
+  product: {
+    CATEGORY_ID_REQUIRED: 'CategoryId is required',
+    NAME_REQUIRED: 'Name product is required',
+    NAME_EMPTY: 'Name product can not empty',
+    BRAND_ID_REQUIRED: 'BrandId is required',
+    STATE_REQUIRED: 'State product is required',
+    PHYSICAL_CONDITION_REQUIRED: 'Physical condition product is required',
+    PUBLIC_ID_REQUIRED: 'PublicId is required',
+    PUBLIC_ID_EMPTY: 'PublicId can not empty',
+    URL_REQUIRED: 'Url is required',
+    URL_EMPTY: 'Url can not empty',
+    NAME_SPECS_REQUIRED: 'Name attribute is required',
+    NAME_SPECS_EMPTY: 'Name attribute can not empty',
+    VALUE_SPECS_REQUIRED: 'Value attribute is required',
+    VALUE_SPECS_EMPTY: 'Value attribute can not empty',
+    newInfo: {
+      TYPE_PRODUCT_REQUIRED: 'Type product is required',
+      TYPE_PRODUCT_EMPTY: 'Type product can not empty',
+      CONDITION_PRODUCT_REQUIRED: 'Condition Product is required',
+      CONDITION_PRODUCT_EMPTY: 'COndition product can not empty',
+      WARRANTY_LEFT_REQUIRED: 'Warranty left is required',
+      WARRANTY_LEFT_EMPTY: 'Warranty left can not empty',
+      PRICE_INFO_REQUIRED: 'Price info product is required',
+      PRICE_INFO_EMPTY: 'Price info can not empty'
+    },
+    options: {
+      NAME_REQUIRED: 'Name option is required'
+    }
+  },
+
+  productVariant: {
+    SLUG_REQUIRED: 'Slug product variant is required',
+    SLUG_EMPTY: 'Slug product variant can not empty',
+    NAME_REQUIRED: 'Name product variant is required',
+    NAME_EMPTY: 'Name product variant is not empty',
+    PRODUCT_ID_REQUIRED: 'ProductId is required',
+    SKU_REQUIRED: 'Sku product variant is required',
+    SKU_EMPTY: 'Sku can not empty',
+    ORIGIN_PRICE_REQUIRED: 'Origin price is required',
+    COST_PRICE_REQUIRED: 'Cost price product variant is required',
+    STOCK_REQUIRED: 'Stock product variant is required',
+    SOLD_REQUIRED: 'Sold product variant is required',
+    STATUS_REQUIRED: 'Status product variant is required',
+    CATEGORY_ID_REQUIRED: 'CategoryId is required',
+    BRAND_ID_REQUIRED: 'BrandId is required',
+    spec: {
+      NAME_REQUIRED: 'Name spec is required',
+      VALUE_REQUIRED: 'Value spec is required'
+    },
+    seo: {
+      META_TITLE_REQUIRED: 'Meta title seo product variant is required',
+      META_DESCRIPTION_REQUIRED: 'Meta description seo product variant is required',
+      KEYWORDS_REQUIRED: 'Keywords seo product variant is required',
+      ROBOTS_REQUIRED: 'Robots seo product variant is required',
+      OG_TITLE_REQUIRED: 'OG Title is required',
+      OG_DESCRIPTION_REQUIRED: 'OG Description is required',
+      OG_IMAGE_REQUIRED: 'OG Image is required'
+    },
+    images: {
+      PUBLIC_ID_REQUIRED: 'Public id is required',
+      URL_REQUIRED: 'Url is required'
+    },
+    optionValues: {
+      NAME_REQUIRED: 'Option name is required',
+      VALUE_REQUIRED: 'Option value is required',
+      NAME_EMPTY: 'Option name can not empty',
+      VALUE_EMPTY: 'Option value can not empty'
+    },
+    STATE_REQUIRED: 'State is required'
   }
 };

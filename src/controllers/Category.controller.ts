@@ -3,6 +3,7 @@ import {
   ChangeOrderCategoryRequestBody,
   ChangeParentIdRequestBody,
   CreateCategoryRequestBody,
+  createCategoryRequestBodySchema,
   UpdateCategoryRequestBody,
   updateCategoryRequestBodySchema
 } from '../schema/zod/api/requests/category.schema.js';
@@ -50,9 +51,10 @@ export class CategoryController implements ICategoryController {
   constructor() {}
 
   public async create(request: CreateRequestType, response: Response): Promise<void> {
-    const { name, slug, parentId } = request.body;
+    const requestBody = request.body;
 
-    const categoryData = await this._categoryService.create({ name, slug, parentId });
+    const createData = createCategoryRequestBodySchema.parse(requestBody);
+    const categoryData = await this._categoryService.create(createData);
 
     sendSuccessResponse<typeof categoryData>({
       response,
@@ -154,8 +156,8 @@ export class CategoryController implements ICategoryController {
 
   public async changeOrder(request: ChangeOrderRequestType, response: Response): Promise<void> {
     const { id } = request.params;
-    const { newOrder, parentId } = request.body;
-    await this._categoryService.changeOrder({ parentId, newOrder, categoryId: id });
+    const { newOrder } = request.body;
+    await this._categoryService.changeOrder({ newOrder, categoryId: id });
 
     sendSuccessResponse({
       response,

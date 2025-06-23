@@ -22,6 +22,9 @@ type GetAllReturns = {
 type GetByIdParams = {
   id: string;
 };
+type CheckExistParams = {
+  id: string;
+};
 
 interface IBrandRepository {
   create: (params: CreateParams) => Promise<IBrandDocument>;
@@ -29,6 +32,7 @@ interface IBrandRepository {
   update: (params: UpdateParams) => Promise<IBrandDocument | null>;
   getAll: (params: GetAllParams) => Promise<GetAllReturns>;
   getById: (params: GetByIdParams) => Promise<IBrandDocument | null>;
+  checkExist: (params: CheckExistParams) => Promise<boolean>;
 }
 
 export class BrandRepository implements IBrandRepository {
@@ -77,5 +81,12 @@ export class BrandRepository implements IBrandRepository {
 
   public async getById({ id }: GetByIdParams): Promise<IBrandDocument | null> {
     return await this._brandMode.findById(id);
+  }
+
+  public async checkExist({ id }: CheckExistParams): Promise<boolean> {
+    const brand = await this._brandMode.exists({ _id: id });
+    if (!brand) return false;
+
+    return true;
   }
 }
