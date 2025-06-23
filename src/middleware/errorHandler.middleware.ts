@@ -147,7 +147,11 @@ class _ErrorMiddlewareHandler {
 
     sendErrorResponse<null>({
       response,
-      content: _error
+      content: {
+        ..._error,
+        message: error.message,
+        stack: error.stack
+      }
     });
   }
 
