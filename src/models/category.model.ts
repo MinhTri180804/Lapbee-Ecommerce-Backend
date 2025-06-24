@@ -1,10 +1,11 @@
+import { ITimestamp } from './../types/commons.type.js';
 import { Document, model, Schema, Types } from 'mongoose';
 import { CategorySchemaType } from '../schema/zod/category/index.schema.js';
 
 const DOCUMENT_NAME = 'category';
 const COLLECTION_NAME = 'categories';
 
-export interface ICategoryDocument extends Document, CategorySchemaType {}
+export interface ICategoryDocument extends Document, Omit<CategorySchemaType, '_id'>, ITimestamp {}
 
 const categorySchema = new Schema<ICategoryDocument>(
   {

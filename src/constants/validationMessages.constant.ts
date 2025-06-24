@@ -104,7 +104,8 @@ export const ValidationMessages = {
     PUBLIC_ID_BANNERS_REQUIRED: 'PublicId of banners is required',
     URL_BANNERS_REQUIRED: 'Url of banners is required',
     PUBLIC_ID_LOGO_REQUIRED: 'PublicId logo is required',
-    URL_LOGO_REQUIRED: 'Url of logo is required'
+    URL_LOGO_REQUIRED: 'Url of logo is required',
+    SLUG_REQUIRED: 'Slug is required'
   },
 
   category: {

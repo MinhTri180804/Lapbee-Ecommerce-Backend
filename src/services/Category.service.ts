@@ -10,6 +10,7 @@ import { NotFoundError } from 'src/errors/NotFound.error.js';
 import { CategoryNotExistError } from '../errors/CategoryNotExist.error.js';
 import { BadRequestError } from 'src/errors/BadRequest.error.js';
 import { BuildTree } from '../utils/buildTree.util.js';
+import { TreeNode } from 'src/types/commons.type.js';
 
 type CreateParams = CreateCategoryRequestBody;
 type DeleteParams = {
@@ -42,8 +43,7 @@ interface ICategoryService {
   getDetails: (params: GetDetailsParams) => Promise<ICategoryDocument>;
   getAll: (params: GetAllParams) => Promise<ICategoryDocument[]>;
   changeParentId: (params: ChangeParentIdParams) => Promise<ICategoryDocument>;
-  // eslint-disable-next-line
-  getAllTree: () => Promise<any>;
+  getAllTree: () => Promise<TreeNode<ICategoryDocument>[]>;
   changeOrder: (params: ChangeOrderParams) => Promise<ICategoryDocument>;
 }
 
@@ -146,7 +146,11 @@ export class CategoryService implements ICategoryService {
   }
 
   public async getAll({ parentId }: GetAllParams): Promise<ICategoryDocument[]> {
-    return await this._categoryRepository.find({ parentId });
+    if (parentId === 'root') {
+      return await this._categoryRepository.find({ filter: undefined });
+    }
+
+    return await this._categoryRepository.findByParentId({ parentId });
   }
 
   public async changeParentId({ categoryId, newParentId }: ChangeParentIdParams): Promise<ICategoryDocument> {
@@ -198,7 +202,7 @@ export class CategoryService implements ICategoryService {
     return category;
   }
 
-  public async getAllTree() {
+  public async getAllTree(): Promise<TreeNode<ICategoryDocument>[]> {
     const data = await this._categoryRepository.getAllTree();
     const buildTreeUtil = new BuildTree<ICategoryDocument>(data, '_id', 'parentId');
     const categoryTree = buildTreeUtil.getTree();

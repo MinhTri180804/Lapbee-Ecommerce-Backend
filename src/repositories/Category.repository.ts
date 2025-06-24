@@ -18,7 +18,7 @@ type FindByIdParams = {
 };
 
 type FindParams = {
-  parentId: string | null;
+  filter?: FilterQuery<ICategoryDocument>;
 };
 
 type ChangeParentIdParams = {
@@ -60,6 +60,10 @@ type CountDocumentParams = {
   filter: FilterQuery<ICategoryDocument>;
 };
 
+type FindByParentIdParams = {
+  parentId: string | null;
+};
+
 interface ICategoryRepository {
   create: (params: CreateParams) => Promise<ICategoryDocument>;
   deleteById: (params: DeleteParams) => Promise<ICategoryDocument | null>;
@@ -75,6 +79,7 @@ interface ICategoryRepository {
   getAllTree: () => Promise<GetAllTreeReturns>;
   changeOrder: (params: ChangeOrderParams) => Promise<void>;
   countDocument: (params: CountDocumentParams) => Promise<number>;
+  findByParentId: (params: FindByParentIdParams) => Promise<ICategoryDocument[]>;
 }
 
 export class CategoryRepository implements ICategoryRepository {
@@ -100,8 +105,12 @@ export class CategoryRepository implements ICategoryRepository {
     return await this._categoryModel.findById(id);
   }
 
-  public async find({ parentId }: FindParams): Promise<ICategoryDocument[]> {
-    return await this._categoryModel.find({ parentId }).exec();
+  public async find({ filter = undefined }: FindParams): Promise<ICategoryDocument[]> {
+    //TODO: Optimization logic handler
+    if (filter) {
+      return await this._categoryModel.find(filter).exec();
+    }
+    return await this._categoryModel.find().exec();
   }
 
   public async changeParentId({ newParentId, id }: ChangeParentIdParams): Promise<ICategoryDocument | null> {
@@ -177,5 +186,9 @@ export class CategoryRepository implements ICategoryRepository {
 
   public async countDocument({ filter }: CountDocumentParams): Promise<number> {
     return await this._categoryModel.countDocuments(filter);
+  }
+
+  public async findByParentId({ parentId }: FindByParentIdParams): Promise<ICategoryDocument[]> {
+    return await this._categoryModel.find({ parentId }).exec();
   }
 }
