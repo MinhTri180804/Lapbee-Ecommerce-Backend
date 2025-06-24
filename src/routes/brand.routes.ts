@@ -3,19 +3,21 @@ import { BrandController } from '../controllers/Brand.controller.js';
 import { validateRequestBody } from '../middleware/validateRequestBody.middleware.js';
 import { verifyAccessTokenMiddleware } from '../middleware/verifyAccessToken.middleware.js';
 import {
-  CreateBrandRequestBody,
-  createBrandRequestBodySchema,
-  UpdateBrandRequestBody,
-  updateBrandRequestBodySchema
-} from '../schema/zod/api/requests/brand.schema.js';
+  createDTO as brandCreateRequestDTO,
+  CreateDTO as BrandCreateRequestDTO
+} from '../dto/request/brand/create.dto.js';
+import {
+  updateDTO as brandUpdateRequestDTO,
+  UpdateDTO as BrandUpdateRequestDTO
+} from '../dto/request/brand/update.dto.js';
 
 export const router = Router();
 
 const brandController = new BrandController();
 
 // Middleware validate request body
-const validateCreateBrandRequestBody = validateRequestBody<CreateBrandRequestBody>(createBrandRequestBodySchema);
-const validateUpdateBrandRequestBody = validateRequestBody<UpdateBrandRequestBody>(updateBrandRequestBodySchema);
+const validateCreateBrandRequestBody = validateRequestBody<BrandCreateRequestDTO>(brandCreateRequestDTO);
+const validateUpdateBrandRequestBody = validateRequestBody<BrandUpdateRequestDTO>(brandUpdateRequestDTO);
 
 router.post(
   '/',

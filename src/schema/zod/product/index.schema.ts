@@ -8,6 +8,7 @@ import {
   nameSchema,
   newInfoSchema,
   optionsSchema,
+  slugSchema,
   stateSchema,
   usedInfoSchema
 } from './field.schema.js';
@@ -18,6 +19,7 @@ export const productZodSchema = z.object({
   categoryId: categoryIdSchema.nullable(),
   // TODO: Implement createdBy later
   name: nameSchema,
+  slug: slugSchema,
   commonImages: z.array(commonImagesSchema).default([]),
   commonSpecs: z.array(commonSpecsSchema).default([]),
   brandId: brandIdSchema.nullable(),

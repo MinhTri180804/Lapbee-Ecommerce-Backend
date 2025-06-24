@@ -5,7 +5,7 @@ import { CategorySchemaType } from '../schema/zod/category/index.schema.js';
 const DOCUMENT_NAME = 'category';
 const COLLECTION_NAME = 'categories';
 
-export interface ICategoryDocument extends Document, Omit<CategorySchemaType, '_id'>, ITimestamp {}
+export interface ICategoryDocument extends Document<Types.ObjectId>, Omit<CategorySchemaType, '_id'>, ITimestamp {}
 
 const categorySchema = new Schema<ICategoryDocument>(
   {

@@ -1,18 +1,15 @@
 import { CategoryResponseDTO } from './../dto/response/category/index.dto.js';
 import { NextFunction, Request, Response } from 'express';
-import {
-  ChangeOrderCategoryRequestBody,
-  ChangeParentIdRequestBody,
-  CreateCategoryRequestBody,
-  createCategoryRequestBodySchema,
-  UpdateCategoryRequestBody,
-  updateCategoryRequestBodySchema
-} from '../schema/zod/api/requests/category.schema.js';
 import { CategoryService } from '../services/Category.service.js';
 import { sendSuccessResponse } from '../utils/responses.util.js';
 import { StatusCodes } from 'http-status-codes';
+import { CategoryRequestDTO } from '../dto/request/category/index.dto.js';
+import { UpdateDTO as CategoryUpdateRequestDTO } from '../dto/request/category/update.dto.js';
+import { CreateDTO as CategoryCreateRequestDTO } from '../dto/request/category/create.dto.js';
+import { ChangeOrderDTO as CategoryChangeOrderRequestDTO } from '../dto/request/category/changeOrder.dto.js';
+import { ChangeParentIdDTO as CategoryChangeParentIdRequestDTO } from '../dto/request/category/changeParentId.dto.js';
 
-type CreateRequestType = Request<unknown, unknown, CreateCategoryRequestBody>;
+type CreateRequestType = Request<unknown, unknown, CategoryCreateRequestDTO>;
 type DeleteRequestType = Request<
   { id: string },
   unknown,
@@ -21,7 +18,7 @@ type DeleteRequestType = Request<
     force?: boolean;
   }
 >;
-type UpdateRequestType = Request<{ id: string }, unknown, UpdateCategoryRequestBody>;
+type UpdateRequestType = Request<{ id: string }, unknown, CategoryUpdateRequestDTO>;
 type GetDetailsRequestType = Request<{ id: string }>;
 type GetAllRequestType = Request<
   unknown,
@@ -31,8 +28,8 @@ type GetAllRequestType = Request<
     parentId?: string;
   }
 >;
-type ChangeParentIdRequestType = Request<{ id: string }, unknown, ChangeParentIdRequestBody>;
-type ChangeOrderRequestType = Request<{ id: string }, unknown, ChangeOrderCategoryRequestBody>;
+type ChangeParentIdRequestType = Request<{ id: string }, unknown, CategoryChangeParentIdRequestDTO>;
+type ChangeOrderRequestType = Request<{ id: string }, unknown, CategoryChangeOrderRequestDTO>;
 
 interface ICategoryController {
   create: (request: CreateRequestType, response: Response, next: NextFunction) => Promise<void>;
@@ -52,9 +49,7 @@ export class CategoryController implements ICategoryController {
   constructor() {}
 
   public async create(request: CreateRequestType, response: Response): Promise<void> {
-    const requestBody = request.body;
-
-    const createData = createCategoryRequestBodySchema.parse(requestBody);
+    const createData = CategoryRequestDTO.create(request.body);
     const categoryData = await this._categoryService.create(createData);
     const categoryResponse = CategoryResponseDTO.create(categoryData);
     sendSuccessResponse<typeof categoryResponse>({
@@ -83,8 +78,7 @@ export class CategoryController implements ICategoryController {
 
   public async update(request: UpdateRequestType, response: Response): Promise<void> {
     const { id } = request.params;
-    const requestBody = request.body;
-    const updateData = updateCategoryRequestBodySchema.parse(requestBody);
+    const updateData = CategoryRequestDTO.update(request.body);
     const categoryUpdated = await this._categoryService.update({ categoryId: id, updateData });
     const categoryUpdatedResponse = CategoryResponseDTO.update(categoryUpdated);
 
@@ -133,9 +127,9 @@ export class CategoryController implements ICategoryController {
   }
 
   public async changeParentId(request: ChangeParentIdRequestType, response: Response): Promise<void> {
-    const { newParentId } = request.body;
     const { id } = request.params;
 
+    const { newParentId } = CategoryRequestDTO.changeParentId(request.body);
     await this._categoryService.changeParentId({ categoryId: id, newParentId });
     sendSuccessResponse({
       response,
@@ -161,7 +155,7 @@ export class CategoryController implements ICategoryController {
 
   public async changeOrder(request: ChangeOrderRequestType, response: Response): Promise<void> {
     const { id } = request.params;
-    const { newOrder } = request.body;
+    const { newOrder } = CategoryRequestDTO.changeOrder(request.body);
     await this._categoryService.changeOrder({ newOrder, categoryId: id });
 
     sendSuccessResponse({

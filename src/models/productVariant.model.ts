@@ -2,12 +2,14 @@ import { Document, model, Schema, Types } from 'mongoose';
 import { ProductVariantZodSchemaType } from '../schema/zod/productVariant/index.schema.js';
 import { StatusProductVariantEnum } from '../enums/statusProductVariant.enum.js';
 import { StateProductEnum } from 'src/enums/stateProduct.enum.js';
+import { ITimestamp } from 'src/types/commons.type.js';
 
 const DOCUMENT_NAME = 'product_variant';
 const COLLECTION_NAME = 'products_variant';
 
 export interface IProductVariantDocument
   extends Omit<ProductVariantZodSchemaType, '_id'>,
+    ITimestamp,
     Document<Schema.Types.ObjectId> {}
 
 const specsSchema = new Schema<IProductVariantDocument['specs'][0]>(
@@ -100,7 +102,7 @@ const productVariantSchema = new Schema<IProductVariantDocument>(
     slug: {
       type: String,
       required: true,
-      index: true
+      unique: true
     },
     productId: {
       type: Types.ObjectId,

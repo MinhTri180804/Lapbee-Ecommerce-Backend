@@ -129,6 +129,7 @@ export const ValidationMessages = {
     NAME_SPECS_EMPTY: 'Name attribute can not empty',
     VALUE_SPECS_REQUIRED: 'Value attribute is required',
     VALUE_SPECS_EMPTY: 'Value attribute can not empty',
+    SLUG_REQUIRED: 'Slug is required',
     newInfo: {
       TYPE_PRODUCT_REQUIRED: 'Type product is required',
       TYPE_PRODUCT_EMPTY: 'Type product can not empty',

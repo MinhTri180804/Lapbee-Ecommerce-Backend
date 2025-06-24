@@ -2,17 +2,15 @@ import { ProductVariantResponseDTO } from '../dto/response/productVariant/index.
 import { NextFunction, Request, Response } from 'express';
 import { isValidObjectId } from 'mongoose';
 import { ProductVariantService } from '../services/ProductVariant.service.js';
-import {
-  CreateManyProductsVariantRequestBody,
-  CreateProductVariantRequestBody,
-  createProductVariantRequestBodySchema
-} from '../schema/zod/api/requests/productVariant.schema.js';
 import { sendSuccessResponse } from '../utils/responses.util.js';
 import { StatusCodes } from 'http-status-codes';
-import { BadRequestError } from 'src/errors/BadRequest.error.js';
+import { BadRequestError } from '../errors/BadRequest.error.js';
+import { ProductVariantRequestDTO } from '../dto/request/productVariant/index.dto.js';
+import { CreateDTO as ProductVariantCreateRequestDTO } from '../dto/request/productVariant/create.dto.js';
+import { CreateManyDTO as ProductVariantCreateManyRequestDTO } from '../dto/request/productVariant/createMany.dto.js';
 
-type CreateRequestType = Request<{ id: string }, unknown, CreateProductVariantRequestBody>;
-type CreateManyRequestType = Request<{ id: string }, unknown, CreateManyProductsVariantRequestBody>;
+type CreateRequestType = Request<{ id: string }, unknown, ProductVariantCreateRequestDTO>;
+type CreateManyRequestType = Request<{ id: string }, unknown, ProductVariantCreateManyRequestDTO>;
 type GetAllProductVariantsByProductRequestType = Request<{ id: string }>;
 type GetDetailsProductVariantBySlugRequestType = Request<{ slug: string }>;
 
@@ -40,8 +38,7 @@ export class ProductVariantController implements IProductVariantController {
     if (!isValidObjectId(id)) {
       throw new BadRequestError({ message: 'ProductId invalid ObjectId ' });
     }
-    const requestBody = request.body;
-    const createData = createProductVariantRequestBodySchema.parse(requestBody);
+    const createData = ProductVariantRequestDTO.create(request.body);
     const productVariant = await this._productVariantService.create({ ...createData, productId: id });
     const createProductVariantResponse = ProductVariantResponseDTO.create(productVariant);
     sendSuccessResponse({
@@ -56,15 +53,12 @@ export class ProductVariantController implements IProductVariantController {
 
   public async createMany(request: CreateManyRequestType, response: Response): Promise<void> {
     const { id } = request.params;
-    const { productsVariant } = request.body;
 
-    const createData = productsVariant.map((productVariant) =>
-      createProductVariantRequestBodySchema.parse(productVariant)
-    );
+    const { productsVariant } = ProductVariantRequestDTO.createMany(request.body);
 
     const productsVariantCreated = await this._productVariantService.createMany({
       productId: id,
-      productsVariant: createData
+      productsVariant
     });
 
     const createManyProductVariantResponse = ProductVariantResponseDTO.createMany(productsVariantCreated);

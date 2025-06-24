@@ -29,6 +29,7 @@ const {
     WARRANTY_LEFT_EMPTY,
     PRICE_INFO_EMPTY
   },
+  SLUG_REQUIRED,
   options: { NAME_REQUIRED: OPTIONS_NAME_REQUIRED }
 } = ValidationMessages.product;
 
@@ -74,3 +75,4 @@ export const optionsSchema = z.object(
   },
   { required_error: 'Options Product can not empty' }
 );
+export const slugSchema = z.string({ required_error: SLUG_REQUIRED });
