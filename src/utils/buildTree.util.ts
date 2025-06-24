@@ -1,8 +1,5 @@
+import { TreeNode } from '../types/commons.type.js';
 type KeyOfObject<T extends object> = keyof T;
-
-type TreeNode<T> = T & {
-  children?: TreeNode<T>[];
-};
 
 export const buildTree = <T extends object & { children?: T[] }>(
   flatList: T[],

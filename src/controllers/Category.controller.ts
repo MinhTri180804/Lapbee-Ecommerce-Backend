@@ -1,3 +1,4 @@
+import { CategoryResponseDTO } from './../dto/response/category/index.dto.js';
 import { NextFunction, Request, Response } from 'express';
 import {
   ChangeOrderCategoryRequestBody,
@@ -55,13 +56,13 @@ export class CategoryController implements ICategoryController {
 
     const createData = createCategoryRequestBodySchema.parse(requestBody);
     const categoryData = await this._categoryService.create(createData);
-
-    sendSuccessResponse<typeof categoryData>({
+    const categoryResponse = CategoryResponseDTO.create(categoryData);
+    sendSuccessResponse<typeof categoryResponse>({
       response,
       content: {
         statusCode: StatusCodes.CREATED,
         message: 'Create category success',
-        data: categoryData
+        data: categoryResponse
       }
     });
   }
@@ -85,13 +86,14 @@ export class CategoryController implements ICategoryController {
     const requestBody = request.body;
     const updateData = updateCategoryRequestBodySchema.parse(requestBody);
     const categoryUpdated = await this._categoryService.update({ categoryId: id, updateData });
+    const categoryUpdatedResponse = CategoryResponseDTO.update(categoryUpdated);
 
-    sendSuccessResponse<typeof categoryUpdated>({
+    sendSuccessResponse<typeof categoryUpdatedResponse>({
       response,
       content: {
         statusCode: StatusCodes.OK,
         message: 'Updated category success',
-        data: categoryUpdated
+        data: categoryUpdatedResponse
       }
     });
   }
@@ -100,13 +102,14 @@ export class CategoryController implements ICategoryController {
     const { id } = request.params;
 
     const category = await this._categoryService.getDetails({ categoryId: id });
+    const categoryResponse = CategoryResponseDTO.getDetails(category);
 
-    sendSuccessResponse<typeof category>({
+    sendSuccessResponse<typeof categoryResponse>({
       response,
       content: {
         statusCode: StatusCodes.OK,
         message: 'Get details category success',
-        data: category
+        data: categoryResponse
       }
     });
   }
@@ -117,13 +120,14 @@ export class CategoryController implements ICategoryController {
     const categoriesData = await this._categoryService.getAll({
       parentId
     });
+    const categoriesResponse = CategoryResponseDTO.getAll(categoriesData);
 
-    sendSuccessResponse<typeof categoriesData>({
+    sendSuccessResponse<typeof categoriesResponse>({
       response,
       content: {
         statusCode: StatusCodes.OK,
         message: 'Get all categories success',
-        data: categoriesData
+        data: categoriesResponse
       }
     });
   }
@@ -143,13 +147,14 @@ export class CategoryController implements ICategoryController {
   }
 
   public async getAllTree(_: Request, response: Response): Promise<void> {
-    const data = await this._categoryService.getAllTree();
-    sendSuccessResponse<typeof data>({
+    const categoriesTree = await this._categoryService.getAllTree();
+    const categoriesTreeResponse = CategoryResponseDTO.getAllTree(categoriesTree);
+    sendSuccessResponse<typeof categoriesTreeResponse>({
       response,
       content: {
         statusCode: StatusCodes.OK,
         message: 'Get all categories tree success',
-        data: data
+        data: categoriesTreeResponse
       }
     });
   }

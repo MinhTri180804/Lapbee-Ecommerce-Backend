@@ -1,12 +1,13 @@
 import { model, Schema, Document } from 'mongoose';
 import { BrandSchemaType } from '../schema/zod/brand/index.schema.js';
+import { ITimestamp } from '../types/commons.type.js';
 
 const DOCUMENT_NAME = 'brand';
 const COLLECTION_NAME = 'brands';
 
-export interface IBrandDocument extends BrandSchemaType, Document {}
+export interface IBrandDocument extends Document, Omit<BrandSchemaType, '_id'>, ITimestamp {}
 
-const bannersSchema = new Schema<BrandSchemaType['banners'][0]>(
+const bannersSchema = new Schema<IBrandDocument['banners'][0]>(
   {
     publicId: {
       type: String
@@ -24,7 +25,7 @@ const bannersSchema = new Schema<BrandSchemaType['banners'][0]>(
   }
 );
 
-const logoSchema = new Schema<BrandSchemaType['logo']>(
+const logoSchema = new Schema<IBrandDocument['logo']>(
   {
     publicId: {
       type: String
@@ -47,6 +48,11 @@ const brandSchema = new Schema<IBrandDocument>(
       type: logoSchema,
       default: null
     },
+    slug: {
+      type: String,
+      required: true,
+      unique: true
+    },
     banners: {
       type: [bannersSchema],
       default: []
@@ -58,4 +64,4 @@ const brandSchema = new Schema<IBrandDocument>(
   }
 );
 
-export const Brand = model(DOCUMENT_NAME, brandSchema);
+export const Brand = model<IBrandDocument>(DOCUMENT_NAME, brandSchema);

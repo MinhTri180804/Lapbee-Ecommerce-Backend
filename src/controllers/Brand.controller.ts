@@ -8,6 +8,7 @@ import {
 import { BrandService } from '../services/Brand.service.js';
 import { sendSuccessResponse } from '../utils/responses.util.js';
 import { StatusCodes } from 'http-status-codes';
+import { BrandResponseDTO } from '../dto/response/brand/index.dto.js';
 
 type CreateRequestType = Request<unknown, unknown, CreateBrandRequestBody>;
 type DeleteRequestType = Request<{ id: string }>;
@@ -40,13 +41,14 @@ export class BrandController implements IBrandController {
     const requestData = request.body;
     const createData = createBrandRequestBodySchema.parse(requestData);
     const brandData = await this._brandService.create(createData);
+    const brandResponse = BrandResponseDTO.create(brandData);
 
-    sendSuccessResponse<typeof brandData>({
+    sendSuccessResponse<typeof brandResponse>({
       response,
       content: {
         statusCode: StatusCodes.CREATED,
         message: 'Create brand success',
-        data: brandData
+        data: brandResponse
       }
     });
   }
@@ -69,12 +71,14 @@ export class BrandController implements IBrandController {
     const requestBody = request.body;
     const updateData = updateBrandRequestBodySchema.parse(requestBody);
     const brandUpdated = await this._brandService.update({ brandId: id, updateData });
-    sendSuccessResponse<typeof brandUpdated>({
+    const brandResponse = BrandResponseDTO.update(brandUpdated);
+
+    sendSuccessResponse<typeof brandResponse>({
       response,
       content: {
         statusCode: StatusCodes.OK,
         message: 'Update brand success',
-        data: brandUpdated
+        data: brandResponse
       }
     });
   }
@@ -86,12 +90,14 @@ export class BrandController implements IBrandController {
       page: Number(page),
       limit: Number(limit) > 0 ? Number(limit) : DEFAULT_LIMIT_GET_ALL
     });
-    sendSuccessResponse<typeof data.paginatedResult, typeof data.metadata>({
+    const brandsResponse = BrandResponseDTO.getAll(data.paginatedResult);
+
+    sendSuccessResponse<typeof brandsResponse, typeof data.metadata>({
       response,
       content: {
         statusCode: StatusCodes.OK,
         message: 'Get all brands success',
-        data: data.paginatedResult,
+        data: brandsResponse,
         metadata: data.metadata
       }
     });
@@ -100,12 +106,15 @@ export class BrandController implements IBrandController {
   public async getDetails(request: GetDetailsRequestType, response: Response) {
     const { id } = request.params;
     const brand = await this._brandService.getDetails({ brandId: id });
-    sendSuccessResponse<typeof brand>({
+
+    const brandResponse = BrandResponseDTO.getDetail(brand);
+
+    sendSuccessResponse<typeof brandResponse>({
       response,
       content: {
         statusCode: StatusCodes.OK,
         message: 'Get details brand success',
-        data: brand
+        data: brandResponse
       }
     });
   }

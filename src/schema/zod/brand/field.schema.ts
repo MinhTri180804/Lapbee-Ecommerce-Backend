@@ -1,8 +1,14 @@
 import { ValidationMessages } from '../../../constants/validationMessages.constant.js';
 import { z } from 'zod';
 
-const { NAME_REQUIRED, URL_LOGO_REQUIRED, PUBLIC_ID_BANNERS_REQUIRED, PUBLIC_ID_LOGO_REQUIRED, URL_BANNERS_REQUIRED } =
-  ValidationMessages.brand;
+const {
+  NAME_REQUIRED,
+  URL_LOGO_REQUIRED,
+  SLUG_REQUIRED,
+  PUBLIC_ID_BANNERS_REQUIRED,
+  PUBLIC_ID_LOGO_REQUIRED,
+  URL_BANNERS_REQUIRED
+} = ValidationMessages.brand;
 
 export const nameSchema = z.string({ required_error: NAME_REQUIRED });
 export const logoSchema = z.object({
@@ -14,3 +20,4 @@ export const bannersSchema = z.object({
   url: z.string({ required_error: URL_BANNERS_REQUIRED }),
   isMain: z.boolean()
 });
+export const slugSchema = z.string({ required_error: SLUG_REQUIRED });
