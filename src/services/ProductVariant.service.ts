@@ -5,21 +5,19 @@ import { BadRequestError } from '../errors/BadRequest.error.js';
 import { IProductVariantDocument } from '../models/productVariant.model.js';
 import { ProductRepository } from '../repositories/Product.repository.js';
 import { ProductVariantRepository } from '../repositories/productVariant.repository.js';
-import {
-  CreateManyProductsVariantRequestBody,
-  CreateProductVariantRequestBody
-} from '../schema/zod/api/requests/productVariant.schema.js';
 import { validateObjectIds } from '../utils/validateObjectId.util.js';
 import { ProductVariantZodSchemaType } from './../schema/zod/productVariant/index.schema.js';
 import { IProductDocument } from 'src/models/product.model.js';
+import { CreateDTO as ProductVariantCreateRequestDTO } from '../dto/request/productVariant/create.dto.js';
+import { CreateManyDTO as ProductVariantCreateManyRequestDTO } from '../dto/request/productVariant/createMany.dto.js';
 
-type CreateParams = CreateProductVariantRequestBody & {
+type CreateParams = ProductVariantCreateRequestDTO & {
   productId: string;
 };
 
 type CreateManyParams = {
   productId: string;
-} & CreateManyProductsVariantRequestBody;
+} & ProductVariantCreateManyRequestDTO;
 
 type GetAllProductVariantsByProductParams = {
   productId: string;

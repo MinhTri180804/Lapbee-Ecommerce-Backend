@@ -2,6 +2,7 @@ import { productVariantZodSchema } from 'src/schema/zod/productVariant/index.sch
 import { z } from 'zod';
 import { brandZodSchema } from './../../../schema/zod/brand/index.schema.js';
 import { categoryZodSchema } from './../../../schema/zod/category/index.schema.js';
+import { timestampsSchema } from '../../common.dto.js';
 
 const statusSchema = z.object({
   code: productVariantZodSchema.shape.status,
@@ -29,28 +30,30 @@ const categorySchema = categoryZodSchema
   });
 
 export const getAllByProductDTO = z.array(
-  z.object({
-    id: z.string(),
-    name: productVariantZodSchema.shape.name,
-    slug: productVariantZodSchema.shape.slug,
-    productId: z.string(),
-    specs: productVariantZodSchema.shape.specs,
-    sku: productVariantZodSchema.shape.sku,
-    seo: productVariantZodSchema.shape.seo,
-    originPrice: productVariantZodSchema.shape.originPrice,
-    salePrice: productVariantZodSchema.shape.salePrice,
-    stock: productVariantZodSchema.shape.stock,
-    sold: productVariantZodSchema.shape.sold,
-    relatedBlogId: productVariantZodSchema.shape.relatedBlogId,
-    relatedProductVariantId: productVariantZodSchema.shape.relatedProductVariantId,
-    suggestProductVariantId: productVariantZodSchema.shape.suggestProductVariantId,
-    status: statusSchema,
-    images: productVariantZodSchema.shape.images,
-    category: categorySchema.nullable(),
-    brand: brandSchema.nullable(),
-    state: stateSchema,
-    optionValues: productVariantZodSchema.shape.optionValues
-  })
+  z
+    .object({
+      id: z.string(),
+      name: productVariantZodSchema.shape.name,
+      slug: productVariantZodSchema.shape.slug,
+      productId: z.string(),
+      specs: productVariantZodSchema.shape.specs,
+      sku: productVariantZodSchema.shape.sku,
+      seo: productVariantZodSchema.shape.seo,
+      originPrice: productVariantZodSchema.shape.originPrice,
+      salePrice: productVariantZodSchema.shape.salePrice,
+      stock: productVariantZodSchema.shape.stock,
+      sold: productVariantZodSchema.shape.sold,
+      relatedBlogId: productVariantZodSchema.shape.relatedBlogId,
+      relatedProductVariantId: productVariantZodSchema.shape.relatedProductVariantId,
+      suggestProductVariantId: productVariantZodSchema.shape.suggestProductVariantId,
+      status: statusSchema,
+      images: productVariantZodSchema.shape.images,
+      category: categorySchema.nullable(),
+      brand: brandSchema.nullable(),
+      state: stateSchema,
+      optionValues: productVariantZodSchema.shape.optionValues
+    })
+    .merge(timestampsSchema)
 );
 
 export type GetAllByProductDTO = z.infer<typeof getAllByProductDTO>;

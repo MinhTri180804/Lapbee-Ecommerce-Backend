@@ -7,10 +7,11 @@ export class ProductResponseDTO {
 
   static create(product: IProductDocument) {
     const candidate: CreateDTO = {
-      name: product.name,
       id: String(product._id),
-      categoryId: String(product.categoryId),
-      brandId: String(product.brandId),
+      name: product.name,
+      slug: product.slug,
+      categoryId: product.categoryId ? String(product.categoryId) : null,
+      brandId: product.brandId ? String(product.brandId) : null,
       commonImages: product.commonImages,
       commonSpecs: product.commonSpecs,
       state: {
@@ -20,7 +21,9 @@ export class ProductResponseDTO {
       newInfo: product.newInfo,
       usedInfo: product.usedInfo,
       options: product.options,
-      description: product.description
+      description: product.description,
+      createdAt: product.createdAt.toISOString(),
+      updatedAt: product.updatedAt.toISOString()
     };
 
     return createDTO.parse(candidate);

@@ -1,31 +1,36 @@
 import { Router } from 'express';
 import { CategoryController } from '../controllers/Category.controller.js';
 import { validateRequestBody } from '../middleware/validateRequestBody.middleware.js';
-import {
-  createCategoryRequestBodySchema,
-  CreateCategoryRequestBody,
-  UpdateCategoryRequestBody,
-  updateCategoryRequestBodySchema,
-  ChangeParentIdRequestBody,
-  changeParentIdRequestBodySchema,
-  ChangeOrderCategoryRequestBody,
-  changeOrderCategoryRequestBodySchema
-} from '../schema/zod/api/requests/category.schema.js';
 import { verifyAccessTokenMiddleware } from '../middleware/verifyAccessToken.middleware.js';
+import {
+  CreateDTO as CategoryCreateRequestDTO,
+  createDTO as categoryCreateRequestDTO
+} from '../dto/request/category/create.dto.js';
+import {
+  updateDTO as categoryUpdateRequestDTO,
+  UpdateDTO as CategoryUpdateRequestDTO
+} from '../dto/request/category/update.dto.js';
+import {
+  changeOrderDTO as categoryChangeOrderRequestDTO,
+  ChangeOrderDTO as CategoryChangeOrderRequestDTO
+} from '../dto/request/category/changeOrder.dto.js';
+import {
+  changeParentIdDTO as categoryChangeParentIdRequestDTO,
+  ChangeParentIdDTO as CategoryChangeParentIdRequestDTO
+} from '../dto/request/category/changeParentId.dto.js';
 
 export const router = Router();
 
 const categoryController = new CategoryController();
 
 // Middleware handle request body
-const validateRequestBodyCreate = validateRequestBody<CreateCategoryRequestBody>(createCategoryRequestBodySchema);
-const validateRequestBodyUpdate = validateRequestBody<UpdateCategoryRequestBody>(updateCategoryRequestBodySchema);
-const validateRequestBodyChangeParentId = validateRequestBody<ChangeParentIdRequestBody>(
-  changeParentIdRequestBodySchema
+const validateRequestBodyCreate = validateRequestBody<CategoryCreateRequestDTO>(categoryCreateRequestDTO);
+const validateRequestBodyUpdate = validateRequestBody<CategoryUpdateRequestDTO>(categoryUpdateRequestDTO);
+const validateRequestBodyChangeParentId = validateRequestBody<CategoryChangeParentIdRequestDTO>(
+  categoryChangeParentIdRequestDTO
 );
-const validateRequestBodyChangeOrder = validateRequestBody<ChangeOrderCategoryRequestBody>(
-  changeOrderCategoryRequestBodySchema
-);
+const validateRequestBodyChangeOrder =
+  validateRequestBody<CategoryChangeOrderRequestDTO>(categoryChangeOrderRequestDTO);
 
 router.post(
   '/',

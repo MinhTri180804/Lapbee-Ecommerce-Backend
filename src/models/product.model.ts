@@ -2,11 +2,12 @@ import { Document, model, Schema, Types } from 'mongoose';
 import { ProductZodSchemaType } from '../schema/zod/product/index.schema.js';
 import { StateProductEnum } from '../enums/stateProduct.enum.js';
 import { PhysicalConditionProductEnum } from '../enums/physicalConditionProduct.enum.js';
+import { ITimestamp } from 'src/types/commons.type.js';
 
 const DOCUMENT_NAME = 'product';
 const COLLECTION_NAME = 'products';
 
-export interface IProductDocument extends Omit<ProductZodSchemaType, '_id'>, Document<Types.ObjectId> {}
+export interface IProductDocument extends Omit<ProductZodSchemaType, '_id'>, ITimestamp, Document<Types.ObjectId> {}
 
 const commonImagesSchema = new Schema<IProductDocument['commonImages'][0]>(
   {
@@ -140,6 +141,11 @@ const productSchema = new Schema<IProductDocument>(
     name: {
       type: String,
       required: true
+    },
+    slug: {
+      type: String,
+      required: true,
+      unique: true
     },
     commonImages: {
       type: [commonImagesSchema],

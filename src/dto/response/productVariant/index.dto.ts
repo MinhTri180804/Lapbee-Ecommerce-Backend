@@ -1,6 +1,5 @@
 import { getAllByProductDTO, GetAllByProductDTO } from './getAllByProduct.dto.js';
 import { createManyDTO, CreateManyDTO } from './createMany.dto.js';
-import { ProductVariantZodSchemaType } from 'src/schema/zod/productVariant/index.schema.js';
 import { createDTO, CreateDTO } from './create.dto.js';
 import { StatusProductVariantToName } from 'src/constants/statusProductVariantToName.constant.js';
 import { StateProductToName } from 'src/constants/stateProduct.constant.js';
@@ -13,7 +12,7 @@ import { IProductVariantDocument } from 'src/models/productVariant.model.js';
 export class ProductVariantResponseDTO {
   constructor() {}
 
-  static create(productVariant: ProductVariantZodSchemaType) {
+  static create(productVariant: IProductVariantDocument) {
     const candidate: CreateDTO = {
       id: String(productVariant._id),
       name: productVariant.name,
@@ -34,19 +33,21 @@ export class ProductVariantResponseDTO {
         name: StatusProductVariantToName[productVariant.status]
       },
       images: productVariant.images,
-      categoryId: String(productVariant.categoryId),
-      brandId: String(productVariant.brandId),
+      categoryId: productVariant.categoryId ? String(productVariant.categoryId) : null,
+      brandId: productVariant.brandId ? String(productVariant.brandId) : null,
       state: {
         code: productVariant.state,
         name: StateProductToName[productVariant.state]
       },
-      optionValues: productVariant.optionValues
+      optionValues: productVariant.optionValues,
+      createdAt: productVariant.createdAt.toISOString(),
+      updatedAt: productVariant.updatedAt.toISOString()
     };
 
     return createDTO.parse(candidate);
   }
 
-  static createMany(productVariants: ProductVariantZodSchemaType[]) {
+  static createMany(productVariants: IProductVariantDocument[]) {
     const candidate: CreateManyDTO = productVariants.map((productVariant) => ({
       id: String(productVariant._id),
       name: productVariant.name,
@@ -67,20 +68,22 @@ export class ProductVariantResponseDTO {
         name: StatusProductVariantToName[productVariant.status]
       },
       images: productVariant.images,
-      categoryId: String(productVariant.categoryId),
-      brandId: String(productVariant.brandId),
+      categoryId: productVariant.categoryId ? String(productVariant.categoryId) : null,
+      brandId: productVariant.brandId ? String(productVariant.brandId) : null,
       state: {
         code: productVariant.state,
         name: StateProductToName[productVariant.state]
       },
-      optionValues: productVariant.optionValues
+      optionValues: productVariant.optionValues,
+      createdAt: productVariant.createdAt.toISOString(),
+      updatedAt: productVariant.updatedAt.toISOString()
     }));
 
     return createManyDTO.parse(candidate);
   }
 
   static getAllByProduct(
-    productVariants: (ProductVariantZodSchemaType & {
+    productVariants: (IProductVariantDocument & {
       category: ICategoryDocument;
       brand: IBrandDocument;
     })[]
@@ -123,7 +126,9 @@ export class ProductVariantResponseDTO {
         code: productVariant.state,
         name: StateProductToName[productVariant.state]
       },
-      optionValues: productVariant.optionValues
+      optionValues: productVariant.optionValues,
+      createdAt: productVariant.createdAt.toISOString(),
+      updatedAt: productVariant.updatedAt.toISOString()
     }));
 
     return getAllByProductDTO.parse(candidate);
@@ -164,7 +169,9 @@ export class ProductVariantResponseDTO {
         },
         newInfo: getDetailsDTO.shape.productOrigin.shape.newInfo.parse(productOrigin.newInfo),
         usedInfo: getDetailsDTO.shape.productOrigin.shape.usedInfo.parse(productOrigin.usedInfo),
-        description: productOrigin.description
+        description: productOrigin.description,
+        createdAt: productOrigin.createdAt.toISOString(),
+        updatedAt: productOrigin.updatedAt.toISOString()
       },
       productVariant: {
         id: String(productVariant._id),
@@ -186,7 +193,9 @@ export class ProductVariantResponseDTO {
         },
         images: productVariant.images,
         optionValues: productVariant.optionValues,
-        description: productVariant.description
+        description: productVariant.description,
+        createdAt: productVariant.createdAt.toISOString(),
+        updatedAt: productVariant.updatedAt.toISOString()
       }
     };
 

@@ -1,18 +1,15 @@
 import { NextFunction, Request, Response } from 'express';
-import {
-  createBrandRequestBodySchema,
-  CreateBrandRequestBody,
-  updateBrandRequestBodySchema,
-  UpdateBrandRequestBody
-} from '../schema/zod/api/requests/brand.schema.js';
 import { BrandService } from '../services/Brand.service.js';
 import { sendSuccessResponse } from '../utils/responses.util.js';
 import { StatusCodes } from 'http-status-codes';
 import { BrandResponseDTO } from '../dto/response/brand/index.dto.js';
+import { BrandRequestDTO } from '../dto/request/brand/index.dto.js';
+import { CreateDTO as BrandCreateRequestDTO } from '../dto/request/brand/create.dto.js';
+import { UpdateDTO as BrandUpdateRequestDTO } from '../dto/request/brand/update.dto.js';
 
-type CreateRequestType = Request<unknown, unknown, CreateBrandRequestBody>;
+type CreateRequestType = Request<unknown, unknown, BrandCreateRequestDTO>;
 type DeleteRequestType = Request<{ id: string }>;
-type UpdateRequestType = Request<{ id: string }, unknown, UpdateBrandRequestBody>;
+type UpdateRequestType = Request<{ id: string }, unknown, BrandUpdateRequestDTO>;
 type GetDetailsRequestType = Request<{ id: string }>;
 type GetAllRequestType = Request<
   unknown,
@@ -38,8 +35,7 @@ export class BrandController implements IBrandController {
   private _brandService: BrandService = new BrandService();
   constructor() {}
   public async create(request: CreateRequestType, response: Response) {
-    const requestData = request.body;
-    const createData = createBrandRequestBodySchema.parse(requestData);
+    const createData = BrandRequestDTO.create(request.body);
     const brandData = await this._brandService.create(createData);
     const brandResponse = BrandResponseDTO.create(brandData);
 
@@ -68,8 +64,7 @@ export class BrandController implements IBrandController {
 
   public async update(request: UpdateRequestType, response: Response) {
     const { id } = request.params;
-    const requestBody = request.body;
-    const updateData = updateBrandRequestBodySchema.parse(requestBody);
+    const updateData = BrandRequestDTO.update(request.body);
     const brandUpdated = await this._brandService.update({ brandId: id, updateData });
     const brandResponse = BrandResponseDTO.update(brandUpdated);
 

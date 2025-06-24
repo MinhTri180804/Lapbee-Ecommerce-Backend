@@ -1,11 +1,11 @@
-import { CreateProductRequestBody } from '../schema/zod/api/requests/product.schema.js';
 import { IProductDocument } from '../models/product.model.js';
 import { ProductRepository } from '../repositories/Product.repository.js';
-import { CategoryRepository } from 'src/repositories/Category.repository.js';
-import { BadRequestError } from 'src/errors/BadRequest.error.js';
-import { BrandRepository } from 'src/repositories/Brand.repository.js';
+import { CategoryRepository } from '../repositories/Category.repository.js';
+import { BadRequestError } from '../errors/BadRequest.error.js';
+import { BrandRepository } from '../repositories/Brand.repository.js';
+import { CreateDTO as ProductCreateRequestDTO } from '../dto/request/product/create.dto.js';
 
-type CreateParams = CreateProductRequestBody;
+type CreateParams = ProductCreateRequestDTO;
 
 interface IProductService {
   create: (params: CreateParams) => Promise<IProductDocument>;

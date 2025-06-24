@@ -1,15 +1,16 @@
-import { CreateBrandRequestBody, UpdateBrandRequestBody } from '../schema/zod/api/requests/brand.schema.js';
 import { IBrandDocument } from '../models/brand.model.js';
 import { BrandRepository } from '../repositories/Brand.repository.js';
 import { NotFoundError } from 'src/errors/NotFound.error.js';
+import { CreateDTO as BrandCreateRequestDTO } from '../dto/request/brand/create.dto.js';
+import { UpdateDTO as BrandUpdateRequestDTO } from '../dto/request/brand/update.dto.js';
 
-type CreateParams = CreateBrandRequestBody;
+type CreateParams = BrandCreateRequestDTO;
 type DeleteParams = {
   brandId: string;
 };
 type UpdateParams = {
   brandId: string;
-  updateData: UpdateBrandRequestBody;
+  updateData: BrandUpdateRequestDTO;
 };
 type GetAllParams = {
   page: number;

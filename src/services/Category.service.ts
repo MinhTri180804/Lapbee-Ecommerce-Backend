@@ -1,9 +1,3 @@
-import {
-  ChangeOrderCategoryRequestBody,
-  ChangeParentIdRequestBody,
-  CreateCategoryRequestBody,
-  UpdateCategoryRequestBody
-} from '../schema/zod/api/requests/category.schema.js';
 import { ICategoryDocument } from '../models/category.model.js';
 import { CategoryRepository } from '../repositories/Category.repository.js';
 import { NotFoundError } from 'src/errors/NotFound.error.js';
@@ -11,15 +5,19 @@ import { CategoryNotExistError } from '../errors/CategoryNotExist.error.js';
 import { BadRequestError } from 'src/errors/BadRequest.error.js';
 import { BuildTree } from '../utils/buildTree.util.js';
 import { TreeNode } from 'src/types/commons.type.js';
+import { CreateDTO as CategoryCreateRequestDTO } from '../dto/request/category/create.dto.js';
+import { UpdateDTO as CategoryUpdateRequestDTO } from '../dto/request/category/update.dto.js';
+import { ChangeParentIdDTO as CategoryChangeParentIdRequestDTO } from '../dto/request/category/changeParentId.dto.js';
+import { ChangeOrderDTO as CategoryChangeOrderRequestDTO } from '../dto/request/category/changeOrder.dto.js';
 
-type CreateParams = CreateCategoryRequestBody;
+type CreateParams = CategoryCreateRequestDTO;
 type DeleteParams = {
   categoryId: string;
   isForce: boolean;
 };
 type UpdateParams = {
   categoryId: string;
-  updateData: UpdateCategoryRequestBody;
+  updateData: CategoryUpdateRequestDTO;
 };
 type GetDetailsParams = {
   categoryId: string;
@@ -30,9 +28,9 @@ type GetAllParams = {
 
 type ChangeParentIdParams = {
   categoryId: string;
-} & ChangeParentIdRequestBody;
+} & CategoryChangeParentIdRequestDTO;
 
-type ChangeOrderParams = ChangeOrderCategoryRequestBody & {
+type ChangeOrderParams = CategoryChangeOrderRequestDTO & {
   categoryId: string;
 };
 
