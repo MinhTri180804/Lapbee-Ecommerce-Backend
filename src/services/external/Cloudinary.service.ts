@@ -1,12 +1,24 @@
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
-import path from 'path';
 import streamifier from 'streamifier';
 import { v4 as uuidV4 } from 'uuid';
 import { env } from '../../configs/env.config.js';
 import { CloudinaryFolder } from '../../enums/cloudinaryFolder.enum.js';
 import { CloudinaryUploadError } from '../../errors/CloudinaryUpload.error.js';
+import path from 'node:path';
 
-export class CloudinaryService {
+type UploadStreamParams = {
+  fileBuffer: Buffer;
+  originalFileName: string;
+  remainingPathDirectory: string;
+  needSuffix: boolean;
+  isOverwrite?: boolean;
+};
+
+interface ICloudinaryService {
+  uploadStream: (params: UploadStreamParams) => Promise<UploadApiResponse>;
+}
+
+export class CloudinaryService implements ICloudinaryService {
   private _folder: CloudinaryFolder;
   private _cloudinaryName: string = env.cloudinary.NAME as string;
   private _cloudinaryKey: string = env.cloudinary.KEY as string;
@@ -34,16 +46,24 @@ export class CloudinaryService {
     });
   }
 
-  public async uploadStream(fileBuffer: Buffer, originalFileName: string): Promise<{ public_id: string; url: string }> {
+  public async uploadStream({
+    fileBuffer,
+    originalFileName,
+    remainingPathDirectory,
+    needSuffix,
+    isOverwrite = false
+  }: UploadStreamParams): Promise<UploadApiResponse> {
     return new Promise((resolve, reject) => {
       const fileExt = path.extname(originalFileName);
       const fileName = path.basename(originalFileName, fileExt).replaceAll(' ', '_');
-      const suffix = this._generateSuffix();
+      const publicId = needSuffix ? `${fileName}_${this._generateSuffix()}` : fileName;
       const stream = cloudinary.uploader.upload_stream(
         {
           resource_type: 'image',
-          folder: this._folder,
-          public_id: `${fileName}_${suffix}`
+          folder: `${this._folder}${remainingPathDirectory}`,
+          public_id: publicId,
+          overwrite: isOverwrite,
+          transformation: [{ quality: 'auto' }, { fetch_format: 'auto' }]
         },
         (error, result) => {
           if (error) {
@@ -51,10 +71,7 @@ export class CloudinaryService {
             return;
           }
 
-          resolve({
-            url: result!.secure_url,
-            public_id: result!.public_id
-          });
+          resolve(result as UploadApiResponse);
         }
       );
       streamifier.createReadStream(fileBuffer).pipe(stream);

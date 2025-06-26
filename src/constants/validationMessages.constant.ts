@@ -67,6 +67,14 @@ export const ValidationMessages = {
       },
       productVariant: {
         SKU_REQUIRED: 'Sku product variant is required'
+      },
+      external: {
+        cloudinary: {
+          uploadNewProductImage: {
+            SLUG_REQUIRED: 'Slug is required',
+            CATEGORY_REQUIRED: 'Category is required'
+          }
+        }
       }
     }
   },

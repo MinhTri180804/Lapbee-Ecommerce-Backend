@@ -2,13 +2,13 @@ import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { UploadImageService } from '../../services/UploadImage.service.js';
 import { sendSuccessResponse } from '../../utils/responses.util.js';
-import { CloudinaryFolder } from 'src/enums/cloudinaryFolder.enum.js';
+import { CloudinaryFolder } from '../../enums/cloudinaryFolder.enum.js';
 
 type DeleteLogoBrandRequestType = Request<{ public_id: string }, unknown, unknown>;
 type DeleteBannerBrandRequestType = Request<{ public_id: string }>;
 type GetAllImagesRequestType = Request;
 
-interface IUploadImageController {
+interface ICloudinaryController {
   uploadLogoBrand: (request: Request, response: Response, next: NextFunction) => Promise<void>;
   deleteLogoBrand: (request: DeleteLogoBrandRequestType, response: Response, next: NextFunction) => Promise<void>;
   uploadBannerBrand: (request: Request, response: Response, next: NextFunction) => Promise<void>;
@@ -16,7 +16,7 @@ interface IUploadImageController {
   getAllImages: (request: GetAllImagesRequestType, response: Response, next: NextFunction) => Promise<void>;
 }
 
-export class UploadImageController implements IUploadImageController {
+export class CloudinaryController implements ICloudinaryController {
   private _uploadImageService: UploadImageService = new UploadImageService();
 
   constructor() {}
