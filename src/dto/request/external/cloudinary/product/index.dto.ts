@@ -1,4 +1,4 @@
-import { uploadProductImageDTO, UploadProductImageDTO } from './uploadNewProductImage.dto.js';
+import { uploadProductImageDTO, UploadProductImageDTO } from './uploadProductImage.dto.js';
 
 export class ProductCloudinaryRequestDTO {
   constructor() {}
