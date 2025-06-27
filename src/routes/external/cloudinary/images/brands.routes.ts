@@ -35,3 +35,4 @@ router.post(
 );
 
 router.delete('/logo/:publicId', brandCloudinaryController.deleteLogo.bind(brandCloudinaryController));
+router.delete('/banner/:publicId', brandCloudinaryController.deleteBanner.bind(brandCloudinaryController));

@@ -11,22 +11,24 @@ import { UploadBannerDTO as BrandUploadBannerDTO } from '../../../dto/request/ex
 type UploadLogoRequestType = Request<unknown, unknown, BrandUploadLogoDTO>;
 type UploadBannerRequestType = Request<unknown, unknown, BrandUploadBannerDTO>;
 type DeleteLogoRequestType = Request<{ publicId: string }>;
+type DeleteBannerRequestType = Request<{ publicId: string }>;
 
 interface IBrandCloudinaryController {
   uploadLogo: (request: UploadLogoRequestType, response: Response, next: NextFunction) => Promise<void>;
   uploadBanner: (request: UploadBannerRequestType, response: Response, next: NextFunction) => Promise<void>;
   deleteLogo: (request: DeleteLogoRequestType, response: Response, next: NextFunction) => Promise<void>;
+  deleteBanner: (request: DeleteBannerRequestType, response: Response, next: NextFunction) => Promise<void>;
 }
 
 export class BrandCloudinaryController implements IBrandCloudinaryController {
+  private _cloudinaryService = new CloudinaryService(CloudinaryFolder.BRAND);
   constructor() {}
 
   public async uploadLogo(request: UploadLogoRequestType, response: Response): Promise<void> {
     const file = request.file as Express.Multer.File;
     const { nameBrand } = BrandCloudinaryRequestDTO.uploadLogo(request.body);
 
-    const cloudinaryService = new CloudinaryService(CloudinaryFolder.BRAND);
-    const uploadResponse = await cloudinaryService.uploadStream({
+    const uploadResponse = await this._cloudinaryService.uploadStream({
       fileBuffer: file.buffer,
       originalFileName: file.originalname,
       needSuffix: true,
@@ -49,8 +51,7 @@ export class BrandCloudinaryController implements IBrandCloudinaryController {
     const file = request.file as Express.Multer.File;
     const { nameBrand } = BrandCloudinaryRequestDTO.uploadBanner(request.body);
 
-    const cloudinaryService = new CloudinaryService(CloudinaryFolder.BRAND);
-    const uploadResponse = await cloudinaryService.uploadStream({
+    const uploadResponse = await this._cloudinaryService.uploadStream({
       fileBuffer: file.buffer,
       originalFileName: file.originalname,
       remainingPathDirectory: `/${nameBrand}/banners`,
@@ -72,13 +73,26 @@ export class BrandCloudinaryController implements IBrandCloudinaryController {
   public async deleteLogo(request: DeleteLogoRequestType, response: Response): Promise<void> {
     const { publicId } = request.params;
 
-    const cloudinaryService = new CloudinaryService(CloudinaryFolder.BRAND);
-    await cloudinaryService.delete({ publicId });
+    await this._cloudinaryService.delete({ publicId });
     sendSuccessResponse({
       response,
       content: {
         statusCode: StatusCodes.NO_CONTENT,
         message: 'Delete Logo brand is success'
+      }
+    });
+  }
+
+  public async deleteBanner(request: DeleteBannerRequestType, response: Response): Promise<void> {
+    const { publicId } = request.params;
+
+    await this._cloudinaryService.delete({ publicId });
+
+    sendSuccessResponse({
+      response,
+      content: {
+        statusCode: StatusCodes.NO_CONTENT,
+        message: 'Delete banner brand is success'
       }
     });
   }
