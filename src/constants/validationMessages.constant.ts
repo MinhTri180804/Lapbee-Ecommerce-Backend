@@ -73,6 +73,12 @@ export const ValidationMessages = {
           uploadNewProductImage: {
             SLUG_REQUIRED: 'Slug is required',
             CATEGORY_REQUIRED: 'Category is required'
+          },
+          uploadBrandLogo: {
+            NAME_BRAND_REQUIRED: 'Name brand is required'
+          },
+          uploadBannerBrand: {
+            NAME_BRAND_REQUIRED: 'Name brand is required'
           }
         }
       }

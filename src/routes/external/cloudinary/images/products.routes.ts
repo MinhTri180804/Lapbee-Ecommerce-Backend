@@ -4,7 +4,7 @@ import { UploadMulterMiddleware } from '../../../../middleware/UploadMulter.midd
 import {
   uploadProductImageDTO,
   UploadProductImageDTO
-} from '../../../../dto/request/external/cloudinary/product/uploadNewProductImage.dto.js';
+} from '../../../../dto/request/external/cloudinary/product/uploadProductImage.dto.js';
 import { ProductCloudinaryController } from '../../../../controllers/external/cloudinary/ProductCloudinary.controller.js';
 
 export const router = Router();
