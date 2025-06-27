@@ -10,10 +10,12 @@ import { UploadBannerDTO as BrandUploadBannerDTO } from '../../../dto/request/ex
 
 type UploadLogoRequestType = Request<unknown, unknown, BrandUploadLogoDTO>;
 type UploadBannerRequestType = Request<unknown, unknown, BrandUploadBannerDTO>;
+type DeleteLogoRequestType = Request<{ publicId: string }>;
 
 interface IBrandCloudinaryController {
   uploadLogo: (request: UploadLogoRequestType, response: Response, next: NextFunction) => Promise<void>;
   uploadBanner: (request: UploadBannerRequestType, response: Response, next: NextFunction) => Promise<void>;
+  deleteLogo: (request: DeleteLogoRequestType, response: Response, next: NextFunction) => Promise<void>;
 }
 
 export class BrandCloudinaryController implements IBrandCloudinaryController {
@@ -63,6 +65,20 @@ export class BrandCloudinaryController implements IBrandCloudinaryController {
         statusCode: StatusCodes.OK,
         message: 'Upload banner for brand success',
         data: responseData
+      }
+    });
+  }
+
+  public async deleteLogo(request: DeleteLogoRequestType, response: Response): Promise<void> {
+    const { publicId } = request.params;
+
+    const cloudinaryService = new CloudinaryService(CloudinaryFolder.BRAND);
+    await cloudinaryService.delete({ publicId });
+    sendSuccessResponse({
+      response,
+      content: {
+        statusCode: StatusCodes.NO_CONTENT,
+        message: 'Delete Logo brand is success'
       }
     });
   }
