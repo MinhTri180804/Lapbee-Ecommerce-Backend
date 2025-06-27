@@ -76,6 +76,9 @@ export const ValidationMessages = {
           },
           uploadBrandLogo: {
             NAME_BRAND_REQUIRED: 'Name brand is required'
+          },
+          uploadBannerBrand: {
+            NAME_BRAND_REQUIRED: 'Name brand is required'
           }
         }
       }
