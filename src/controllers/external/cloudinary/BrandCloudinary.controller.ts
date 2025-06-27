@@ -6,11 +6,14 @@ import { CloudinaryService } from '../../../services/external/Cloudinary.service
 import { CloudinaryFolder } from '../../../enums/cloudinaryFolder.enum.js';
 import { sendSuccessResponse } from '../../../utils/responses.util.js';
 import { StatusCodes } from 'http-status-codes';
+import { UploadBannerDTO as BrandUploadBannerDTO } from '../../../dto/request/external/cloudinary/brand/uploadBanner.dto.js';
 
 type UploadLogoRequestType = Request<unknown, unknown, BrandUploadLogoDTO>;
+type UploadBannerRequestType = Request<unknown, unknown, BrandUploadBannerDTO>;
 
 interface IBrandCloudinaryController {
   uploadLogo: (request: UploadLogoRequestType, response: Response, next: NextFunction) => Promise<void>;
+  uploadBanner: (request: UploadBannerRequestType, response: Response, next: NextFunction) => Promise<void>;
 }
 
 export class BrandCloudinaryController implements IBrandCloudinaryController {
@@ -25,7 +28,7 @@ export class BrandCloudinaryController implements IBrandCloudinaryController {
       fileBuffer: file.buffer,
       originalFileName: file.originalname,
       needSuffix: true,
-      remainingPathDirectory: `/${nameBrand}/logo`
+      remainingPathDirectory: `/${nameBrand}/logos`
     });
 
     const responseData = BrandCloudinaryResponseDTO.uploadLogo(uploadResponse);
@@ -35,6 +38,30 @@ export class BrandCloudinaryController implements IBrandCloudinaryController {
       content: {
         statusCode: StatusCodes.OK,
         message: 'Upload logo brand success',
+        data: responseData
+      }
+    });
+  }
+
+  public async uploadBanner(request: UploadBannerRequestType, response: Response): Promise<void> {
+    const file = request.file as Express.Multer.File;
+    const { nameBrand } = BrandCloudinaryRequestDTO.uploadBanner(request.body);
+
+    const cloudinaryService = new CloudinaryService(CloudinaryFolder.BRAND);
+    const uploadResponse = await cloudinaryService.uploadStream({
+      fileBuffer: file.buffer,
+      originalFileName: file.originalname,
+      remainingPathDirectory: `/${nameBrand}/banners`,
+      needSuffix: true,
+      isOverwrite: false
+    });
+
+    const responseData = BrandCloudinaryResponseDTO.uploadBanner(uploadResponse);
+    sendSuccessResponse<typeof responseData>({
+      response,
+      content: {
+        statusCode: StatusCodes.OK,
+        message: 'Upload banner for brand success',
         data: responseData
       }
     });
