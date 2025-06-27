@@ -33,3 +33,5 @@ router.post(
   validateRequestBodyUploadBanner,
   brandCloudinaryController.uploadBanner.bind(brandCloudinaryController)
 );
+
+router.delete('/logo/:publicId', brandCloudinaryController.deleteLogo.bind(brandCloudinaryController));
