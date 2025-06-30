@@ -43,7 +43,8 @@ export const ErrorCodes: ErrorCodes = {
   [ErrorInstance.USER_AVATAR_MISSING]: 4000,
   [ErrorInstance.NOT_FOUND]: 4004,
   [ErrorInstance.CATEGORY_NOT_EXIST]: 4000,
-  [ErrorInstance.BAD_REQUEST]: 4000
+  [ErrorInstance.BAD_REQUEST]: 4000,
+  [ErrorInstance.MISSING_TOKEN]: 4001
 } as const;
 
 export type ErrorCodesKeys = keyof typeof ErrorCodes;

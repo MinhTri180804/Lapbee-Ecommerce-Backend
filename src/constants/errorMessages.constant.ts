@@ -46,5 +46,6 @@ export const ErrorMessages: ErrorMessagesType = {
   [ErrorInstance.USER_AVATAR_MISSING]: 'Avatar not found for this user.',
   [ErrorInstance.NOT_FOUND]: 'Notfound',
   [ErrorInstance.CATEGORY_NOT_EXIST]: 'Category not exist',
-  [ErrorInstance.BAD_REQUEST]: 'Bad request'
+  [ErrorInstance.BAD_REQUEST]: 'Bad request',
+  [ErrorInstance.MISSING_TOKEN]: 'Missing token'
 };
