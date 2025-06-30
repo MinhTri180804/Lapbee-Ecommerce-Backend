@@ -1,4 +1,4 @@
-import { Document, model, Schema } from 'mongoose';
+import { Document, model, Schema, Types } from 'mongoose';
 import { UserAuthProviderEnum } from '../enums/userAuthProvider.enum.js';
 import { UserAuthRoleEnum } from '../enums/userAuthRole.enum.js';
 import { UserAuthSchemaType } from '../schema/zod/userAuth/index.schema.js';
@@ -7,7 +7,7 @@ import { hashPassword } from '../utils/password.util.js';
 const DOCUMENT_NAME = 'user_auth';
 const COLLECTION_NAME = 'users_auth';
 
-export interface IUserAuthDocument extends UserAuthSchemaType, Document {
+export interface IUserAuthDocument extends UserAuthSchemaType, Document<Types.ObjectId> {
   isSetPassword: boolean;
 }
 
@@ -26,9 +26,9 @@ const userAuthSchema = new Schema<IUserAuthDocument>(
       select: false
     },
     role: {
-      type: String,
-      enum: Object.values(UserAuthRoleEnum),
-      default: UserAuthRoleEnum.CUSTOMER
+      type: Number,
+      enum: UserAuthRoleEnum,
+      required: true
     },
     provider: {
       type: String,

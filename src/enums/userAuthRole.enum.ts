@@ -1,3 +1,3 @@
 export enum UserAuthRoleEnum {
-  CUSTOMER = 'customer'
+  CUSTOMER = 0
 }

@@ -8,6 +8,7 @@ import {
 } from '../schema/zod/api/requests/userProfile.schema.js';
 import { UserProfileService } from '../services/userProfile.service.js';
 import { sendSuccessResponse } from '../utils/responses.util.js';
+import { UserProfileResponseDTO } from '../dto/response/userProfile/index.js';
 
 type CreateRequestType = Request<unknown, unknown, CreateUserProfileRequestBody>;
 type GetMeRequestType = Request;
@@ -29,7 +30,7 @@ export class UserProfileController implements IUserProfileController {
 
   public async create(request: CreateRequestType, response: Response) {
     const data = request.body;
-    const accessToken = request.headers['authorization']!.split(' ')[1];
+    const accessToken = request.cookies.accessToken;
 
     const userProfileData = await this._userProfileService.create({ accessToken, ...data });
     sendSuccessResponse<typeof userProfileData>({
@@ -46,12 +47,15 @@ export class UserProfileController implements IUserProfileController {
     const accessToken = request.cookies.accessToken as string;
 
     const userProfileData = await this._userProfileService.getMe({ accessToken });
-    sendSuccessResponse<typeof userProfileData>({
+
+    const responseData = UserProfileResponseDTO.getMe(userProfileData);
+
+    sendSuccessResponse<typeof responseData>({
       response,
       content: {
         statusCode: StatusCodes.OK,
         message: 'Get me profile success',
-        data: userProfileData
+        data: responseData
       }
     });
   }

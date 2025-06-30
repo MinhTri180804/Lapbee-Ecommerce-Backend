@@ -36,9 +36,16 @@ type UpdateParams = {
   updateData: UpdateUserProfileRequestBody;
 };
 
+type GetMeReturns = IUserProfileDocument & {
+  userAuthId: {
+    email: string;
+    role: number;
+  };
+};
+
 interface IUserProfileService {
   create: (params: CreateParams) => Promise<IUserProfileDocument>;
-  getMe: (params: GetMeParams) => Promise<IUserProfileDocument>;
+  getMe: (params: GetMeParams) => Promise<GetMeReturns>;
   updateAvatar: (params: UpdateAvatarParams) => Promise<{
     publicId: string;
     url: string;
@@ -87,9 +94,16 @@ export class UserProfileService implements IUserProfileService {
     return userProfile;
   }
 
-  public async getMe({ accessToken }: GetMeParams): Promise<IUserProfileDocument> {
+  public async getMe({ accessToken }: GetMeParams): Promise<GetMeReturns> {
     const { sub } = decode(accessToken) as JwtPayload;
-    const userProfile = await this._userProfileRepository.findByUserAuthId({ userAuthId: sub as string });
+    const userProfile = await this._userProfileRepository.findByUserAuthIdWithPopulate<GetMeReturns>({
+      userAuthId: sub as string,
+      populate: {
+        path: 'userAuthId',
+        select: 'role email'
+      }
+    });
+
     if (!userProfile) {
       throw new UserProfileNotExistError({});
     }
@@ -102,7 +116,21 @@ export class UserProfileService implements IUserProfileService {
     url: string;
   }> {
     const { sub } = decode(accessToken) as JwtPayload;
-    const profile = await this._userProfileRepository.findByUserAuthId({ userAuthId: sub as string });
+    const profile = await this._userProfileRepository.findByUserAuthIdWithPopulate<
+      IUserProfileDocument & {
+        userAuthId: {
+          email: string;
+          role: number;
+        };
+      }
+    >({
+      userAuthId: sub as string,
+      populate: {
+        path: 'userAuthId',
+        select: 'email role'
+      }
+    });
+
     if (!profile) {
       throw new UserProfileNotExistError({});
     }
@@ -112,7 +140,14 @@ export class UserProfileService implements IUserProfileService {
       await cloudinaryService.delete({ publicId: profile.avatar.publicId });
     }
 
-    const { public_id, url } = await cloudinaryService.uploadStream(fileBuffer, originalFileName);
+    //TODO: Refactor logic upload update avatar in here later
+    const { public_id, url } = await cloudinaryService.uploadStream({
+      fileBuffer: fileBuffer,
+      originalFileName,
+      remainingPathDirectory: `${profile.userAuthId.email}`,
+      needSuffix: true,
+      isOverwrite: true
+    });
     await this._userProfileRepository.updateAvatar({
       userProfile: profile,
       url,
