@@ -8,8 +8,12 @@ import { router as categoryRouter } from './routes/category.route.js';
 import { router as productRouter } from './routes/product.routes.js';
 import { router as cloudinaryRouter } from './routes/external/cloudinary/index.routes.js';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 const app = express();
+
+// CookieParser middleware
+app.use(cookieParser());
 
 // CORS middleware
 app.use(
