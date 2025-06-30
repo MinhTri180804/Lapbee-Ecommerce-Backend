@@ -62,6 +62,15 @@ type SaveResetPasswordTokenValue = {
   createdAt: number;
 };
 
+type SaveAccessTokenToBacklistParams = {
+  jti: string;
+  expiredAt: number;
+};
+
+type CheckAccessTokenExistInBlacklistParams = {
+  jti: string;
+};
+
 interface IIoredisService {
   savePinCodeVerifyEmail: (params: SavePinCodeVerifyEmailParams) => Promise<SavePinCodeVerifyEmailResponse>;
   getPinCodeVerifyEmail: (params: GetPinCodeVerifyEmailParams) => Promise<GetPinCodeVerifyEmailReturns>;
@@ -72,6 +81,7 @@ interface IIoredisService {
   saveResetPasswordToken: (params: SaveResetPasswordTokenParams) => Promise<void>;
   getResetPasswordToken: (params: GetResetPasswordTokenParams) => Promise<GetResetPasswordTokenReturns>;
   removeResetPasswordToken: (params: RemoveResetPasswordTokenParams) => Promise<void>;
+  saveAccessTokenToBlacklist: (params: SaveAccessTokenToBacklistParams) => Promise<void>;
 }
 export class IoredisService implements IIoredisService {
   private _redisInstance: Redis;
@@ -192,5 +202,21 @@ export class IoredisService implements IIoredisService {
     const key = RedisKeyGenerator.resetPasswordToken({ userAuthId });
     await this._redisInstance.del(key);
     return;
+  }
+
+  public async saveAccessTokenToBlacklist({ jti, expiredAt }: SaveAccessTokenToBacklistParams): Promise<void> {
+    const key = RedisKeyGenerator.accessTokenBlacklist({ jti });
+    await this._redisInstance.setex(key, expiredAt, '1');
+    return;
+  }
+
+  public async checkAccessTokenExistInBlacklist({ jti }: CheckAccessTokenExistInBlacklistParams): Promise<boolean> {
+    const key = RedisKeyGenerator.accessTokenBlacklist({ jti });
+    const result = await this._redisInstance.get(key);
+    if (!result) {
+      return false;
+    }
+
+    return true;
   }
 }

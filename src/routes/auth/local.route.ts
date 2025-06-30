@@ -23,6 +23,8 @@ import {
   VerifyEmailRegisterRequestBody,
   verifyEmailRegisterRequestBodySchema
 } from '../../schema/zod/api/requests/auth/local.schema.js';
+import { verifyAccessTokenMiddleware } from '../../middleware/verifyAccessToken.middleware.js';
+import { verifyRefreshTokenMiddleware } from '../../middleware/verifyRefreshToken.middleware.js';
 
 export const router = Router();
 
@@ -78,8 +80,11 @@ router.post(
   validateRequestBodyResendResetPasswordToken,
   authLocalController.resendResetPasswordToken.bind(authLocalController)
 );
+router.post('/refresh-token', verifyRefreshTokenMiddleware, authLocalController.refreshToken.bind(authLocalController));
+
 router.post(
-  '/refresh-token',
-  validateRequestBodyRefreshToken,
-  authLocalController.refreshToken.bind(authLocalController)
+  '/logout',
+  verifyAccessTokenMiddleware,
+  verifyRefreshTokenMiddleware,
+  authLocalController.logout.bind(authLocalController)
 );

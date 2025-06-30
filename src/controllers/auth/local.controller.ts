@@ -17,6 +17,7 @@ import {
 } from '../../schema/zod/api/requests/auth/local.schema.js';
 import { AuthLocalService } from '../../services/auth/local.service.js';
 import { sendSuccessResponse } from '../../utils/responses.util.js';
+import { MissingTokenError } from 'src/errors/MissingToken.error.js';
 
 type RegisterRequestType = Request<unknown, unknown, RegisterLocalRequestBody>;
 type VerifyEmailRequestType = Request<unknown, unknown, VerifyEmailRegisterRequestBody>;
@@ -28,6 +29,7 @@ type ForgotPasswordRequestType = Request<unknown, unknown, ForgotPasswordRequest
 type ResetPasswordRequestType = Request<unknown, unknown, ResetPasswordRequestBody>;
 type ResendResetPasswordTokenRequestType = Request<unknown, unknown, ResendResetPasswordTokenRequestBody>;
 type RefreshTokenRequestType = Request<unknown, unknown, RefreshTokenRequestBody>;
+type LogoutRequestType = Request;
 
 interface IAuthLocalController {
   register: (request: RegisterRequestType, response: Response, next: NextFunction) => void;
@@ -48,6 +50,7 @@ interface IAuthLocalController {
     next: NextFunction
   ) => Promise<void>;
   refreshToken: (params: RefreshTokenRequestType, response: Response, next: NextFunction) => Promise<void>;
+  logout: (params: LogoutRequestType, response: Response, next: NextFunction) => Promise<void>;
 }
 
 export class AuthLocalController implements IAuthLocalController {
@@ -224,7 +227,7 @@ export class AuthLocalController implements IAuthLocalController {
   }
 
   public async refreshToken(request: RefreshTokenRequestType, response: Response): Promise<void> {
-    const { refreshToken } = request.body;
+    const refreshToken = request.cookies.refreshToken as string;
     const redis = IoredisManager.getInstance().getRedisClient();
     const ioredisService = new IoredisService(redis);
     const authLocalService = new AuthLocalService(this._userAuthRepository, ioredisService);
@@ -243,6 +246,47 @@ export class AuthLocalController implements IAuthLocalController {
           accessToken: newAccessToken,
           refreshToken: newRefreshToken
         }
+      }
+    });
+  }
+
+  public async logout(request: LogoutRequestType, response: Response): Promise<void> {
+    const accessToken = request.cookies?.accessToken;
+    const refreshToken = request.cookies?.refreshToken;
+
+    if (!accessToken) {
+      throw new MissingTokenError({
+        message: 'Missing accessToken'
+      });
+    }
+
+    if (!refreshToken) {
+      throw new MissingTokenError({
+        message: 'Missing refreshToken'
+      });
+    }
+    const redis = IoredisManager.getInstance().getRedisClient();
+    const ioredisService = new IoredisService(redis);
+    const authLocalService = new AuthLocalService(this._userAuthRepository, ioredisService);
+
+    await authLocalService.logout({ accessToken, refreshToken });
+
+    response.cookie('accessToken', '', {
+      httpOnly: false,
+      secure: true,
+      sameSite: 'none'
+    });
+    response.cookie('refreshToken', '', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none'
+    });
+
+    sendSuccessResponse({
+      response,
+      content: {
+        statusCode: StatusCodes.OK,
+        message: 'Logout success'
       }
     });
   }

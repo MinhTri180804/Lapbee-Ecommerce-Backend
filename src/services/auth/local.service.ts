@@ -62,6 +62,11 @@ type ResendResetPasswordTokenParams = ResendResetPasswordTokenRequestBody;
 
 type RefreshTokenParams = RefreshTokenRequestBody;
 
+type LogoutParams = {
+  accessToken: string;
+  refreshToken: string;
+};
+
 type LoginReturns = {
   accessToken: string;
   refreshToken: string;
@@ -85,6 +90,7 @@ interface IAuthLocalService {
     accessToken: string;
     refreshToken: string;
   }>;
+  logout: (parasm: LogoutParams) => Promise<void>;
 }
 
 export class AuthLocalService implements IAuthLocalService {
@@ -189,7 +195,6 @@ export class AuthLocalService implements IAuthLocalService {
     const userAuth = await this._userAuthRepository.createRegisterLocal({ email });
     const tokenSetPassword = JWTGenerator.createPassword({ userAuthId: userAuth.id });
     const { jti, exp } = decode(tokenSetPassword) as JwtPayload;
-    console.log(jti);
     await this._userAuthRepository.verifyEmailRegister({ userAuthId: userAuth.id, jti: jti as string });
     const jobSendEmailVerificationSuccess = SendEmailJobs.createVerificationEmailSuccess({
       to: email,
@@ -446,5 +451,25 @@ export class AuthLocalService implements IAuthLocalService {
     await this._ioredisService.saveRefreshTokenWhitelist({ userAuthId: sub as string, jti: newJtiRefreshToken });
 
     return { accessToken: newAccessToken, refreshToken: newRefreshToken };
+  }
+
+  public async logout({ accessToken, refreshToken }: LogoutParams): Promise<void> {
+    const currentTime = Math.floor(Date.now() / 1000);
+    const { exp: expAccessToken, jti: jtiAccessToken } = decode(accessToken) as JwtPayload;
+    const { jti: jtiRefreshToken, sub: userAuthId } = decode(refreshToken) as JwtPayload;
+    if (Number(expAccessToken) - currentTime > 1000) {
+      const expiredAtAccessTokenBlacklist = Number(expAccessToken) - currentTime;
+      await this._ioredisService.saveAccessTokenToBlacklist({
+        jti: jtiAccessToken as string,
+        expiredAt: expiredAtAccessTokenBlacklist
+      });
+    }
+
+    await this._ioredisService.removeRefreshTokenWhitelist({
+      userAuthId: userAuthId as string,
+      jti: jtiRefreshToken as string
+    });
+
+    return;
   }
 }

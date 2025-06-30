@@ -43,7 +43,7 @@ export class UserProfileController implements IUserProfileController {
   }
 
   public async getMe(request: GetMeRequestType, response: Response) {
-    const accessToken = request.headers['authorization']!.split(' ')[1];
+    const accessToken = request.cookies.accessToken as string;
 
     const userProfileData = await this._userProfileService.getMe({ accessToken });
     sendSuccessResponse<typeof userProfileData>({

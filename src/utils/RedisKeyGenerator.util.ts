@@ -12,6 +12,10 @@ type ResetPasswordTokenParams = {
   userAuthId: string;
 };
 
+type accessTokenBlacklistParams = {
+  jti: string;
+};
+
 export class RedisKeyGenerator {
   /**
    * Generates a Redis key specifically for storing or retrieving PIN codes
@@ -41,5 +45,9 @@ export class RedisKeyGenerator {
 
   static resetPasswordToken({ userAuthId }: ResetPasswordTokenParams): string {
     return `${RedisKeys.RESET_PASSWORD_TOKEN}:${userAuthId}`;
+  }
+
+  static accessTokenBlacklist({ jti }: accessTokenBlacklistParams): string {
+    return `${RedisKeys.ACCESS_TOKEN_BLACKLIST}:${jti}`;
   }
 }

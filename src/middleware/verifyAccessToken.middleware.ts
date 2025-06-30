@@ -1,23 +1,23 @@
 import { RequestHandler } from 'express';
-import { AuthorizationHeaderMissingError } from '../errors/AuthorizationHeaderMissing.error.js';
 import { JWTGenerator } from '../utils/JwtGenerator.util.js';
+import { MissingTokenError } from 'src/errors/MissingToken.error.js';
+import { IoredisService } from '../services/external/Ioredis.service.js';
+import { IoredisManager } from 'src/configs/ioredisManager.config.js';
+import { JWTTokenInvalidError } from 'src/errors/JwtTokenInvalid.error.js';
 
-export const verifyAccessTokenMiddleware: RequestHandler = (request, _, next) => {
+export const verifyAccessTokenMiddleware: RequestHandler = async (request, _, next) => {
   try {
-    const authHeader = request.headers['authorization'];
-    if (!authHeader) {
-      throw new AuthorizationHeaderMissingError({ message: 'Authorization header missing' });
+    const accessToken = request.cookies?.accessToken as string | undefined;
+    if (!accessToken) {
+      throw new MissingTokenError({ message: 'Authentication failed, AccessToken missing' });
     }
-
-    const parts = authHeader.split(' ');
-
-    if (parts.length < 2 || parts[0].toLowerCase() !== 'bearer') {
-      throw new AuthorizationHeaderMissingError({ message: 'Authorization header must be in format: Bearer <token>' });
+    const { jti } = JWTGenerator.verifyToken({ token: accessToken, typeToken: 'ACCESS_TOKEN' });
+    const redis = IoredisManager.getInstance().getRedisClient();
+    const ioredisService = new IoredisService(redis);
+    const result = await ioredisService.checkAccessTokenExistInBlacklist({ jti: jti as string });
+    if (result) {
+      throw new JWTTokenInvalidError({ message: 'AccessToken invalid' });
     }
-
-    // eslint-disable-next-line
-    const [_, accessToken] = parts;
-    JWTGenerator.verifyToken({ token: accessToken, typeToken: 'ACCESS_TOKEN' });
 
     next();
   } catch (error) {
