@@ -7,8 +7,17 @@ import { router as brandRouter } from './routes/brand.routes.js';
 import { router as categoryRouter } from './routes/category.route.js';
 import { router as productRouter } from './routes/product.routes.js';
 import { router as cloudinaryRouter } from './routes/external/cloudinary/index.routes.js';
+import cors from 'cors';
 
 const app = express();
+
+// CORS middleware
+app.use(
+  cors({
+    origin: true,
+    credentials: true
+  })
+);
 
 // Initial middleware
 app.use(express.json());

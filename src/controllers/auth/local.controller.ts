@@ -150,15 +150,21 @@ export class AuthLocalController implements IAuthLocalController {
     const ioredisService = new IoredisService(redis);
     const authLocalService = new AuthLocalService(this._userAuthRepository, ioredisService);
     const { accessToken, refreshToken } = await authLocalService.login({ email, password });
-    sendSuccessResponse<{ accessToken: string; refreshToken: string }>({
+    response.cookie('accessToken', accessToken, {
+      httpOnly: false,
+      secure: true,
+      sameSite: 'none'
+    });
+    response.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none'
+    });
+    sendSuccessResponse({
       response,
       content: {
         statusCode: StatusCodes.OK,
-        message: 'Login success',
-        data: {
-          accessToken,
-          refreshToken
-        }
+        message: 'Login success'
       }
     });
   }
