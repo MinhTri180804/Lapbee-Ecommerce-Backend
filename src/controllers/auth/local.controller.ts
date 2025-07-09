@@ -274,12 +274,14 @@ export class AuthLocalController implements IAuthLocalController {
     response.cookie('accessToken', '', {
       httpOnly: false,
       secure: true,
-      sameSite: 'none'
+      sameSite: 'none',
+      maxAge: 0
     });
     response.cookie('refreshToken', '', {
       httpOnly: true,
       secure: true,
-      sameSite: 'none'
+      sameSite: 'none',
+      maxAge: 0
     });
 
     sendSuccessResponse({

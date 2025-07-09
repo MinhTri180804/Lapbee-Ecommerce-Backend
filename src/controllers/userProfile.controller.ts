@@ -45,7 +45,6 @@ export class UserProfileController implements IUserProfileController {
 
   public async getMe(request: GetMeRequestType, response: Response) {
     const accessToken = request.cookies.accessToken as string;
-
     const userProfileData = await this._userProfileService.getMe({ accessToken });
 
     const responseData = UserProfileResponseDTO.getMe(userProfileData);
@@ -61,7 +60,7 @@ export class UserProfileController implements IUserProfileController {
   }
 
   public async updateAvatar(request: UpdateAvatarRequestType, response: Response): Promise<void> {
-    const accessToken = request.headers['authorization']!.split(' ')[1];
+    const accessToken = request.cookies.accessToken as string;
     const file = request.file as Express.Multer.File;
 
     const { publicId, url } = await this._userProfileService.updateAvatar({
@@ -84,7 +83,7 @@ export class UserProfileController implements IUserProfileController {
   }
 
   public async deleteAvatar(request: DeleteAvatarRequestType, response: Response): Promise<void> {
-    const accessToken = request.headers['authorization']!.split(' ')[1];
+    const accessToken = request.cookies.accessToken as string;
 
     await this._userProfileService.deleteAvatar({ accessToken });
     sendSuccessResponse({

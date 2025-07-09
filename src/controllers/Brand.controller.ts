@@ -20,12 +20,15 @@ type GetAllRequestType = Request<
     limit?: number;
   }
 >;
+type GetDetailsBySlugRequestType = Request<{ slug: string }>;
+
 interface IBrandController {
   create: (request: CreateRequestType, response: Response, next: NextFunction) => Promise<void>;
   delete: (request: DeleteRequestType, response: Response, next: NextFunction) => Promise<void>;
   update: (request: UpdateRequestType, response: Response, next: NextFunction) => Promise<void>;
   getAll: (params: GetAllRequestType, response: Response, next: NextFunction) => Promise<void>;
   getDetails: (request: GetDetailsRequestType, response: Response, next: NextFunction) => Promise<void>;
+  getDetailsBySlug: (request: GetDetailsBySlugRequestType, response: Response, next: NextFunction) => Promise<void>;
 }
 
 const DEFAULT_PAGE_GET_ALL = 1;
@@ -104,6 +107,22 @@ export class BrandController implements IBrandController {
 
     const brandResponse = BrandResponseDTO.getDetail(brand);
 
+    sendSuccessResponse<typeof brandResponse>({
+      response,
+      content: {
+        statusCode: StatusCodes.OK,
+        message: 'Get details brand success',
+        data: brandResponse
+      }
+    });
+  }
+
+  public async getDetailsBySlug(request: GetDetailsBySlugRequestType, response: Response) {
+    const { slug } = request.params;
+
+    const brand = await this._brandService.getDetailsBySlug({ slug });
+
+    const brandResponse = BrandResponseDTO.getDetailBySlug(brand);
     sendSuccessResponse<typeof brandResponse>({
       response,
       content: {

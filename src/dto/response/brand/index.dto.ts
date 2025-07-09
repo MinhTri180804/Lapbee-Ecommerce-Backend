@@ -3,6 +3,7 @@ import { createDTO, CreateDTO } from './create.dto.js';
 import { updateDTO, UpdateDTO } from './update.dto.js';
 import { getDetailsDTO, GetDetailsDTO } from './getDetails.dto.js';
 import { getAllDTO, GetAllDTO } from './getAll.dto.js';
+import { getDetailsBySlugDTO, GetDetailsBySlugDTO } from './getDetailsBySlug.dto.ts';
 
 export class BrandResponseDTO {
   constructor() {}
@@ -61,5 +62,19 @@ export class BrandResponseDTO {
     }));
 
     return getAllDTO.parse(candidate);
+  }
+
+  static getDetailBySlug(brand: IBrandDocument) {
+    const candidate: GetDetailsBySlugDTO = {
+      id: String(brand._id),
+      name: brand.name,
+      slug: brand.slug,
+      banners: brand.banners,
+      logo: brand.logo,
+      createdAt: brand.createdAt.toISOString(),
+      updatedAt: brand.updatedAt.toISOString()
+    };
+
+    return getDetailsBySlugDTO.parse(candidate);
   }
 }

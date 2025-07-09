@@ -28,8 +28,13 @@ type GetAllReturns = {
     limit: number;
   };
 };
+
 type GetDetailsParams = {
   brandId: string;
+};
+
+type GetDetailsBySlugParams = {
+  slug: string;
 };
 
 interface IBrandService {
@@ -37,6 +42,7 @@ interface IBrandService {
   delete: (params: DeleteParams) => Promise<void>;
   update: (params: UpdateParams) => Promise<IBrandDocument>;
   getAll: (params: GetAllParams) => Promise<GetAllReturns>;
+  getDetailsBySlug: (params: GetDetailsBySlugParams) => Promise<IBrandDocument>;
 }
 
 export class BrandService implements IBrandService {
@@ -101,5 +107,14 @@ export class BrandService implements IBrandService {
         limit
       }
     };
+  }
+
+  public async getDetailsBySlug({ slug }: GetDetailsBySlugParams): Promise<IBrandDocument> {
+    const brand = await this._brandRepository.getBySlug({ slug });
+    if (!brand) {
+      throw new NotFoundError({ message: 'Brand not found' });
+    }
+
+    return brand;
   }
 }

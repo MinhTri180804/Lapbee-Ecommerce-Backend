@@ -37,3 +37,4 @@ router.patch(
 
 router.get('/', brandController.getAll.bind(brandController));
 router.get('/:id', brandController.getDetails.bind(brandController));
+router.get('/slug/:slug', brandController.getDetailsBySlug.bind(brandController));

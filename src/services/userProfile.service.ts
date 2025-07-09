@@ -144,7 +144,7 @@ export class UserProfileService implements IUserProfileService {
     const { public_id, url } = await cloudinaryService.uploadStream({
       fileBuffer: fileBuffer,
       originalFileName,
-      remainingPathDirectory: `${profile.userAuthId.email}`,
+      remainingPathDirectory: `/${profile.userAuthId.email}`,
       needSuffix: true,
       isOverwrite: true
     });
@@ -159,7 +159,17 @@ export class UserProfileService implements IUserProfileService {
 
   public async deleteAvatar({ accessToken }: DeleteAvatarParams): Promise<void> {
     const { sub } = decode(accessToken) as JwtPayload;
-    const profile = await this._userProfileRepository.findByUserAuthId({ userAuthId: sub as string });
+    const profile = (await this._userProfileRepository.findByUserAuthIdWithPopulate({
+      userAuthId: sub as string,
+      populate: {
+        path: 'userAuthId',
+        select: 'email'
+      }
+    })) as IUserProfileDocument & {
+      userAuthId: {
+        email: string;
+      };
+    };
     if (!profile) {
       throw new UserProfileNotExistError({});
     }
@@ -168,7 +178,7 @@ export class UserProfileService implements IUserProfileService {
       throw new UserAvatarMissingError({});
     }
 
-    const cloudinaryService = new CloudinaryService(CloudinaryFolder.USERS_AVATAR);
+    const cloudinaryService = new CloudinaryService(`${CloudinaryFolder.USERS_AVATAR}/${profile.userAuthId.email}`);
     await cloudinaryService.delete({ publicId: profile.avatar.publicId });
     await this._userProfileRepository.deleteAvatar({ userProfile: profile });
     return;

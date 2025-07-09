@@ -19,11 +19,11 @@ interface ICloudinaryService {
 }
 
 export class CloudinaryService implements ICloudinaryService {
-  private _folder: CloudinaryFolder;
+  private _folder: CloudinaryFolder | string;
   private _cloudinaryName: string = env.cloudinary.NAME as string;
   private _cloudinaryKey: string = env.cloudinary.KEY as string;
   private _cloudinarySecret: string = env.cloudinary.SECRET as string;
-  constructor(folder: CloudinaryFolder) {
+  constructor(folder: CloudinaryFolder | string) {
     this._folder = folder;
     cloudinary.config({
       cloud_name: this._cloudinaryName,

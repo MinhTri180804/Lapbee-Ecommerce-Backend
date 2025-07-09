@@ -20,11 +20,17 @@ type GetAllReturns = {
   paginatedResult: IBrandDocument[];
   totalCount: number;
 };
+
 type GetByIdParams = {
   id: string;
 };
+
 type CheckExistParams = {
   id: string;
+};
+
+type GetBySlugParams = {
+  slug: string;
 };
 
 interface IBrandRepository {
@@ -34,6 +40,7 @@ interface IBrandRepository {
   getAll: (params: GetAllParams) => Promise<GetAllReturns>;
   getById: (params: GetByIdParams) => Promise<IBrandDocument | null>;
   checkExist: (params: CheckExistParams) => Promise<boolean>;
+  getBySlug: (params: GetBySlugParams) => Promise<IBrandDocument | null>;
 }
 
 export class BrandRepository implements IBrandRepository {
@@ -89,5 +96,9 @@ export class BrandRepository implements IBrandRepository {
     if (!brand) return false;
 
     return true;
+  }
+
+  public async getBySlug({ slug }: GetBySlugParams): Promise<IBrandDocument | null> {
+    return await this._brandMode.findOne({ slug }).exec();
   }
 }
