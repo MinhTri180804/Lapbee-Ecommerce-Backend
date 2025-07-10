@@ -1,6 +1,7 @@
 import { Brand, IBrandDocument } from '../models/brand.model.js';
 import { CreateDTO as BrandCreateRequestDTO } from '../dto/request/brand/create.dto.js';
 import { UpdateDTO as BrandUpdateRequestDTO } from '../dto/request/brand/update.dto.js';
+import { PipelineStage } from 'mongoose';
 
 type CreateParams = BrandCreateRequestDTO;
 type DeleteParams = {
@@ -14,6 +15,7 @@ type UpdateParams = {
 type GetAllParams = {
   skip: number;
   limit: number;
+  search?: string;
 };
 
 type GetAllReturns = {
@@ -66,19 +68,29 @@ export class BrandRepository implements IBrandRepository {
     );
   }
 
-  public async getAll({ skip, limit }: GetAllParams): Promise<GetAllReturns> {
+  public async getAll({ skip, limit, search }: GetAllParams): Promise<GetAllReturns> {
+    const pipeline: PipelineStage[] = [];
+
+    if (search) {
+      pipeline.push({
+        $match: {
+          name: { $regex: search, $options: 'i' }
+        }
+      });
+    }
+
+    pipeline.push({
+      $facet: {
+        paginatedResults: [{ $skip: skip }, { $limit: limit }],
+        totalCount: [{ $count: 'count' }]
+      }
+    });
+
     const result = await this._brandMode
       .aggregate<{
         paginatedResults: IBrandDocument[];
         totalCount: { count: number }[];
-      }>([
-        {
-          $facet: {
-            paginatedResults: [{ $skip: skip }, { $limit: limit }],
-            totalCount: [{ $count: 'count' }]
-          }
-        }
-      ])
+      }>(pipeline)
       .exec();
 
     return {

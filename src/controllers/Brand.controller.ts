@@ -18,6 +18,7 @@ type GetAllRequestType = Request<
   {
     page?: number;
     limit?: number;
+    search?: string;
   }
 >;
 type GetDetailsBySlugRequestType = Request<{ slug: string }>;
@@ -33,6 +34,7 @@ interface IBrandController {
 
 const DEFAULT_PAGE_GET_ALL = 1;
 const DEFAULT_LIMIT_GET_ALL = 10;
+const DEFAULT_SEARCH_GET_ALL = undefined;
 
 export class BrandController implements IBrandController {
   private _brandService: BrandService = new BrandService();
@@ -82,11 +84,16 @@ export class BrandController implements IBrandController {
   }
 
   public async getAll(request: GetAllRequestType, response: Response) {
-    const { page = DEFAULT_PAGE_GET_ALL, limit = DEFAULT_LIMIT_GET_ALL } = request.query;
+    const {
+      page = DEFAULT_PAGE_GET_ALL,
+      limit = DEFAULT_LIMIT_GET_ALL,
+      search = DEFAULT_SEARCH_GET_ALL
+    } = request.query;
 
     const data = await this._brandService.getAll({
       page: Number(page),
-      limit: Number(limit) > 0 ? Number(limit) : DEFAULT_LIMIT_GET_ALL
+      limit: Number(limit) > 0 ? Number(limit) : DEFAULT_LIMIT_GET_ALL,
+      search
     });
     const brandsResponse = BrandResponseDTO.getAll(data.paginatedResult);
 

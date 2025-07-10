@@ -15,6 +15,7 @@ type UpdateParams = {
 type GetAllParams = {
   page: number;
   limit: number;
+  search?: string;
 };
 
 type GetAllReturns = {
@@ -82,11 +83,12 @@ export class BrandService implements IBrandService {
     return brand;
   }
 
-  public async getAll({ page, limit }: GetAllParams): Promise<GetAllReturns> {
+  public async getAll({ page, limit, search }: GetAllParams): Promise<GetAllReturns> {
     const skip = (page - 1) * limit;
     const { paginatedResult, totalCount } = await this._brandRepository.getAll({
       skip,
-      limit
+      limit,
+      search
     });
     console.log(skip);
 
