@@ -4,6 +4,7 @@ import { v4 as uuidV4 } from 'uuid';
 import { env } from '../../configs/env.config.js';
 import { CloudinaryFolder } from '../../enums/cloudinaryFolder.enum.js';
 import { CloudinaryUploadError } from '../../errors/CloudinaryUpload.error.js';
+import { GetRootFoldersResponse } from '../../types/cloudinary.type.js';
 import path from 'node:path';
 
 type UploadStreamParams = {
@@ -16,6 +17,7 @@ type UploadStreamParams = {
 
 interface ICloudinaryService {
   uploadStream: (params: UploadStreamParams) => Promise<UploadApiResponse>;
+  getRootFolder: () => Promise<GetRootFoldersResponse>;
 }
 
 export class CloudinaryService implements ICloudinaryService {
@@ -80,5 +82,10 @@ export class CloudinaryService implements ICloudinaryService {
 
   public async delete({ publicId }: { publicId: string }) {
     return await cloudinary.uploader.destroy(publicId);
+  }
+
+  public async getRootFolder(): Promise<GetRootFoldersResponse> {
+    const result = await cloudinary.api.root_folders();
+    return result;
   }
 }
