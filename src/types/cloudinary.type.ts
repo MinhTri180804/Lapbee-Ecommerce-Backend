@@ -11,3 +11,9 @@ export type GetRootFoldersResponse = AdminApiBaseResponse &
     folders: Folder[];
     total_count: number;
   };
+
+export type GetSubFoldersResponse = AdminApiBaseResponse &
+  AdminApiPaginationResponse & {
+    folders: Folder[];
+    total_count: number;
+  };
