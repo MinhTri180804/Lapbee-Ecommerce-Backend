@@ -4,7 +4,11 @@ import { v4 as uuidV4 } from 'uuid';
 import { env } from '../../configs/env.config.js';
 import { CloudinaryFolder } from '../../enums/cloudinaryFolder.enum.js';
 import { CloudinaryUploadError } from '../../errors/CloudinaryUpload.error.js';
-import { GetRootFoldersResponse, GetSubFoldersResponse } from '../../types/cloudinary.type.js';
+import {
+  GetAllFilesResourceResponse,
+  GetRootFoldersResponse,
+  GetSubFoldersResponse
+} from '../../types/cloudinary.type.js';
 import path from 'node:path';
 
 type UploadStreamParams = {
@@ -15,10 +19,16 @@ type UploadStreamParams = {
   isOverwrite?: boolean;
 };
 
+type GetAllFilesResourcesParams = {
+  nextCursor: string | null;
+};
+
 interface ICloudinaryService {
   uploadStream: (params: UploadStreamParams) => Promise<UploadApiResponse>;
   getRootFolder: () => Promise<GetRootFoldersResponse>;
   getSubFolder: () => Promise<GetSubFoldersResponse>;
+
+  getAllFilesResources: (params: GetAllFilesResourcesParams) => Promise<GetAllFilesResourceResponse>;
 }
 
 export class CloudinaryService implements ICloudinaryService {
@@ -92,6 +102,12 @@ export class CloudinaryService implements ICloudinaryService {
 
   public async getSubFolder(): Promise<GetSubFoldersResponse> {
     const result = await cloudinary.api.sub_folders(this._folder);
+    return result;
+  }
+
+  public async getAllFilesResources({ nextCursor }: GetAllFilesResourcesParams): Promise<GetAllFilesResourceResponse> {
+    console.log(nextCursor);
+    const result = await cloudinary.api.resources({ next_cursor: nextCursor });
     return result;
   }
 }
