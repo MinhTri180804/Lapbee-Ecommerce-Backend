@@ -8,7 +8,10 @@ export const fileResourceDTOSchema = z.object({
   createdAt: z.string(),
   bytes: z.number(),
   assetFolder: z.string(),
-  displayName: z.string()
+  displayName: z.string(),
+  width: z.number(),
+  height: z.number(),
+  secureUrl: z.string()
 });
 
 export const metadataFileSchema = z.object({

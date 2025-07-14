@@ -15,7 +15,10 @@ export class FileCloudinaryResponseDTO {
         createdAt: createdAtFormat,
         bytes: fileResource.bytes,
         publicId: fileResource.public_id,
-        displayName: fileResource.display_name
+        displayName: fileResource.display_name,
+        width: fileResource.width,
+        height: fileResource.height,
+        secureUrl: fileResource.secure_url
       };
     });
 
