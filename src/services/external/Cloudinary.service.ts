@@ -7,7 +7,8 @@ import { CloudinaryUploadError } from '../../errors/CloudinaryUpload.error.js';
 import {
   GetAllFilesResourceResponse,
   GetRootFoldersResponse,
-  GetSubFoldersResponse
+  GetSubFoldersResponse,
+  SearchFileResourcesResponse
 } from '../../types/cloudinary.type.js';
 import path from 'node:path';
 
@@ -23,12 +24,18 @@ type GetAllFilesResourcesParams = {
   nextCursor: string | null;
 };
 
+type SearchFileResourcesParams = {
+  filename: string;
+  maxResult: number;
+  nextCursor: string | null;
+};
+
 interface ICloudinaryService {
   uploadStream: (params: UploadStreamParams) => Promise<UploadApiResponse>;
   getRootFolder: () => Promise<GetRootFoldersResponse>;
   getSubFolder: () => Promise<GetSubFoldersResponse>;
-
   getAllFilesResources: (params: GetAllFilesResourcesParams) => Promise<GetAllFilesResourceResponse>;
+  searchFileResources: (params: SearchFileResourcesParams) => Promise<SearchFileResourcesResponse>;
 }
 
 export class CloudinaryService implements ICloudinaryService {
@@ -109,5 +116,30 @@ export class CloudinaryService implements ICloudinaryService {
     console.log(nextCursor);
     const result = await cloudinary.api.resources({ next_cursor: nextCursor });
     return result;
+  }
+
+  public async searchFileResources({
+    filename,
+    maxResult,
+    nextCursor
+  }: SearchFileResourcesParams): Promise<SearchFileResourcesResponse> {
+    const paramsExpression = [];
+
+    if (this._folder !== '') {
+      paramsExpression.push(`folder:${this._folder}`);
+    }
+
+    if (filename !== '') {
+      paramsExpression.push(`filename:${filename}`);
+    }
+
+    const result: cloudinary.search = cloudinary.search
+      .expression(paramsExpression.join(' AND '))
+      .max_results(maxResult);
+
+    if (nextCursor) {
+      result.next_cursor(nextCursor);
+    }
+    return await result.execute();
   }
 }

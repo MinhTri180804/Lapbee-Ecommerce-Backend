@@ -23,6 +23,24 @@ export type FileResource = {
   secure_url: string;
 };
 
+export type FileResourceSearch = FileResource & {
+  filename: string;
+  uploaded_at: string;
+  backup_bytes: number;
+  aspect_ratio: number;
+  pixels: number;
+  status: string;
+  accessMode: string;
+  access_control: string;
+  etag: string;
+  created_by: {
+    access_key: string;
+  };
+  uploaded_by: {
+    access_key: string;
+  };
+};
+
 export type GetRootFoldersResponse = AdminApiBaseResponse &
   AdminApiPaginationResponse & {
     folders: Folder[];
@@ -38,4 +56,11 @@ export type GetSubFoldersResponse = AdminApiBaseResponse &
 export type GetAllFilesResourceResponse = AdminApiBaseResponse &
   AdminApiPaginationResponse & {
     resources: FileResource[];
+  };
+
+export type SearchFileResourcesResponse = AdminApiBaseResponse &
+  AdminApiPaginationResponse & {
+    resources: FileResourceSearch[];
+    total_count: number;
+    time: number;
   };

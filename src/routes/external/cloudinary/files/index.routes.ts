@@ -6,3 +6,5 @@ export const router = Router();
 const fileCloudinaryController = new FileCloudinaryController();
 
 router.get('/', fileCloudinaryController.getAllFileResources.bind(fileCloudinaryController));
+
+router.get('/search', fileCloudinaryController.searchFileResources.bind(fileCloudinaryController));

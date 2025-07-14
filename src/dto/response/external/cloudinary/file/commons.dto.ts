@@ -15,7 +15,7 @@ export const fileResourceDTOSchema = z.object({
 });
 
 export const metadataFileSchema = z.object({
-  nextCursor: z.string().nullable(),
+  nextCursor: z.string().nullable().default(null),
   rateLimitAllowed: z.number(),
   rateLimitResetAt: z.string(),
   rateLimitRemaining: z.number()
