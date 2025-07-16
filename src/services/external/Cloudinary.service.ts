@@ -130,8 +130,10 @@ export class CloudinaryService implements ICloudinaryService {
     }
 
     if (filename !== '') {
-      paramsExpression.push(`filename:${filename}`);
+      paramsExpression.push(`filename:${encodeURIComponent(filename)}`);
     }
+
+    console.log(paramsExpression);
 
     const result: cloudinary.search = cloudinary.search
       .expression(paramsExpression.join(' AND '))

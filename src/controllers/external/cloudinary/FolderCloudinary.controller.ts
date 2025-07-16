@@ -5,7 +5,14 @@ import { StatusCodes } from 'http-status-codes';
 import { FolderCloudinaryResponseDTO } from '../../../dto/response/external/cloudinary/folder/index.dto.js';
 
 type GetRootRequestType = Request;
-type GetSubFolderRequestType = Request<{ folder: string }>;
+type GetSubFolderRequestType = Request<
+  unknown,
+  unknown,
+  unknown,
+  {
+    folder?: string;
+  }
+>;
 
 interface IFolderCloudinaryController {
   getRoot: (request: GetRootRequestType, response: Response, next: NextFunction) => Promise<void>;
@@ -33,7 +40,7 @@ export class FolderCloudinaryController implements IFolderCloudinaryController {
   }
 
   public async getSubFolder(request: GetSubFolderRequestType, response: Response): Promise<void> {
-    const { folder } = request.params;
+    const { folder = '' } = request.query;
     const cloudinaryService = new CloudinaryService(folder);
 
     const data = await cloudinaryService.getSubFolder();

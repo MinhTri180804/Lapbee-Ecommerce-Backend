@@ -5,4 +5,4 @@ export const router = Router();
 const folderCloudinaryController = new FolderCloudinaryController();
 
 router.get('/root', folderCloudinaryController.getRoot.bind(folderCloudinaryController));
-router.get('/sub/:folder', folderCloudinaryController.getSubFolder.bind(folderCloudinaryController));
+router.get('/sub', folderCloudinaryController.getSubFolder.bind(folderCloudinaryController));
