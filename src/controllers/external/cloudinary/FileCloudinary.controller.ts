@@ -3,6 +3,8 @@ import { CloudinaryService } from './../../../services/external/Cloudinary.servi
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { FileCloudinaryResponseDTO } from '../../../dto/response/external/cloudinary/file/index.dto.js';
+import { UploadFileResourcesDTO } from '../../../dto/request/external/cloudinary/file/uploadFileResources.dto.js';
+import { FileCloudinaryRequestDTO } from '../../../dto/request/external/cloudinary/file/index.dto.js';
 
 type GetAllFilesRequestType = Request<
   unknown,
@@ -25,6 +27,8 @@ type SearchFileResourcesRequestType = Request<
   }
 >;
 
+type UploadFileResourcesRequestType = Request<unknown, unknown, UploadFileResourcesDTO>;
+
 interface IFileCloudinaryController {
   getAllFileResources: (request: GetAllFilesRequestType, response: Response, next: NextFunction) => Promise<void>;
   searchFileResources: (
@@ -32,6 +36,7 @@ interface IFileCloudinaryController {
     response: Response,
     next: NextFunction
   ) => Promise<void>;
+  uploadFileResources: (request: UploadFileResourcesRequestType, response: Response) => Promise<void>;
 }
 
 const DEFAULT_MAX_RESULT_SEARCH = 10;
@@ -71,6 +76,31 @@ export class FileCloudinaryController implements IFileCloudinaryController {
         message: 'Search file resources success',
         data,
         metadata
+      }
+    });
+  }
+
+  public async uploadFileResources(request: UploadFileResourcesRequestType, response: Response): Promise<void> {
+    const file = request.file as Express.Multer.File;
+    const { rename = null, folderPath } = FileCloudinaryRequestDTO.uploadFileResources(request.body);
+
+    const cloudinaryService = new CloudinaryService(folderPath);
+    const result = await cloudinaryService.uploadStream({
+      fileBuffer: file.buffer,
+      originalFileName: rename ? rename : file.originalname,
+      remainingPathDirectory: '',
+      needSuffix: false,
+      isOverwrite: false
+    });
+
+    // const { data } = FileCloudinaryResponseDTO.uploadFileResources(result);
+
+    sendSuccessResponse<typeof result>({
+      response,
+      content: {
+        statusCode: StatusCodes.OK,
+        message: 'Upload file resources success',
+        data: result
       }
     });
   }
