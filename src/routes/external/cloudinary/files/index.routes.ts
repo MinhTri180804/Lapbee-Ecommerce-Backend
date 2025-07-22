@@ -5,6 +5,10 @@ import {
   uploadFileResourcesDTO,
   UploadFileResourcesDTO
 } from '../../../../dto/request/external/cloudinary/file/uploadFileResources.dto.js';
+import {
+  uploadFileResourcesFromLinkDTO,
+  UploadFileResourcesFromLinkDTO
+} from '../../../../dto/request/external/cloudinary/file/uploadFileResourcesFromLink.dto.js';
 import { UploadMulterMiddleware } from 'src/middleware/UploadMulter.middleware.js';
 
 export const router = Router();
@@ -12,6 +16,9 @@ export const router = Router();
 const fileCloudinaryController = new FileCloudinaryController();
 
 const validateUploadFileResources = validateRequestBody<UploadFileResourcesDTO>(uploadFileResourcesDTO);
+const validateUploadFileResourcesFromLink =
+  validateRequestBody<UploadFileResourcesFromLinkDTO>(uploadFileResourcesFromLinkDTO);
+
 const uploadFileResourcesMulterMiddleware = new UploadMulterMiddleware({ fieldName: 'file' });
 
 router.get('/', fileCloudinaryController.getAllFileResources.bind(fileCloudinaryController));
@@ -22,5 +29,11 @@ router.post(
   '/upload/from-local',
   uploadFileResourcesMulterMiddleware.singleUpload.bind(uploadFileResourcesMulterMiddleware),
   validateUploadFileResources,
-  fileCloudinaryController.uploadFileResources.bind(fileCloudinaryController)
+  fileCloudinaryController.uploadFileResourcesFromLocal.bind(fileCloudinaryController)
+);
+
+router.post(
+  '/upload/from-link',
+  validateUploadFileResourcesFromLink,
+  fileCloudinaryController.uploadFileResourcesFromLink.bind(fileCloudinaryController)
 );

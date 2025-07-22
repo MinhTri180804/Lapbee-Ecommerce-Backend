@@ -30,12 +30,19 @@ type SearchFileResourcesParams = {
   nextCursor: string | null;
 };
 
+type UploadFileResourcesFromLinkParams = {
+  link: string;
+  folderPath: string;
+  filename: string;
+};
+
 interface ICloudinaryService {
   uploadStream: (params: UploadStreamParams) => Promise<UploadApiResponse>;
   getRootFolder: () => Promise<GetRootFoldersResponse>;
   getSubFolder: () => Promise<GetSubFoldersResponse>;
   getAllFilesResources: (params: GetAllFilesResourcesParams) => Promise<GetAllFilesResourceResponse>;
   searchFileResources: (params: SearchFileResourcesParams) => Promise<SearchFileResourcesResponse>;
+  uploadFileResourcesFromLink: (params: UploadFileResourcesFromLinkParams) => Promise<UploadApiResponse>;
 }
 
 export class CloudinaryService implements ICloudinaryService {
@@ -143,5 +150,14 @@ export class CloudinaryService implements ICloudinaryService {
       result.next_cursor(nextCursor);
     }
     return await result.execute();
+  }
+
+  public async uploadFileResourcesFromLink({ link, folderPath, filename }: UploadFileResourcesFromLinkParams) {
+    return await cloudinary.uploader.upload(link, {
+      folder: folderPath,
+      public_id: filename,
+      transformation: [{ quality: 'auto' }, { fetch_format: 'auto' }],
+      resource_type: 'image'
+    });
   }
 }

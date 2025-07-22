@@ -5,6 +5,7 @@ import { StatusCodes } from 'http-status-codes';
 import { FileCloudinaryResponseDTO } from '../../../dto/response/external/cloudinary/file/index.dto.js';
 import { UploadFileResourcesDTO } from '../../../dto/request/external/cloudinary/file/uploadFileResources.dto.js';
 import { FileCloudinaryRequestDTO } from '../../../dto/request/external/cloudinary/file/index.dto.js';
+import { UploadFileResourcesFromLinkDTO } from 'src/dto/request/external/cloudinary/file/uploadFileResourcesFromLink.dto.js';
 
 type GetAllFilesRequestType = Request<
   unknown,
@@ -27,7 +28,9 @@ type SearchFileResourcesRequestType = Request<
   }
 >;
 
-type UploadFileResourcesRequestType = Request<unknown, unknown, UploadFileResourcesDTO>;
+type UploadFileResourcesFromLocalRequestType = Request<unknown, unknown, UploadFileResourcesDTO>;
+
+type UploadFileResourcesFromLinkRequestType = Request<unknown, unknown, UploadFileResourcesFromLinkDTO>;
 
 interface IFileCloudinaryController {
   getAllFileResources: (request: GetAllFilesRequestType, response: Response, next: NextFunction) => Promise<void>;
@@ -36,7 +39,7 @@ interface IFileCloudinaryController {
     response: Response,
     next: NextFunction
   ) => Promise<void>;
-  uploadFileResources: (request: UploadFileResourcesRequestType, response: Response) => Promise<void>;
+  uploadFileResourcesFromLocal: (request: UploadFileResourcesFromLocalRequestType, response: Response) => Promise<void>;
 }
 
 const DEFAULT_MAX_RESULT_SEARCH = 10;
@@ -80,7 +83,10 @@ export class FileCloudinaryController implements IFileCloudinaryController {
     });
   }
 
-  public async uploadFileResources(request: UploadFileResourcesRequestType, response: Response): Promise<void> {
+  public async uploadFileResourcesFromLocal(
+    request: UploadFileResourcesFromLocalRequestType,
+    response: Response
+  ): Promise<void> {
     const file = request.file as Express.Multer.File;
     const { rename = null, folderPath } = FileCloudinaryRequestDTO.uploadFileResources(request.body);
 
@@ -100,6 +106,25 @@ export class FileCloudinaryController implements IFileCloudinaryController {
       content: {
         statusCode: StatusCodes.OK,
         message: 'Upload file resources success',
+        data: result
+      }
+    });
+  }
+
+  public async uploadFileResourcesFromLink(
+    request: UploadFileResourcesFromLinkRequestType,
+    response: Response
+  ): Promise<void> {
+    const { link, folderPath, filename } = FileCloudinaryRequestDTO.uploadFileResourcesFromLink(request.body);
+
+    const cloudinaryService = new CloudinaryService(folderPath);
+    const result = await cloudinaryService.uploadFileResourcesFromLink({ link, folderPath, filename });
+
+    sendSuccessResponse<typeof result>({
+      response,
+      content: {
+        statusCode: StatusCodes.OK,
+        message: 'Upload file resources from link success',
         data: result
       }
     });
