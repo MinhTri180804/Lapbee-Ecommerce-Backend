@@ -47,5 +47,6 @@ export const ErrorMessages: ErrorMessagesType = {
   [ErrorInstance.NOT_FOUND]: 'Notfound',
   [ErrorInstance.CATEGORY_NOT_EXIST]: 'Category not exist',
   [ErrorInstance.BAD_REQUEST]: 'Bad request',
-  [ErrorInstance.MISSING_TOKEN]: 'Missing token'
+  [ErrorInstance.MISSING_TOKEN]: 'Missing token',
+  [ErrorInstance.MAX_SIZE_FILE]: 'File size is too large'
 };

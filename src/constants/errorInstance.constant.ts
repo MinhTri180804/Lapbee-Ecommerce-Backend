@@ -38,7 +38,8 @@ export const ErrorInstance = {
   NOT_FOUND: 'NOT_FOUND_ERROR',
   CATEGORY_NOT_EXIST: 'CATEGORY_NOT_EXIST_ERROR',
   BAD_REQUEST: 'BAD_REQUEST_ERROR',
-  MISSING_TOKEN: 'MISSING_TOKEN_ERROR'
+  MISSING_TOKEN: 'MISSING_TOKEN_ERROR',
+  MAX_SIZE_FILE: 'MAX_SIZE_FILE_ERROR'
 } as const;
 
 export type ErrorInstanceKeys = keyof typeof ErrorInstance;
