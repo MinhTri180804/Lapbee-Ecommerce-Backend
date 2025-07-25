@@ -99,6 +99,7 @@ export class FileCloudinaryController implements IFileCloudinaryController {
       isOverwrite: false
     });
 
+    //TODO: Implement DTO response
     // const { data } = FileCloudinaryResponseDTO.uploadFileResources(result);
 
     sendSuccessResponse<typeof result>({
@@ -119,6 +120,8 @@ export class FileCloudinaryController implements IFileCloudinaryController {
 
     const cloudinaryService = new CloudinaryService(folderPath);
     const result = await cloudinaryService.uploadFileResourcesFromLink({ link, folderPath, filename });
+
+    //TODO: Implement DTO response
 
     sendSuccessResponse<typeof result>({
       response,
