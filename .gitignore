@@ -6,4 +6,9 @@ logs/
 .env.dev
 .data
 .DS_Store
-coverage/*
+.env
+.env.example
+.env.dev
+.env.test
+.env.prod
+
