@@ -13,8 +13,6 @@ export class TinyPNGCompressingImageResponseDTO {
       output: {
         size: data.output.size,
         type: data.output.type,
-        width: data.output.width,
-        height: data.output.height,
         ratio: data.output.ratio,
         url: data.output.url
       }
