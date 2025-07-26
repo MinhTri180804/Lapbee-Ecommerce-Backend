@@ -72,5 +72,9 @@ export const env = {
     NAME: process.env.CLOUDINARY_NAME,
     KEY: process.env.CLOUDINARY_KEY,
     SECRET: process.env.CLOUDINARY_SECRET
+  },
+  tinyPNG: {
+    API_KEY: process.env.TINY_PNG_API_KEY,
+    MAX_SIZE_FILE: process.env.TINY_PNG_MAX_SIZE_FILE
   }
 };

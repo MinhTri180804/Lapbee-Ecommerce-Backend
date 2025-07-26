@@ -10,6 +10,8 @@ import { router as cloudinaryRouter } from './routes/external/cloudinary/index.r
 import { router as systemRouter } from './routes/system/index.routes.js';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import { router as utilsRouter } from './routes/utils/index.routes.js';
+import { router as tinyPNGRouter } from './routes/external/tinyPNG/index.routes.js';
 
 const app = express();
 
@@ -36,6 +38,8 @@ app.use('/brands', brandRouter);
 app.use('/categories', categoryRouter);
 app.use('/products', productRouter);
 app.use('/system', systemRouter);
+app.use('/utils', utilsRouter);
+app.use('/tinyPNG', tinyPNGRouter);
 
 app.use(ErrorMiddlewareHandler.handler.bind(ErrorMiddlewareHandler));
 

@@ -4,6 +4,12 @@ import { v4 as uuidV4 } from 'uuid';
 import { env } from '../../configs/env.config.js';
 import { CloudinaryFolder } from '../../enums/cloudinaryFolder.enum.js';
 import { CloudinaryUploadError } from '../../errors/CloudinaryUpload.error.js';
+import {
+  GetAllFilesResourceResponse,
+  GetRootFoldersResponse,
+  GetSubFoldersResponse,
+  SearchFileResourcesResponse
+} from '../../types/cloudinary.type.js';
 import path from 'node:path';
 
 type UploadStreamParams = {
@@ -14,8 +20,29 @@ type UploadStreamParams = {
   isOverwrite?: boolean;
 };
 
+type GetAllFilesResourcesParams = {
+  nextCursor: string | null;
+};
+
+type SearchFileResourcesParams = {
+  filename: string;
+  maxResult: number;
+  nextCursor: string | null;
+};
+
+type UploadFileResourcesFromLinkParams = {
+  link: string;
+  folderPath: string;
+  filename: string;
+};
+
 interface ICloudinaryService {
   uploadStream: (params: UploadStreamParams) => Promise<UploadApiResponse>;
+  getRootFolder: () => Promise<GetRootFoldersResponse>;
+  getSubFolder: () => Promise<GetSubFoldersResponse>;
+  getAllFilesResources: (params: GetAllFilesResourcesParams) => Promise<GetAllFilesResourceResponse>;
+  searchFileResources: (params: SearchFileResourcesParams) => Promise<SearchFileResourcesResponse>;
+  uploadFileResourcesFromLink: (params: UploadFileResourcesFromLinkParams) => Promise<UploadApiResponse>;
 }
 
 export class CloudinaryService implements ICloudinaryService {
@@ -80,5 +107,57 @@ export class CloudinaryService implements ICloudinaryService {
 
   public async delete({ publicId }: { publicId: string }) {
     return await cloudinary.uploader.destroy(publicId);
+  }
+
+  public async getRootFolder(): Promise<GetRootFoldersResponse> {
+    const result = await cloudinary.api.root_folders();
+    return result;
+  }
+
+  public async getSubFolder(): Promise<GetSubFoldersResponse> {
+    const result = await cloudinary.api.sub_folders(this._folder);
+    return result;
+  }
+
+  public async getAllFilesResources({ nextCursor }: GetAllFilesResourcesParams): Promise<GetAllFilesResourceResponse> {
+    console.log(nextCursor);
+    const result = await cloudinary.api.resources({ next_cursor: nextCursor });
+    return result;
+  }
+
+  public async searchFileResources({
+    filename,
+    maxResult,
+    nextCursor
+  }: SearchFileResourcesParams): Promise<SearchFileResourcesResponse> {
+    const paramsExpression = [];
+
+    if (this._folder !== '') {
+      paramsExpression.push(`folder:${this._folder}`);
+    }
+
+    if (filename !== '') {
+      paramsExpression.push(`filename:${encodeURIComponent(filename)}`);
+    }
+
+    console.log(paramsExpression);
+
+    const result: cloudinary.search = cloudinary.search
+      .expression(paramsExpression.join(' AND '))
+      .max_results(maxResult);
+
+    if (nextCursor) {
+      result.next_cursor(nextCursor);
+    }
+    return await result.execute();
+  }
+
+  public async uploadFileResourcesFromLink({ link, folderPath, filename }: UploadFileResourcesFromLinkParams) {
+    return await cloudinary.uploader.upload(link, {
+      folder: folderPath,
+      public_id: filename,
+      transformation: [{ quality: 'auto' }, { fetch_format: 'auto' }],
+      resource_type: 'image'
+    });
   }
 }

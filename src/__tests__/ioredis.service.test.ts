@@ -1,5 +1,5 @@
 import { Redis } from 'ioredis';
-import { IoredisService } from '../services/Ioredis.service.js';
+import { IoredisService } from '../services/external/Ioredis.service.js';
 import { RedisKeyGenerator } from '../utils/RedisKeyGenerator.util.js';
 import { env } from '../configs/env.config.js';
 import { RedisKeys } from '../constants/redisKeys.constant.js';
@@ -91,7 +91,7 @@ describe('IoredisService', () => {
       }));
 
       // Re-import IoredisService, env, và RedisKeyGenerator để đảm bảo chúng sử dụng các mock mới
-      const { IoredisService: NewIoredisService } = await import('../services/Ioredis.service.js');
+      const { IoredisService: NewIoredisService } = await import('../services/external/Ioredis.service.js');
       const { env: newEnv } = await import('../configs/env.config.js');
       const { RedisKeyGenerator: newRedisKeyGenerator } = await import('../utils/RedisKeyGenerator.util.js');
 

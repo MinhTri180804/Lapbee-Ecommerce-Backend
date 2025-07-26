@@ -90,7 +90,6 @@ export class BrandService implements IBrandService {
       limit,
       search
     });
-    console.log(skip);
 
     const totalPage = Math.ceil(totalCount / limit);
     const currentPage = page;
