@@ -8,8 +8,6 @@ export const compressingImageFromUrlDTO = z.object({
   output: z.object({
     size: z.number(),
     type: z.string(),
-    width: z.number(),
-    height: z.number(),
     ratio: z.number(),
     url: z.string()
   })
