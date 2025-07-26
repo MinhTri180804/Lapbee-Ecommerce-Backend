@@ -8,7 +8,4 @@ logs/
 .DS_Store
 .env
 .env.example
-.env.dev
-.env.test
-.env.prod
 coverage/
